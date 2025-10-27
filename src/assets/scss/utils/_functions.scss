@@ -1,0 +1,31 @@
+@use "sass:map";
+@use "@/assets/scss/utils/variables" as *;
+
+// rem
+@function fn-rem($px, $base: 16) {
+  @return (math.div($px, $base)) * 1rem;
+}
+
+// variables
+@function get-color($name) {
+  @if map.has-key($colors, $name) {
+    @return map.get($colors, $name);
+  }
+  @error "Unknown color `#{$name}`. Check your $colors map.";
+}
+
+@function space($size) {
+  @return map.get($space, $size);
+}
+
+@function radius($size) {
+  @return map.get($radius, $size);
+}
+
+@function font($size) {
+  @return map.get($font, $size);
+}
+
+@function bp($point) {
+  @return map.get($breakpoints, $point);
+}
