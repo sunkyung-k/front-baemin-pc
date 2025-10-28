@@ -1,0 +1,6 @@
+@use "sass:math";
+
+// 기초 단위 변환 함수 — 다른 파일 어디서든 의존 가능
+@function fn-rem($px, $base: 16) {
+  @return (math.div($px, $base)) * 1rem;
+}

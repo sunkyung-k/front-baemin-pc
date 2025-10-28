@@ -1,3 +1,7 @@
+@use "sass:map";
+@use "sass:math";
+@use "@/assets/scss/utils/base" as *;
+
 /* ============================================================
 🎨 SCSS Design Tokens (Global Variables)
 공통 색상 / 간격 / 반응형 / 폰트 / 둥근 정도 등
