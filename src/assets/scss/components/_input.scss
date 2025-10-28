@@ -40,7 +40,7 @@
   }
 
   .input-error {
-    font-size: map.get($font, "sm");
+    font-size: font("sm");
     color: fn-color("danger");
   }
 }
