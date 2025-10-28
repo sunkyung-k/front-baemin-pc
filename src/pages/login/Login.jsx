@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import React, { useState } from "react";
 import styles from "./Login.module.scss";
 import { Link } from "react-router-dom";
