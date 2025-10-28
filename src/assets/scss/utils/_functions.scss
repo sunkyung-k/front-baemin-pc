@@ -8,7 +8,7 @@
 }
 
 // variables
-@function get-color($name) {
+@function fn-color($name) {
   @if map.has-key($colors, $name) {
     @return map.get($colors, $name);
   }
