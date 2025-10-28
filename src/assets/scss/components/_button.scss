@@ -58,14 +58,14 @@
   }
 
   &:disabled {
-    background-color: get-color("gray-100");
-    color: get-color("gray-300");
-    border: 1px solid get-color("gray-100");
+    background-color: fn-color("gray-100");
+    color: fn-color("gray-300");
+    border: 1px solid fn-color("gray-100");
     cursor: not-allowed;
     transform: none;
 
     &:hover {
-      background-color: get-color("gray-100");
+      background-color: fn-color("gray-100");
       transform: none;
     }
   }
@@ -73,65 +73,65 @@
 
 /* 주 버튼 */
 .btn-primary {
-  background-color: get-color("primary");
-  color: get-color("white");
-  border: 1px solid get-color("primary");
+  background-color: fn-color("primary");
+  color: fn-color("white");
+  border: 1px solid fn-color("primary");
 
   &:hover {
-    background-color: rgba(get-color("primary"), 0.9);
+    background-color: rgba(fn-color("primary"), 0.9);
   }
 }
 
 /* 어두운 버튼 (대비 강조용) */
 .btn-dark {
-  background-color: get-color("dark");
-  color: get-color("white");
-  border: 1px solid get-color("dark");
+  background-color: fn-color("dark");
+  color: fn-color("white");
+  border: 1px solid fn-color("dark");
 
   &:hover {
-    background-color: rgba(get-color("dark"), 0.9);
+    background-color: rgba(fn-color("dark"), 0.9);
   }
 }
 
 /* 보조 버튼 */
 .btn-secondary {
-  background-color: get-color("gray-400");
-  color: get-color("white");
-  border: 1px solid get-color("gray-400");
+  background-color: fn-color("gray-400");
+  color: fn-color("white");
+  border: 1px solid fn-color("gray-400");
 
   &:hover {
-    background-color: get-color("gray-500");
+    background-color: fn-color("gray-500");
   }
 }
 
 /* 보조 버튼 (라인형, 깔끔한 스타일) */
 .btn-secondary-line {
-  background-color: get-color("white");
-  color: get-color("gray-500");
-  border: 1px solid get-color("gray-300");
+  background-color: fn-color("white");
+  color: fn-color("gray-500");
+  border: 1px solid fn-color("gray-300");
 
   &:hover {
-    background-color: get-color("gray-100");
-    border-color: get-color("gray-400");
-    color: get-color("dark");
+    background-color: fn-color("gray-100");
+    border-color: fn-color("gray-400");
+    color: fn-color("dark");
   }
 }
 
 /* 삭제/위험 액션 */
 .btn-danger {
-  background-color: get-color("danger");
-  color: get-color("white");
-  border: 1px solid get-color("danger");
+  background-color: fn-color("danger");
+  color: fn-color("white");
+  border: 1px solid fn-color("danger");
 
   &:hover {
-    background-color: rgba(get-color("danger"), 0.9);
+    background-color: rgba(fn-color("danger"), 0.9);
   }
 }
 
 /* 텍스트 링크형 버튼 */
 .btn-hv {
   transition: color 0.2s ease;
-  color: get-color("primary") !important;
+  color: fn-color("primary") !important;
 
   &:hover {
     text-decoration: underline;

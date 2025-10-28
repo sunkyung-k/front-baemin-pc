@@ -6,10 +6,10 @@
 }
 
 .loginBox {
-  background: map.get($colors, "white");
-  padding: map.get($space, "xxl");
-  border: 1px solid map.get($colors, "gray-200");
-  border-radius: map.get($radius, "md");
+  background: fn-color("white");
+  padding: space("xxl");
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("md");
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
   width: 100%;
   max-width: 460px;
@@ -17,20 +17,20 @@
 }
 
 .title {
-  color: map.get($colors, "primary");
-  font-size: map.get($font, "xxl");
+  color: fn-color("primary");
+  font-size: font("xxl");
   font-weight: 700;
-  margin-bottom: map.get($space, "xl");
+  margin-bottom: space("xl");
 }
 
 .signupText {
-  margin-top: map.get($space, "md");
-  font-size: map.get($font, "md");
-  color: map.get($colors, "gray-600");
+  margin-top: space("md");
+  font-size: font("md");
+  color: fn-color("gray-600");
 }
 
 .error {
-  margin-bottom: map.get($space, "md");
-  font-size: map.get($font, "sm");
-  color: map.get($colors, "danger");
+  margin-bottom: space("md");
+  font-size: font("sm");
+  color: fn-color("danger");
 }
