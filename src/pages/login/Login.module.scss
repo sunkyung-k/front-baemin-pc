@@ -1,0 +1,36 @@
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.loginBox {
+  background: map.get($colors, "white");
+  padding: map.get($space, "xxl");
+  border: 1px solid map.get($colors, "gray-200");
+  border-radius: map.get($radius, "md");
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 460px;
+  text-align: center;
+}
+
+.title {
+  color: map.get($colors, "primary");
+  font-size: map.get($font, "xxl");
+  font-weight: 700;
+  margin-bottom: map.get($space, "xl");
+}
+
+.signupText {
+  margin-top: map.get($space, "md");
+  font-size: map.get($font, "md");
+  color: map.get($colors, "gray-600");
+}
+
+.error {
+  margin-bottom: map.get($space, "md");
+  font-size: map.get($font, "sm");
+  color: map.get($colors, "danger");
+}

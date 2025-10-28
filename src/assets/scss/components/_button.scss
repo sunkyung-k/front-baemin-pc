@@ -131,9 +131,14 @@
 /* 텍스트 링크형 버튼 */
 .btn-hv {
   transition: color 0.2s ease;
+  color: get-color("primary") !important;
 
   &:hover {
-    color: get-color("primary") !important;
     text-decoration: underline;
   }
+}
+
+/* 라운드형 버튼 */
+.btn-round {
+  border-radius: 999px;
 }
