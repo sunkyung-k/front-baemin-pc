@@ -7,8 +7,6 @@
   align-items: flex-start;
   gap: space("sm");
 
-  padding-bottom: space("lg");
-
   .input-label {
     font-size: font("md");
     font-weight: 600;
@@ -42,7 +40,7 @@
   }
 
   .input-error {
-    font-size: font("sm");
+    font-size: map.get($font, "sm");
     color: fn-color("danger");
   }
 }

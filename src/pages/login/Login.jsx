@@ -41,7 +41,7 @@ export default function Login() {
       <div className={styles.loginBox}>
         <h2 className={styles.title}>로그인</h2>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.loginForm}>
           <InputField
             label="아이디"
             name="username"

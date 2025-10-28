@@ -16,6 +16,12 @@
   text-align: center;
 }
 
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: space("lg");
+}
+
 .title {
   color: fn-color("primary");
   font-size: font("xxl");
