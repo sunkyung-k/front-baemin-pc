@@ -1,0 +1,49 @@
+@use "@/assets/scss/utils" as *;
+
+.checkbox-field {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: space("sm") space("md");
+  background: fn-color("gray-bg");
+  border: 1px solid fn-color("border");
+  border-radius: radius("md");
+  padding: space("lg") space("xl");
+}
+
+.checkbox-input {
+  display: flex;
+  align-items: center;
+  gap: space("sm");
+  font-size: font("md");
+  color: fn-color("gray-700");
+  background: fn-color("white");
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("md");
+  padding: space("sm") space("md");
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: fn-color("primary-bg");
+    border-color: fn-color("primary");
+  }
+
+  &:has(input:checked) {
+    background: fn-color("primary-bg");
+    border-color: fn-color("primary");
+    color: fn-color("primary");
+    font-weight: 700;
+  }
+
+  input {
+    accent-color: fn-color("primary");
+    transform: scale(1.1);
+  }
+}
+
+.checkbox-label {
+  font-size: font("md");
+  font-weight: 600;
+  color: fn-color("dark");
+  margin-bottom: space("sm");
+}
