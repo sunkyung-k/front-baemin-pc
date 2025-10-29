@@ -1,0 +1,46 @@
+@use "@/assets/scss/utils" as *;
+
+.textarea-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: space("sm");
+
+  .textarea-label {
+    font-size: font("md");
+    font-weight: 600;
+    color: fn-color("gray-800");
+  }
+
+  .textarea-txt {
+    width: 100%;
+    height: fn-rem(180);
+    padding: space("md");
+    border: 1px solid fn-color("gray-200");
+    border-radius: radius("sm");
+    font-size: font("lg");
+    background: fn-color("white");
+    color: fn-color("dark");
+    resize: none;
+    transition: all 0.2s ease;
+
+    &::placeholder {
+      color: fn-color("gray-400");
+    }
+
+    &:focus {
+      outline: none;
+      border-color: fn-color("primary");
+    }
+
+    &.error {
+      border-color: fn-color("danger");
+      background: fn-color("danger-bg");
+    }
+  }
+
+  .textarea-error {
+    font-size: font("sm");
+    color: fn-color("danger");
+  }
+}

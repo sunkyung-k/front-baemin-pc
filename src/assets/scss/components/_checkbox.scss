@@ -3,7 +3,7 @@
 .checkbox-field {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: space("sm") space("md");
+  gap: space("sm");
   background: fn-color("gray-bg");
   border: 1px solid fn-color("border");
   border-radius: radius("md");
@@ -18,7 +18,7 @@
   color: fn-color("gray-700");
   background: fn-color("white");
   border: 1px solid fn-color("gray-200");
-  border-radius: radius("md");
+  border-radius: radius("sm");
   padding: space("sm") space("md");
   transition: all 0.2s ease;
   cursor: pointer;
@@ -39,6 +39,10 @@
     accent-color: fn-color("primary");
     transform: scale(1.1);
   }
+
+  span {
+    font-weight: 700;
+  }
 }
 
 .checkbox-label {
@@ -46,4 +50,10 @@
   font-weight: 600;
   color: fn-color("dark");
   margin-bottom: space("sm");
+}
+
+@media (max-width: bp("md")) {
+  .checkbox-field {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
