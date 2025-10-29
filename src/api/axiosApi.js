@@ -1,5 +1,6 @@
 import axios from "axios";
 import { authStore } from "../store/authStore";
+import { handleApiError } from "../utills/handleApiError";
 
 const api = axios.create({
   headers: {
@@ -7,69 +8,71 @@ const api = axios.create({
   },
 });
 
-// 리퀘스트 전에 인증 토큰이 있으면 헤더에 추가
+// 요청 인터셉터 (토큰 자동 주입)
 api.interceptors.request.use(
   (config) => {
-    // zustand 를 호출할 때 컴포넌트가 아닌 곳에서는 getState() 함수를 사용해서 가져와야함.
     const token = authStore.getState().token;
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   },
   (error) => {
-    return Promise.reject(error); // 호출한 곳에 에러를 던진다. 즉, 인터셉터에서 에러를 처리하는 것이 아니라 호출한 곳에서 에러를 처리하도록 함.
+    handleApiError(error, "Axios Request"); // 요청 단계 에러 처리
+    return Promise.reject(error);
   }
 );
 
-// 응답 지연 방지
+// 응답 지연 방지 플래그
 let isRefreshing = false;
 
-// 응답 내용을 가로채기
+// 응답 인터셉터
 api.interceptors.response.use(
-  (response) => response,
+  (response) => response, // 정상 응답 시 그대로 반환
   async (error) => {
     const { response, config } = error;
 
-    // 로그인을 하지 않은 경우
+    // 공통 에러 로그 출력
+    handleApiError(error, "Axios Response");
+
+    // 403 (권한 없음)
     if (response?.status === 403) {
-      alert("권한 없음!");
-      // 기존 localStorage 데이터 삭제
+      alert("접근 권한이 없습니다. 로그인 후 이용해주세요.");
       authStore.getState().clearAuth();
       location.href = "/login";
-    }
-
-    // 로그인 실패한 경우
-    if (response?.status === 401) {
-      // 기존 localStorage 데이터 삭제
-      authStore.getState().clearAuth();
-
       return Promise.reject(error);
     }
 
-    // 토큰이 잘못된 경우,
+    // 401 (인증 실패)
+    if (response?.status === 401) {
+      authStore.getState().clearAuth();
+      alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
+      location.href = "/login";
+      return Promise.reject(error);
+    }
+
+    // 406 (토큰 불일치 / 재발급 필요)
     if (response?.status === 406 && !config._retry) {
       if (!isRefreshing) {
         isRefreshing = true;
-        config._retry = true; // 무한루프 방지 플래그
+        config._retry = true;
       }
 
       try {
-        // api 인터셉터 안에서 또 api 를 그대로 사용하면 무한루프에 빠질 수 있으므로 순수한 axios 를 사용함
-        // 쿠키에 저장된 refresh 토큰을 사용해 재 로그인 시도
+        // 순수 axios로 refresh 요청 (무한루프 방지)
         const res = await axios.get("/api/v1/refresh", {
           withCredentials: true,
-        }); // withCredentials 을 true 로 주면 쿠키가 포함된다.
+        });
 
+        // 토큰 갱신 및 재요청
         authStore.getState().setLogin(res.data.response.content);
         const token = authStore.getState().token;
         config.headers.Authorization = `Bearer ${token}`;
+
         return api(config);
-      } catch (error) {
-        // refresh 실패한 경우
-        alert("유효하지 않은 토큰입니다. 다시 로그인 하세요.");
+      } catch (refreshError) {
+        handleApiError(refreshError, "Axios Token Refresh");
+        alert("유효하지 않은 토큰입니다. 다시 로그인 해주세요.");
         authStore.getState().clearAuth();
         location.href = "/login";
       } finally {
