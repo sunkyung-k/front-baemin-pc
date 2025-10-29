@@ -1,0 +1,61 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: fit-content;
+  padding: 24px;
+  background-color: fn-color("gray-bg");
+  border-radius: radius("md");
+  max-width: 260px;
+}
+.profile {
+  padding: 20px;
+  border: 1px solid fn-color("border");
+  text-align: center;
+  border-radius: radius("md");
+  background-color: fn-color("white");
+}
+.profile strong {
+  font-size: font("xl");
+}
+.profile span {
+  display: block;
+  margin-top: space("xs");
+  font-size: font("md");
+  color: fn-color("gray-700");
+}
+.income {
+  margin-top: space("sm");
+  font-size: font("lg");
+  font-weight: 700;
+  color: fn-color("primary");
+}
+
+.navMenu {
+  display: flex;
+  flex-direction: column;
+  gap: space("sm");
+}
+
+.navItem {
+  padding: 10px space("md");
+  border: 1px solid fn-color("border");
+  font-size: font("md");
+  font-weight: 400;
+  color: fn-color("gray-600");
+  border-radius: radius("sm");
+  background-color: fn-color("white");
+  transition: 0.2s;
+}
+
+.navItem.active {
+  font-weight: 700;
+  background-color: fn-color("primary");
+  color: #fff;
+}
+
+@media (max-width: bp("md")) {
+  .sidebar {
+    max-width: none;
+  }
+}

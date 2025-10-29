@@ -1,0 +1,21 @@
+.card {
+  background-color: fn-color("white");
+  padding: space("xxl");
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("md");
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+
+  &Tit {
+    font-size: font("xxl");
+    font-weight: 800;
+    border-left: 5px solid fn-color("primary");
+    padding-left: space("sm");
+    margin-bottom: space("xl");
+  }
+}
+
+@media (max-width: bp("md")) {
+  .card {
+    padding: space("xl") space("lg");
+  }
+}

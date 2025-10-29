@@ -1,0 +1,12 @@
+.label {
+  font-size: font("md");
+  font-weight: 600;
+  color: fn-color("dark");
+  margin-bottom: space("sm");
+}
+
+.timeGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

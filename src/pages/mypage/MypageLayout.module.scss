@@ -1,0 +1,35 @@
+.mypage {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 40px;
+}
+
+.contents {
+  form {
+    width: 100%;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: space("xl");
+
+  &Group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.hint {
+  font-size: font("sm");
+  color: fn-color("primary");
+  margin-top: space("sm");
+}
+
+@media (max-width: bp("md")) {
+  .mypage {
+    grid-template-columns: 1fr;
+  }
+}
