@@ -7,9 +7,9 @@ function Layout() {
   return (
     <div className="wrap">
       <Header />
-      <section>
+      <main className="container">
         <Outlet />
-      </section>
+      </main>
       <Footer />
     </div>
   );

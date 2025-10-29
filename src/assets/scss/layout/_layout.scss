@@ -8,13 +8,23 @@
   height: 100%;
 }
 
-.layout-container {
-  flex: 1;
-  padding: 100px space("lg");
+.header {
+  height: fn-rem(60);
+  background-color: fn-color("primary");
+}
 
-  .inner {
-    max-width: bp("xl");
-    width: 100%;
-    margin: 0 auto;
-  }
+.container {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  padding: 0 space("lg");
+  margin: fn-rem(50) auto fn-rem(80);
+}
+
+.footer {
+  text-align: center;
+  font-size: font("sm");
+  color: fn-color("gray-400");
+  border-top: 1px solid fn-color("border");
+  padding: space("lg") 0;
 }
