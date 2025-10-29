@@ -1,0 +1,136 @@
+.categoryPanel {
+  padding: fn-rem(30);
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 fn-rem(400);
+  border-right: 1px solid fn-color("gray-200");
+  background: fn-color("white");
+
+  .categoryHeader {
+    margin-bottom: fn-rem(20);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+      font-size: fn-rem(20);
+      font-weight: 600;
+      color: fn-color("gray-700");
+    }
+  }
+
+  .categoryList {
+    margin-top: fn-rem(15);
+    flex-grow: 1;
+    border-radius: radius("md");
+    border: 1px solid fn-color("gray-200");
+    overflow: hidden;
+    background: fn-color("white");
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .categoryItem {
+    border-bottom: 1px solid fn-color("gray-200");
+    transition: background 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+
+    &.active {
+      background: fn-color("primary-bg");
+      border-left: fn-rem(4) solid fn-color("primary");
+      box-shadow: fn-rem(2) 0 fn-rem(10) rgba(42, 193, 188, 0.15);
+
+      .categoryItemHeader strong {
+        font-weight: 800;
+        color: fn-color("primary");
+      }
+
+      .categoryItemMeta {
+        color: fn-color("primary");
+      }
+    }
+
+    .categoryItemHeader {
+      padding: fn-rem(16) fn-rem(20);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      strong {
+        font-size: fn-rem(16);
+        font-weight: 700;
+        color: fn-color("dark");
+      }
+
+      .categoryItemMeta {
+        font-size: fn-rem(13);
+        color: fn-color("gray-500");
+        font-weight: 400;
+      }
+    }
+
+    .categoryEdit {
+      padding: fn-rem(15) fn-rem(20);
+      background: fn-color("gray-50");
+      border-top: 1px solid fn-color("gray-200");
+      display: flex;
+      flex-direction: column;
+      gap: fn-rem(12);
+
+      .formGroup {
+        display: flex;
+        flex-direction: column;
+        gap: fn-rem(6);
+      }
+
+      .btnRow {
+        margin-top: fn-rem(6);
+        display: flex;
+        gap: fn-rem(8);
+        justify-content: flex-end;
+
+        .delIco {
+          color: fn-color("danger");
+        }
+      }
+    }
+  }
+
+  .emptyState {
+    text-align: center;
+    padding: fn-rem(60) fn-rem(30);
+    background: fn-color("gray-50");
+    border: 2px dashed fn-color("gray-200");
+    border-radius: radius("md");
+    color: fn-color("gray-500");
+    font-size: fn-rem(16);
+    margin-top: fn-rem(30);
+
+    .emptyIco {
+      width: fn-rem(40);
+      height: fn-rem(40);
+      display: inline-block;
+      margin-bottom: fn-rem(10);
+    }
+
+    p {
+      margin-bottom: fn-rem(8);
+      font-weight: 600;
+      color: fn-color("gray-600");
+    }
+
+    small {
+      font-size: fn-rem(12);
+      color: fn-color("gray-400");
+    }
+
+    .btn {
+      margin-top: fn-rem(20);
+    }
+  }
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+}

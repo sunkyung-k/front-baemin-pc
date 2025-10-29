@@ -4,6 +4,7 @@ import Home from "../pages/home/Home";
 import Login from "../pages/login/Login";
 import MypageLayout from "../pages/mypage/MypageLayout";
 import StoreCRUD from "../pages/mypage/owner/StoreCRUD";
+import MenuCRUD from "../pages/menu-register/MenuCRUD";
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
+
       // {
       //   path: "book",
       //   children: [
@@ -71,5 +73,9 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     Component: Login,
+  },
+  {
+    path: "/menuCRUD",
+    Component: MenuCRUD,
   },
 ]);
