@@ -2,25 +2,25 @@ import api from "../api/axiosApi";
 import { handleApiError } from "../utills/handleApiError";
 
 const menuCategoryAPI = {
-  /** ✅ 카테고리 목록 (storeId별) */
+  /**  카테고리 목록 (storeId별) */
   async getList(storeId) {
     try {
       const res = await api.get(`/api/v1/store/${storeId}`);
       const list = res?.data?.response?.vo?.menuCategoryList ?? [];
 
-      // ✅ delYn이 "N"인 항목만 표시 + displayOrder 오름차순 정렬
+      //  delYn이 "N"인 항목만 표시 + displayOrder 오름차순 정렬
       return Array.isArray(list)
         ? list
             .filter((item) => item.delYn === "N")
             .sort((a, b) => a.displayOrder - b.displayOrder)
         : [];
     } catch (err) {
-      handleApiError(err, "menuCategoryAPI.getList"); // ✅ 공통 에러 핸들러
+      handleApiError(err, "menuCategoryAPI.getList"); //  공통 에러 핸들러
       return [];
     }
   },
 
-  /** ✅ 카테고리 등록 */
+  /**  카테고리 등록 */
   async create(payload) {
     try {
       const res = await api.post(`/api/v1/menu/category`, payload);
@@ -31,7 +31,7 @@ const menuCategoryAPI = {
     }
   },
 
-  /** ✅ 카테고리 수정 */
+  /**  카테고리 수정 */
   async update(payload) {
     try {
       const res = await api.put(`/api/v1/menu/category`, payload);
@@ -42,7 +42,7 @@ const menuCategoryAPI = {
     }
   },
 
-  /** ✅ 카테고리 삭제 */
+  /**  카테고리 삭제 */
   async remove(menuCaId) {
     try {
       const res = await api.delete(`/api/v1/menu/category/${menuCaId}`);

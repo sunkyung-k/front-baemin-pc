@@ -4,7 +4,7 @@ import Home from "../pages/home/Home";
 import Login from "../pages/login/Login";
 import MypageLayout from "../pages/mypage/MypageLayout";
 import StoreCRUD from "../pages/mypage/owner/StoreCRUD";
-import MenuCRUD from "../pages/menu-register/MenuCRUD";
+import MenuLayout from "../pages/menu-register/MenuLayout";
 
 export const router = createBrowserRouter([
   {
@@ -75,7 +75,7 @@ export const router = createBrowserRouter([
     Component: Login,
   },
   {
-    path: "/menuCRUD",
-    Component: MenuCRUD,
+    path: "/menuRegister",
+    Component: MenuLayout,
   },
 ]);

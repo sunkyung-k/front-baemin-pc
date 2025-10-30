@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import styles from "./MenuCRUD.module.scss";
+import styles from "./MenuLayout.module.scss";
 import CategoryPanel from "./CategoryPanel";
 import { TiPlus } from "react-icons/ti";
 import { IoClose } from "react-icons/io5";
 
-export default function MenuCRUD() {
+export default function MenuLayout() {
   const [activeCategory, setActiveCategory] = useState(null);
 
   return (
@@ -17,7 +17,7 @@ export default function MenuCRUD() {
           <CategoryPanel
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
-            storeId={5}
+            storeId={4}
           />
 
           <section className={styles.detailPanel}>
