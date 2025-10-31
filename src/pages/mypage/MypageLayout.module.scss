@@ -1,13 +1,15 @@
 .mypage {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 40px;
+  display: flex;
+  justify-content: center;
+  gap: space("xl");
 }
 
 .contents {
   form {
     width: 100%;
   }
+
+  width: calc(100% - fn-rem(260) - space("xl"));
 }
 
 .form {
@@ -30,6 +32,10 @@
 
 @media (max-width: bp("md")) {
   .mypage {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .contents {
+    width: 100%;
   }
 }

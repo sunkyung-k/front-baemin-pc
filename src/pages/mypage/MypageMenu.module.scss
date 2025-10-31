@@ -6,7 +6,7 @@
   padding: 24px;
   background-color: fn-color("gray-bg");
   border-radius: radius("md");
-  max-width: 260px;
+  max-width: fn-rem(260);
 }
 .profile {
   padding: 20px;

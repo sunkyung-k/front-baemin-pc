@@ -11,6 +11,7 @@ export const authStore = create(
       userId: null,
       userName: null,
       userRole: null,
+      storeId: null, // OWNER의 가게 ID 저장용
 
       // 로그인 여부 판단 함수
       // token 이 있으면 true 이고 없으면 false 이다.
@@ -26,6 +27,18 @@ export const authStore = create(
           state.userId = userId;
           state.userName = userName;
           state.userRole = userRole;
+        }),
+
+      // 가게 ID 직접 설정 (등록 후)
+      setStoreId: (storeId) =>
+        set((state) => {
+          state.storeId = storeId;
+        }),
+
+      // 가게 ID 초기화 (삭제 시)
+      clearStoreId: () =>
+        set((state) => {
+          state.storeId = null;
         }),
 
       // 토큰만 갱신하는 함수 (refresh token 을 이용할 때)
@@ -44,6 +57,7 @@ export const authStore = create(
           state.userId = null;
           state.userName = null;
           state.userRole = null;
+          state.storeId = null; // storeId도 같이 제거
         });
 
         // axios authorization 헤더 제거
@@ -66,6 +80,7 @@ export const authStore = create(
         userId: state.userId,
         userName: state.userName,
         userRole: state.userRole,
+        storeId: state.storeId,
       }),
     }
   )
