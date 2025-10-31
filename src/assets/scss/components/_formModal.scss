@@ -1,0 +1,43 @@
+.form-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 65vh;
+    overflow-y: auto;
+    padding-right: 4px; // 스크롤 영역 살짝 여유
+  }
+
+  &__footer {
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+
+    .btn-full {
+      width: 100%;
+      height: 48px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+
+  // 폼 내 에러 메시지나 필드 간격 기본
+  .input-field,
+  .image-upload,
+  .textarea-field {
+    margin-bottom: 10px;
+  }
+
+  // 스크롤 숨김 커스텀
+  &__body::-webkit-scrollbar {
+    width: 6px;
+  }
+  &__body::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+}

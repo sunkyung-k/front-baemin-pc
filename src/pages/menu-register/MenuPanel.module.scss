@@ -1,0 +1,147 @@
+.detailPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: fn-color("white");
+  padding: fn-rem(30) fn-rem(50) 0; // 아래 패딩 제거 (리스트 쪽에서 관리)
+}
+
+.detailHeader {
+  flex-shrink: 0; // ✅ 헤더 고정
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: fn-color("white");
+  position: sticky; // ✅ 스크롤해도 고정
+  top: 0;
+  z-index: 10;
+  padding-bottom: fn-rem(20);
+
+  :global(.btn) {
+    height: fn-rem(38);
+  }
+
+  h2 {
+    font-size: font("xxl");
+    font-weight: 800;
+  }
+}
+
+.menuList {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: fn-rem(6);
+  margin-top: fn-rem(10);
+  margin-bottom: fn-rem(30);
+
+  // 스크롤바 커스텀 (선택사항)
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: fn-color("gray-300");
+    border-radius: 3px;
+  }
+}
+
+.menuItem {
+  border: 1px solid fn-color("border");
+  border-radius: radius("md");
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+
+  &.open .menuHeader {
+    background: fn-color("gray-100");
+  }
+
+  & + .menuItem {
+    margin-top: fn-rem(20);
+  }
+}
+
+.menuHeader {
+  background: fn-color("white");
+  padding: fn-rem(20);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #fcfcfc;
+  }
+}
+
+.menuLeft {
+  display: flex;
+  align-items: center;
+  gap: fn-rem(20);
+}
+
+.menuThumb {
+  position: relative;
+  width: fn-rem(80);
+  height: fn-rem(80);
+  background: fn-color("gray-bg");
+  border-radius: radius("sm");
+  border: 1px solid fn-color("border");
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: fn-color("gray-400");
+  font-size: font("sm");
+}
+
+.soldoutBadge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  color: fn-color("white");
+  font-size: font("sm");
+  font-weight: 600;
+  padding: fn-rem(3) fn-rem(6);
+  border-radius: fn-rem(4);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menuInfo {
+  h4 {
+    font-size: font("lg");
+    font-weight: 700;
+    margin-bottom: fn-rem(4);
+  }
+
+  p {
+    font-size: font("sm");
+    color: fn-color("gray-600");
+  }
+}
+
+.menuRight {
+  text-align: right;
+}
+
+.menuPrice {
+  font-weight: 800;
+  color: fn-color("primary");
+  font-size: font("xl");
+  margin-bottom: fn-rem(8);
+}
+
+.menuButtons {
+  display: flex;
+  gap: fn-rem(8);
+}
+
+:global(.empty-state) {
+  margin-top: fn-rem(20);
+}

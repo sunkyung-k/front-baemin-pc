@@ -1,0 +1,41 @@
+@use "@/assets/scss/utils" as *;
+
+.empty-state {
+  text-align: center;
+  background: fn-color("gray-50");
+  border-radius: radius("md");
+  color: fn-color("gray-600");
+  font-size: font("md");
+  padding: fn-rem(60) fn-rem(30);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: fn-rem(10);
+  transition: all 0.2s ease;
+
+  &--dashed {
+    border: 2px dashed fn-color("border");
+  }
+
+  &__icon {
+    font-size: fn-rem(42);
+    color: fn-color("gray-400");
+    margin-bottom: fn-rem(8);
+  }
+
+  &__title {
+    font-weight: 700;
+    color: fn-color("gray-700");
+    margin: 0;
+  }
+
+  &__desc {
+    font-size: font("sm");
+    color: fn-color("gray-500");
+  }
+
+  &__extra {
+    margin-top: fn-rem(16);
+  }
+}

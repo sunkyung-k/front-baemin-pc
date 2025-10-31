@@ -1,0 +1,80 @@
+@use "@/assets/scss/utils" as *;
+@use "sass:map";
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: space("xs");
+
+  .input-label {
+    font-size: font("md");
+    font-weight: 600;
+    color: fn-color("gray-800");
+  }
+
+  .radio-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space("lg");
+    padding: fn-rem(10) space("md") fn-rem(10) 0;
+    border-radius: radius("sm");
+    background: fn-color("white");
+    width: 100%;
+    transition: border-color 0.2s ease;
+
+    &:focus-within {
+      border-color: fn-color("primary");
+    }
+  }
+
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: space("xs");
+    cursor: pointer;
+
+    input[type="radio"] {
+      width: fn-rem(18);
+      height: fn-rem(18);
+      border: 1px solid fn-color("gray-300");
+      border-radius: 50%;
+      appearance: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+
+      &:checked {
+        border-color: fn-color("primary");
+        background-color: fn-color("primary");
+
+        &::after {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: fn-rem(6);
+          height: fn-rem(6);
+          border-radius: 50%;
+          background-color: fn-color("white");
+        }
+      }
+
+      &:hover {
+        border-color: fn-color("primary");
+      }
+    }
+
+    .radio-label {
+      font-size: font("md");
+      color: fn-color("dark");
+      user-select: none;
+    }
+  }
+
+  .input-error {
+    font-size: font("sm");
+    color: fn-color("danger");
+    margin-top: fn-rem(2);
+  }
+}

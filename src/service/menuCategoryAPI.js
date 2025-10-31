@@ -7,13 +7,7 @@ const menuCategoryAPI = {
     try {
       const res = await api.get(`/api/v1/store/${storeId}`);
       const list = res?.data?.response?.vo?.menuCategoryList ?? [];
-
-      //  delYn이 "N"인 항목만 표시 + displayOrder 오름차순 정렬
-      return Array.isArray(list)
-        ? list
-            .filter((item) => item.delYn === "N")
-            .sort((a, b) => a.displayOrder - b.displayOrder)
-        : [];
+      return Array.isArray(list) ? list : [];
     } catch (err) {
       handleApiError(err, "menuCategoryAPI.getList"); //  공통 에러 핸들러
       return [];

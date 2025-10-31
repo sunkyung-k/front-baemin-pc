@@ -30,7 +30,6 @@
 
 /* 기본 버튼 구조 */
 .btn {
-  border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -38,7 +37,6 @@
   font-weight: 600;
   border-radius: radius("md");
   transition: all 0.25s ease;
-  cursor: pointer;
 
   &-default {
     height: 44px;

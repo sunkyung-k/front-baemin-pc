@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import styles from "./CategoryPanel.module.scss";
 import { TiPlus } from "react-icons/ti";
 import { MdModeEdit } from "react-icons/md";
@@ -8,9 +8,10 @@ import InputField from "@/components/form/InputField";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useMenuCategory } from "../../hooks/useMenuCategory";
-import { dummyRegister } from "../../utills/formUtils";
-import EmptyState from "../../components/menu/EmptyState";
+import { useMenuCategory } from "@/hooks/useMenuCategory";
+import { dummyRegister } from "@/utills/formUtils";
+import EmptyState from "@/components/menu/EmptyState";
+import { useCategoryStore } from "@/store/useCategoryStore";
 
 const schema = yup.object().shape({
   categoryName: yup.string().required("카테고리명을 입력해주세요."),
@@ -22,19 +23,12 @@ const schema = yup.object().shape({
 
 export default function CategoryPanel({ storeId }) {
   const [activeId, setActiveId] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
   const [editableValues, setEditableValues] = useState({});
-  const prevJSONRef = useRef("");
+  const [modalOpen, setModalOpen] = useState(false);
 
-  const {
-    categories,
-    isLoading,
-    isError,
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    refetch,
-  } = useMenuCategory(storeId);
+  const { setActiveCategory, clearActiveCategory } = useCategoryStore();
+  const { categories, createCategory, updateCategory, removeCategory } =
+    useMenuCategory(storeId);
 
   const {
     register,
@@ -43,69 +37,50 @@ export default function CategoryPanel({ storeId }) {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  useEffect(() => {
-    if (!Array.isArray(categories) || categories.length === 0) {
-      if (prevJSONRef.current !== "{}") {
-        setEditableValues({});
-        prevJSONRef.current = "{}";
-      }
-      return;
-    }
-
-    const nextValues = categories.reduce((acc, c) => {
-      acc[c.menuCaId] = {
-        name: c.menuCaName ?? "",
-        order: c.displayOrder ?? 0,
-      };
-      return acc;
-    }, {});
-
-    const nextJSON = JSON.stringify(nextValues);
-    if (prevJSONRef.current !== nextJSON) {
-      prevJSONRef.current = nextJSON;
-      setEditableValues(nextValues);
-    }
-  }, [categories]);
-
   const visibleCategories = useMemo(
-    () => categories?.filter((cat) => cat.delYn === "N") ?? [],
+    () => categories.filter((cat) => cat.delYn === "N"),
     [categories]
   );
 
   const onSubmit = (data) => {
-    const payload = {
-      storeId,
-      menuCaName: data.categoryName,
-      displayOrder: Number(data.categoryOrder),
-    };
-    createCategory.mutate(payload, {
-      onSuccess: () => {
-        reset();
-        setModalOpen(false);
-        refetch();
+    createCategory.mutate(
+      {
+        storeId,
+        menuCaName: data.categoryName,
+        displayOrder: Number(data.categoryOrder),
       },
-    });
+      {
+        onSuccess: () => {
+          reset();
+          setModalOpen(false);
+        },
+      }
+    );
   };
 
   const handleUpdate = (id) => {
     const target = editableValues[id];
-    if (!target) return;
+    if (!target || !target.name) {
+      alert("카테고리명을 입력해주세요.");
+      return;
+    }
 
-    const payload = {
+    updateCategory.mutate({
       menuCaId: id,
       menuCaName: target.name.trim(),
-      displayOrder: Number(target.order),
-    };
-
-    updateCategory.mutate(payload, {
-      onSuccess: () => refetch(),
+      displayOrder: Number(target.order ?? 0),
     });
   };
 
-  const handleDelete = (id) => {
+  const handleRemove = (id) => {
     if (window.confirm("정말 삭제하시겠습니까?")) {
-      deleteCategory.mutate(id, {
-        onSuccess: () => refetch(),
+      removeCategory.mutate(id, {
+        onSuccess: () => {
+          if (id === activeId) {
+            setActiveId(null);
+            clearActiveCategory();
+          }
+        },
       });
     }
   };
@@ -114,12 +89,19 @@ export default function CategoryPanel({ storeId }) {
     setActiveId((prev) => (prev === id ? null : id));
   };
 
-  const handleChangeEditable = (id, field, value) => {
-    setEditableValues((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], [field]: value },
-    }));
-  };
+  useEffect(() => {
+    if (!categories?.length) return;
+
+    if (activeId === null) {
+      clearActiveCategory();
+      return;
+    }
+
+    const selected = categories.find((c) => c.menuCaId === activeId);
+    if (!selected) return;
+
+    setActiveCategory({ ...selected, storeId });
+  }, [activeId, categories, storeId]);
 
   return (
     <section className={styles.categoryPanel}>
@@ -135,7 +117,6 @@ export default function CategoryPanel({ storeId }) {
         <TiPlus size={18} /> 새 카테고리 등록
       </button>
 
-      {/* ✅ EmptyState 적용 */}
       {visibleCategories.length > 0 ? (
         <div className={styles.categoryList}>
           {visibleCategories.map((cat) => {
@@ -169,13 +150,21 @@ export default function CategoryPanel({ storeId }) {
                         label="카테고리명"
                         name={`name_${cat.menuCaId}`}
                         type="text"
-                        value={cur.name}
+                        value={cur.name ?? ""}
                         onChange={(e) =>
-                          handleChangeEditable(
-                            cat.menuCaId,
-                            "name",
-                            e.target.value
-                          )
+                          setEditableValues((prev) => {
+                            const prevData = prev[cat.menuCaId] || {
+                              name: cat.menuCaName ?? "",
+                              order: cat.displayOrder ?? 0,
+                            };
+                            return {
+                              ...prev,
+                              [cat.menuCaId]: {
+                                ...prevData,
+                                name: e.target.value,
+                              },
+                            };
+                          })
                         }
                         register={dummyRegister}
                       />
@@ -186,13 +175,21 @@ export default function CategoryPanel({ storeId }) {
                         label="정렬 순서"
                         name={`order_${cat.menuCaId}`}
                         type="number"
-                        value={cur.order}
+                        value={cur.order ?? 0}
                         onChange={(e) =>
-                          handleChangeEditable(
-                            cat.menuCaId,
-                            "order",
-                            e.target.value
-                          )
+                          setEditableValues((prev) => {
+                            const prevData = prev[cat.menuCaId] || {
+                              name: cat.menuCaName ?? "",
+                              order: cat.displayOrder ?? 0,
+                            };
+                            return {
+                              ...prev,
+                              [cat.menuCaId]: {
+                                ...prevData,
+                                order: e.target.value,
+                              },
+                            };
+                          })
                         }
                         register={dummyRegister}
                       />
@@ -209,7 +206,7 @@ export default function CategoryPanel({ storeId }) {
                       <button
                         type="button"
                         className={`${styles.btn} ${styles.danger} ${styles.small}`}
-                        onClick={() => handleDelete(cat.menuCaId)}
+                        onClick={() => handleRemove(cat.menuCaId)}
                       >
                         <FaTrashAlt /> 삭제
                       </button>
@@ -225,14 +222,7 @@ export default function CategoryPanel({ storeId }) {
           icon={<FaLayerGroup />}
           title="등록된 메뉴 카테고리가 없습니다."
           description="가게 메뉴를 구분할 카테고리를 먼저 등록해주세요."
-        >
-          <button
-            className="btn btn-primary btn-full"
-            onClick={() => setModalOpen(true)}
-          >
-            <TiPlus size={18} /> 카테고리 등록
-          </button>
-        </EmptyState>
+        />
       )}
 
       <Modal

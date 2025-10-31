@@ -34,32 +34,3 @@
     color: fn-color("gray-600");
   }
 }
-
-.categoryPanel {
-  width: fn-rem(400);
-  border-right: 1px solid fn-color("gray-200");
-  background: fn-color("white");
-  display: flex;
-  flex-direction: column;
-  padding: fn-rem(30);
-}
-
-.detailPanel {
-  flex: 1;
-  background: fn-color("white");
-  padding: fn-rem(40) fn-rem(60);
-  overflow-y: auto;
-}
-
-.detailHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: fn-rem(30);
-}
-
-.categoryTitle {
-  font-size: fn-rem(26);
-  font-weight: 800;
-  color: fn-color("gray-800");
-}
