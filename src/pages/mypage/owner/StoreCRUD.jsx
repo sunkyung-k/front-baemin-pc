@@ -3,11 +3,11 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import Checkbox from "@/components/form/Checkbox";
-import InputField from "@/form/InputField";
+import InputField from "@/components/form/InputField";
 import ImageUpload from "@/components/form/ImageUpload";
 import TextareaField from "@/components/form/TextareaField";
-import TimeField from "@/components/form/TimeField";
+import Checkbox from "@/components/mypage/Checkbox";
+import TimeField from "@/components/mypage/TimeField";
 import Card from "../MypageCard";
 
 import stylesLayout from "../MypageLayout.module.scss";
