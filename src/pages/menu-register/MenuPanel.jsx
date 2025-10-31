@@ -5,12 +5,11 @@ import { TiPlus } from "react-icons/ti";
 import { FaUtensils } from "react-icons/fa";
 import MenuFormModal from "./MenuFormModal";
 import { useCategoryStore } from "@/store/useCategoryStore";
-import menuAPI from "@/service/menuAPI";
-import menuCategoryAPI from "@/service/menuCategoryAPI";
+import { useMenu } from "@/hooks/useMenu";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 
 export default function MenuPanel() {
-  const { activeCategory, setActiveCategory } = useCategoryStore();
+  const { activeCategory } = useCategoryStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
 
@@ -21,33 +20,13 @@ export default function MenuPanel() {
   );
   const hasMenus = menuList.length > 0;
 
-  // 메뉴 목록 새로고침
-  const refreshMenuList = async () => {
-    try {
-      const preservedStoreId =
-        activeCategory?.storeId ||
-        activeCategory?.store?.storeId ||
-        activeCategory?.store_id ||
-        activeCategory?.storeID;
+  const storeId =
+    activeCategory?.storeId ||
+    activeCategory?.store?.storeId ||
+    activeCategory?.store_id ||
+    activeCategory?.storeID;
 
-      if (!preservedStoreId) return;
-
-      const list = await menuCategoryAPI.getList(preservedStoreId);
-      const matched = list.find(
-        (cat) => cat.menuCaId === activeCategory.menuCaId
-      );
-
-      if (matched) {
-        const cloned = {
-          ...JSON.parse(JSON.stringify(matched)),
-          storeId: preservedStoreId,
-        };
-        setActiveCategory(cloned);
-      }
-    } catch (err) {
-      console.error("메뉴 목록 갱신 실패:", err);
-    }
-  };
+  const { create, update, remove } = useMenu(storeId);
 
   const handleCreate = () => {
     setEditTarget(null);
@@ -61,10 +40,8 @@ export default function MenuPanel() {
 
   const handleSubmit = async (formData) => {
     try {
-      if (editTarget) await menuAPI.update(formData);
-      else await menuAPI.create(formData);
-
-      await refreshMenuList();
+      if (editTarget) await update.mutateAsync(formData);
+      else await create.mutateAsync(formData);
       setModalOpen(false);
       alert(editTarget ? "메뉴가 수정되었습니다." : "메뉴가 등록되었습니다.");
     } catch (err) {
@@ -76,8 +53,7 @@ export default function MenuPanel() {
   const handleRemove = async (menuId) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
     try {
-      await menuAPI.remove(menuId);
-      await refreshMenuList();
+      await remove.mutateAsync(menuId);
       alert("삭제되었습니다.");
     } catch (err) {
       console.error("메뉴 삭제 실패:", err);
@@ -96,7 +72,6 @@ export default function MenuPanel() {
       </section>
     );
   }
-  console.log("🧩 menuList 데이터 구조 확인:", menuList[0]);
 
   return (
     <section className={styles.detailPanel}>

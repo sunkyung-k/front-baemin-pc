@@ -3,8 +3,8 @@ import menuAPI from "@/service/menuAPI";
 import { useCategoryStore } from "@/store/useCategoryStore";
 
 /**
- * 메뉴 CRUD 및 카테고리 상태 갱신 훅
- * React Query + Zustand 연동 구조
+ * 메뉴 CRUD 훅 (React Query + Zustand 연동)
+ * - 카테고리별 메뉴 등록/수정/삭제 후 자동 동기화
  */
 export const useMenu = (storeId) => {
   const queryClient = useQueryClient();
@@ -19,7 +19,8 @@ export const useMenu = (storeId) => {
         (cat) => cat.menuCaId === activeCategory.menuCaId
       );
       if (updated) {
-        setActiveCategory(JSON.parse(JSON.stringify(updated))); // 강제 리렌더
+        // 구조 안전하게 복사해서 상태 갱신
+        setActiveCategory(JSON.parse(JSON.stringify(updated)));
       }
     }
   };

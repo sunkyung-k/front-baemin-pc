@@ -60,7 +60,7 @@ export default function CategoryPanel({ storeId }) {
 
   const handleUpdate = (id) => {
     const target = editableValues[id];
-    if (!target || !target.name) {
+    if (!target || !target.name?.trim()) {
       alert("카테고리명을 입력해주세요.");
       return;
     }
@@ -152,19 +152,13 @@ export default function CategoryPanel({ storeId }) {
                         type="text"
                         value={cur.name ?? ""}
                         onChange={(e) =>
-                          setEditableValues((prev) => {
-                            const prevData = prev[cat.menuCaId] || {
-                              name: cat.menuCaName ?? "",
-                              order: cat.displayOrder ?? 0,
-                            };
-                            return {
-                              ...prev,
-                              [cat.menuCaId]: {
-                                ...prevData,
-                                name: e.target.value,
-                              },
-                            };
-                          })
+                          setEditableValues((prev) => ({
+                            ...prev,
+                            [cat.menuCaId]: {
+                              ...cur,
+                              name: e.target.value,
+                            },
+                          }))
                         }
                         register={dummyRegister}
                       />
@@ -177,19 +171,13 @@ export default function CategoryPanel({ storeId }) {
                         type="number"
                         value={cur.order ?? 0}
                         onChange={(e) =>
-                          setEditableValues((prev) => {
-                            const prevData = prev[cat.menuCaId] || {
-                              name: cat.menuCaName ?? "",
-                              order: cat.displayOrder ?? 0,
-                            };
-                            return {
-                              ...prev,
-                              [cat.menuCaId]: {
-                                ...prevData,
-                                order: e.target.value,
-                              },
-                            };
-                          })
+                          setEditableValues((prev) => ({
+                            ...prev,
+                            [cat.menuCaId]: {
+                              ...cur,
+                              order: e.target.value,
+                            },
+                          }))
                         }
                         register={dummyRegister}
                       />
