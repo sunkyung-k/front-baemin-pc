@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "./Login.module.scss";
 import { Link } from "react-router-dom";
 import { useLogin } from "../../hooks/useLogin";
-import InputField from "../../components/common/form/InputField";
+import InputField from "../../components/form/InputField";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
