@@ -1,4 +1,4 @@
-// src/components/common/form/InputField.jsx
+// src/components/form/InputField.jsx
 import React from "react";
 
 /**

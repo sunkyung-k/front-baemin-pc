@@ -3,10 +3,11 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import Checkbox from "@/components/common/form/Checkbox";
-import InputField from "@/components/common/form/InputField";
-import ImageUpload from "@/components/common/form/ImageUpload";
-import TextareaField from "@/components/common/form/TextareaField";
+import Checkbox from "@/components/form/Checkbox";
+import InputField from "@/form/InputField";
+import ImageUpload from "@/components/form/ImageUpload";
+import TextareaField from "@/components/form/TextareaField";
+import TimeField from "@/components/form/TimeField";
 import Card from "../MypageCard";
 
 import stylesLayout from "../MypageLayout.module.scss";
@@ -14,9 +15,9 @@ import stylesCrud from "./StoreCRUD.module.scss";
 
 import {
   fetchStoreCategories,
+  fetchMyStore,
   createStore,
   updateStore,
-  fetchMyStore,
   removeStore,
 } from "@/service/storeAPI";
 
@@ -28,6 +29,7 @@ function StoreCRUD() {
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
+  // ✅ yup 검증 스키마
   const schema = useMemo(() => {
     return yup.object().shape({
       storeName: yup.string().required("가게 이름은 필수입니다."),
@@ -43,7 +45,14 @@ function StoreCRUD() {
         .required("최소 주문 금액을 입력해주세요."),
       origin: yup.string().required("원산지 정보를 입력해주세요."),
       openTime: yup.string().required("영업 시작 시간을 선택해주세요."),
-      closeTime: yup.string().required("영업 종료 시간을 선택해주세요."),
+      closeTime: yup
+        .string()
+        .required("영업 종료 시간을 선택해주세요.")
+        .test("is-after-open", "종료시간은 시작시간 이후여야 합니다.", function (value) {
+          const { openTime } = this.parent;
+          if (!openTime || !value) return true;
+          return value > openTime;
+        }),
       categoryIds: yup
         .array()
         .min(1, "최소 1개 이상의 카테고리를 선택해주세요.")
@@ -60,6 +69,7 @@ function StoreCRUD() {
     });
   }, [isEdit, mainImageUrl]);
 
+  // ✅ RHF
   const {
     register,
     handleSubmit,
@@ -68,9 +78,15 @@ function StoreCRUD() {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: { categoryIds: [] },
+    defaultValues: {
+      categoryIds: [],
+      days: [],
+      openTime: "09:00",
+      closeTime: "18:00",
+    },
   });
 
+  // ✅ 카테고리 불러오기
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -90,81 +106,89 @@ function StoreCRUD() {
     loadCategories();
   }, []);
 
+  // ✅ 빈 폼
+  const emptyForm = {
+    storeName: "",
+    branchName: "",
+    phone: "",
+    addr: "",
+    addrDetail: "",
+    minPrice: 0,
+    origin: "",
+    notice: "",
+    categoryIds: [],
+    openTime: "09:00",
+    closeTime: "18:00",
+    days: [],
+    mainImage: undefined,
+  };
+
+  // ✅ 내 가게 불러오기 (localStorage 제거)
   const loadMyStore = async () => {
     try {
-      if (options.days.length === 0) return;
       const myStore = await fetchMyStore();
-      if (myStore) {
-        setIsEdit(true);
-        setStoreId(myStore.storeId);
-        const hourListFromServer = myStore.hourList || [];
-        const referenceHour =
-          hourListFromServer.find((h) => h.dayOfWeek === 1) ||
-          hourListFromServer[0] ||
-          {};
 
-        const openTime = referenceHour.openTime?.substring(0, 5) || "09:00";
-        const closeTime = referenceHour.closeTime?.substring(0, 5) || "18:00";
-
-        const mainFile = myStore.fileList?.find((f) => f.mainYn === "Y");
-        if (mainFile && mainFile.storedName) {
-          const imageUrl = `${API_BASE_URL}/api/v1/file/download/${mainFile.storedName}`;
-          setMainImageUrl(imageUrl);
-        } else {
-          setMainImageUrl(null);
-        }
-
-        reset({
-          storeName: myStore.storeName,
-          branchName: myStore.branchName,
-          phone: myStore.phone,
-          addr: myStore.addr,
-          addrDetail: myStore.addrDetail,
-          minPrice: myStore.minPrice,
-          origin: myStore.origin,
-          notice: myStore.notice,
-          categoryIds: myStore.categoryList.map((c) => c.category.caId.toString()),
-          openTime: openTime,
-          closeTime: closeTime,
-          days: hourListFromServer
-            .filter((h) => h.closeYn === "Y")
-            .map((h) => options.days[h.dayOfWeek - 1]),
-          mainImage: undefined,
-        });
-      } else {
-        reset({
-          storeName: "",
-          branchName: "",
-          phone: "",
-          addr: "",
-          addrDetail: "",
-          minPrice: 0,
-          origin: "",
-          notice: "",
-          categoryIds: [],
-          openTime: "09:00",
-          closeTime: "18:00",
-          days: [],
-          mainImage: undefined,
-        });
-        setMainImageUrl(null);
+      if (!myStore) {
+        reset(emptyForm);
         setIsEdit(false);
         setStoreId(null);
+        setMainImageUrl(null);
+        return;
       }
+
+      if (myStore.delYn === "Y") {
+        console.warn("삭제된 가게입니다.");
+        reset(emptyForm);
+        setIsEdit(false);
+        setStoreId(null);
+        return;
+      }
+
+      setIsEdit(true);
+      setStoreId(myStore.storeId);
+
+      const hourList = myStore.hourList || [];
+      const refHour = hourList.find((h) => h.dayOfWeek === 1) || hourList[0] || {};
+      const openTime = refHour.openTime?.substring(0, 5) || "09:00";
+      const closeTime = refHour.closeTime?.substring(0, 5) || "18:00";
+
+      const mainFile = myStore.fileList?.find((f) => f.mainYn === "Y");
+      if (mainFile?.storedName) {
+        setMainImageUrl(`${API_BASE_URL}/api/v1/file/download/${mainFile.storedName}`);
+      } else {
+        setMainImageUrl(null);
+      }
+
+      reset({
+        ...emptyForm,
+        storeName: myStore.storeName,
+        branchName: myStore.branchName,
+        phone: myStore.phone,
+        addr: myStore.addr,
+        addrDetail: myStore.addrDetail,
+        minPrice: myStore.minPrice,
+        origin: myStore.origin,
+        notice: myStore.notice,
+        categoryIds: myStore.categoryList.map((c) => c.category.caId.toString()),
+        openTime,
+        closeTime,
+        days: hourList
+          .filter((h) => h.closeYn === "Y")
+          .map((h) => options.days[h.dayOfWeek - 1]),
+      });
     } catch (err) {
-      console.log("내 가게 불러오기 실패:", err);
-      setStoreId(null);
+      console.error("내 가게 불러오기 실패:", err);
+      reset(emptyForm);
       setIsEdit(false);
-      setMainImageUrl(null);
+      setStoreId(null);
     }
   };
 
   useEffect(() => {
-    if (options.days.length > 0) {
-      loadMyStore();
-    }
+    if (options.days.length > 0) loadMyStore();
   }, [options.days]);
 
+  // ✅ 등록/수정
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
@@ -176,12 +200,10 @@ function StoreCRUD() {
       formData.append("minPrice", Number(data.minPrice));
       formData.append("origin", data.origin);
       formData.append("notice", data.notice ?? "");
-      formData.append("delYn", "N");
 
-      if (isEdit) {
-        formData.append("storeId", storeId);
-      }
+      if (isEdit) formData.append("storeId", storeId);
 
+      // 이미지
       if (data.mainImage?.[0]) {
         const file = data.mainImage[0];
         const ext = file.name.split(".").pop();
@@ -191,16 +213,18 @@ function StoreCRUD() {
         formData.append("mainImage", safeFile);
       }
 
-      const categoryIds = data.categoryIds?.map((id) => Number(id));
+      // 카테고리
+      const categoryIds = data.categoryIds.map((id) => Number(id));
       categoryIds.forEach((id) => formData.append("categoryIds", id));
 
+      // 시간
+      const selectedDays = data.days || [];
       const hourList = options.days.map((day, idx) => ({
         dayOfWeek: idx + 1,
         openTime: `${data.openTime}:00`,
         closeTime: `${data.closeTime}:00`,
-        closeYn: data.days?.includes(day) ? "Y" : "N",
+        closeYn: selectedDays.includes(day) ? "Y" : "N",
       }));
-
       hourList.forEach((h, i) => {
         formData.append(`hourList[${i}].dayOfWeek`, h.dayOfWeek);
         formData.append(`hourList[${i}].openTime`, h.openTime);
@@ -228,10 +252,13 @@ function StoreCRUD() {
     if (!window.confirm("정말 가게를 숨기시겠습니까?")) return;
     try {
       await removeStore(storeId);
-      alert("가게가 사용자 화면에서 숨김 처리되었습니다.");
-      await loadMyStore();
+      alert("가게가 숨김 처리되었습니다!");
+      reset(emptyForm);
+      setIsEdit(false);
+      setStoreId(null);
+      setMainImageUrl(null);
     } catch (err) {
-      console.error("삭제(숨김) 실패:", err.response?.data || err);
+      console.error("삭제 실패:", err.response?.data || err);
       alert("삭제 처리 중 오류가 발생했습니다.");
     }
   };
@@ -246,97 +273,68 @@ function StoreCRUD() {
             options={options.category}
             register={register}
             watch={watch}
+            errorMessage={errors.categoryIds?.message}
           />
-          {errors.categoryIds && (
-            <p className={stylesLayout.error}>{errors.categoryIds.message}</p>
-          )}
         </div>
 
         <InputField
           label="가게 이름"
           name="storeName"
-          placeholder="예: 김치찜 명가"
           register={register}
           errorMessage={errors.storeName?.message}
         />
-
-        <InputField
-          label="지점명 (선택)"
-          name="branchName"
-          placeholder="예: 강남점"
+        <InputField label="지점명 (선택)" name="branchName" register={register} />
+        <ImageUpload
+          label="가게 이미지"
+          name="mainImage"
           register={register}
+          errorMessage={errors.mainImage?.message}
+          currentImageUrl={mainImageUrl}
         />
-
-        <div className={stylesLayout.formGroup}>
-          <ImageUpload
-            label="가게 이미지"
-            name="mainImage"
-            register={register}
-            errorMessage={errors.mainImage?.message}
-            currentImageUrl={mainImageUrl}
-          />
-        </div>
-
         <InputField
           label="전화번호"
           name="phone"
           type="number"
-          placeholder="예: 0212344567"
           register={register}
           errorMessage={errors.phone?.message}
         />
-
         <InputField
           label="주소"
           name="addr"
-          placeholder="예: 서울특별시 강남구 논현로 123"
           register={register}
           errorMessage={errors.addr?.message}
         />
-
-        <InputField
-          label="상세주소"
-          name="addrDetail"
-          placeholder="예: ○○빌딩 2층"
-          register={register}
-        />
-
+        <InputField label="상세주소" name="addrDetail" register={register} />
         <InputField
           label="최소 주문 금액"
           name="minPrice"
           type="number"
-          placeholder="예: 15000"
           register={register}
           errorMessage={errors.minPrice?.message}
         />
-
         <TextareaField
           label="원산지 표시"
           name="origin"
-          placeholder="예: 쌀(국산), 김치(국산), 고추가루(중국산)"
           register={register}
           errorMessage={errors.origin?.message}
         />
-
-        <TextareaField
-          label="공지사항 (선택)"
-          name="notice"
-          placeholder="예: 배달 시 포장용기가 변경될 수 있습니다."
-          register={register}
-        />
+        <TextareaField label="공지사항 (선택)" name="notice" register={register} />
 
         <div className={stylesLayout.formGroup}>
           <label className={stylesCrud.label}>영업시간</label>
           <div className={stylesCrud.timeGroup}>
-            <input type="time" {...register("openTime")} />
+            <TimeField
+              name="openTime"
+              register={register}
+              errorMessage={errors.openTime?.message}
+            />
             <span>~</span>
-            <input type="time" {...register("closeTime")} />
+            <TimeField
+              name="closeTime"
+              register={register}
+              errorMessage={errors.closeTime?.message}
+            />
           </div>
-          {(errors.openTime || errors.closeTime) && (
-            <p className={stylesLayout.error}>
-              {errors.openTime?.message || errors.closeTime?.message}
-            </p>
-          )}
         </div>
 
         <div className={stylesLayout.formGroup}>
