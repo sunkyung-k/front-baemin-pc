@@ -8,7 +8,7 @@
   margin-top: space("xl");
 
   .btn {
-    width: 220px;
+    width: fn-rem(220);
 
     @media (max-width: bp("md")) {
       flex: 1;
@@ -39,7 +39,7 @@
   transition: all 0.25s ease;
 
   &-default {
-    height: 44px;
+    height: fn-rem(44);
     padding: 0 space("lg");
     font-size: font("md");
     transition: background-color 0.25s ease, transform 0.1s ease;
@@ -86,6 +86,16 @@
 
   &:hover {
     background-color: rgba(fn-color("primary"), 0.9);
+  }
+}
+
+.btn-primary-line {
+  background-color: fn-color("white");
+  color: fn-color("primary");
+  border: 1px solid fn-color("primary");
+
+  &:hover {
+    background-color: rgba(fn-color("primary-bg"), 0.9);
   }
 }
 
