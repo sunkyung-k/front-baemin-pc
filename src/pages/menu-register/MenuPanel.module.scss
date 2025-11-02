@@ -145,3 +145,7 @@
 :global(.empty-state) {
   margin-top: fn-rem(20);
 }
+
+.active {
+  background-color: fn-color("gray-50");
+}

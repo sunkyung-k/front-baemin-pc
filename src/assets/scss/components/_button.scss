@@ -51,8 +51,17 @@
 
   &-sm {
     font-size: font("sm");
-    padding: space("xs") space("md");
-    border-radius: radius("sm");
+    padding: space("xs") space("sm");
+    border-radius: fn-rem(4);
+
+    &.btn-danger {
+      background-color: fn-color("danger-bg");
+      color: fn-color("danger");
+      border: 1px solid fn-color("danger-bg");
+      &:hover {
+        background: fn-color("dangerH-bg");
+      }
+    }
   }
 
   &:disabled {
@@ -110,8 +119,8 @@
 
   &:hover {
     background-color: fn-color("gray-100");
-    border-color: fn-color("gray-400");
-    color: fn-color("dark");
+    border-color: fn-color("gray-300");
+    // color: fn-color("dark");
   }
 }
 

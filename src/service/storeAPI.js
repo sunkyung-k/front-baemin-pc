@@ -52,14 +52,14 @@ export const fetchMyStore = async () => {
     console.log("🧾 [DEBUG] 현재 로그인한 사용자 ID:", userId);
     console.log("🧾 [DEBUG] 현재 authStore.storeId:", storeId);
 
-    // 1️⃣ storeId 있으면 바로 조회
+    // storeId 있으면 바로 조회
     if (storeId) {
       const res = await api.get(`/api/v1/store/${storeId}`);
       console.log("✅ storeId로 직접 조회 성공:", res.data.response?.vo);
       return res.data.response?.vo ?? null;
     }
 
-    // 2️⃣ storeId 없고 OWNER면 — 내 userId 기준으로 필터링
+    // storeId 없고 OWNER면 — 내 userId 기준으로 필터링
     if (userRole === "OWNER") {
       console.log("🧩 storeId 없음 → 전체 목록에서 내 가게(userId) 찾기 시도");
       const res = await api.get("/api/v1/store");

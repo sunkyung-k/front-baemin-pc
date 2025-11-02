@@ -9,7 +9,7 @@ export const handleApiError = (error, context = "") => {
     error?.message ||
     "서버 통신 중 오류가 발생했습니다.";
 
-  console.error(`❌ [${context}]`, message);
+  console.error(`[${context}]`, message);
 
   // 실무에서는 toast나 modal로 대체 가능 (임시 alert 유지)
   alert(`[${context}] ${message}`);

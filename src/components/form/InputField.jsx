@@ -3,7 +3,8 @@ import React from "react";
 
 /**
  * 전역 공용 InputField
- * RHF, 수동 상태, 더미(dummyRegister) 모두 커버
+ * - RHF register / 수동 제어 모두 지원
+ * - 검증 및 min/max 제한은 Yup 등 상위 레벨에서 처리
  */
 export default function InputField({
   label,
@@ -11,33 +12,20 @@ export default function InputField({
   name,
   placeholder,
   errorMessage,
-  register, // RHF or dummyRegister
+  register,
   value,
   onChange,
   onFocus,
   autoComplete = "off",
   disabled = false,
 }) {
-  let inputProps = {};
+  // RHF register 감지
+  const registered = typeof register === "function" ? register(name) : {};
 
-  // register가 있고 RHF에서 온 함수라면
-  if (typeof register === "function") {
-    const temp = register(name);
-
-    // RHF register인지 판별 (ref 속성이 있고, onBlur 있음)
-    const isRHFRegister =
-      temp && (typeof temp.onBlur === "function" || temp.ref !== undefined);
-
-    if (isRHFRegister) {
-      inputProps = { ...temp }; // RHF인 경우 그대로 사용
-    } else {
-      inputProps = {}; // 더미(dummyRegister)는 무시하고 일반 value/onChange 사용
-    }
-  }
-
-  // 수동제어 모드 (value, onChange가 명시적으로 존재하면 우선 적용)
-  if (onChange) inputProps.onChange = onChange;
-  if (value !== undefined) inputProps.value = value;
+  // '-' 키 입력 차단 (숫자 타입일 때만)
+  const handleKeyDown = (e) => {
+    if (type === "number" && e.key === "-") e.preventDefault();
+  };
 
   return (
     <div className="input-field">
@@ -46,6 +34,7 @@ export default function InputField({
           {label}
         </label>
       )}
+
       <input
         id={name}
         name={name}
@@ -54,9 +43,13 @@ export default function InputField({
         autoComplete={autoComplete}
         disabled={disabled}
         className={`input-txt ${errorMessage ? "error" : ""}`}
-        {...inputProps}
+        {...registered}
+        value={value}
+        onChange={onChange || registered?.onChange}
+        onKeyDown={handleKeyDown}
         onFocus={onFocus}
       />
+
       {errorMessage && <p className="input-error">{errorMessage}</p>}
     </div>
   );

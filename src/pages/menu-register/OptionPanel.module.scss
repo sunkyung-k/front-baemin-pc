@@ -1,0 +1,92 @@
+.optionPanel {
+  background: fn-color("white");
+  margin-bottom: space("xs");
+  overflow: hidden;
+
+  .optionList {
+    padding: space("sm") space("md") space("xs");
+    border-top: 1px solid fn-color("gray-200");
+
+    :global(.empty-state) {
+      padding: fn-rem(30);
+      margin: space("md") 0;
+    }
+
+    .optionItem {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: space("sm") space("xs");
+      border-bottom: 1px dashed fn-color("gray-100");
+      transition: background 0.15s ease;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .optionInfo {
+        display: flex;
+        align-items: center;
+        gap: space("xs");
+        font-size: font("md");
+
+        .optName {
+          font-weight: 500;
+          color: fn-color("gray-900");
+        }
+
+        .optAvailable {
+          font-size: font("xs");
+          font-weight: 600;
+          padding: 2px 6px;
+          border-radius: radius("sm");
+
+          &.on {
+            background: #e7f8f0;
+            color: #2c9a65;
+          }
+
+          &.off {
+            background: #fde7e7;
+            color: #d94646;
+          }
+        }
+      }
+
+      .optPrice {
+        margin-right: space("xs");
+        font-size: font("sm");
+        font-weight: 600;
+      }
+
+      .optionActions {
+        display: flex;
+        align-items: center;
+        gap: space("xs");
+
+        // button {
+        //   width: 26px;
+        //   height: 26px;
+        //   display: flex;
+        //   align-items: center;
+        //   justify-content: center;
+        //   border: none;
+        //   border-radius: radius("sm");
+        //   background: none;
+        //   color: fn-color("gray-600");
+        //   cursor: pointer;
+        //   transition: all 0.15s ease;
+
+        //   &:hover {
+        //     color: fn-color("primary");
+        //     background: fn-color("gray-100");
+        //   }
+
+        //   svg {
+        //     font-size: font("sm");
+        //   }
+        // }
+      }
+    }
+  }
+}

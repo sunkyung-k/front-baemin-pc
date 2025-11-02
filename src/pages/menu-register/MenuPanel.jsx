@@ -1,23 +1,27 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import styles from "./MenuPanel.module.scss";
 import EmptyState from "@/components/menu/EmptyState";
 import { TiPlus } from "react-icons/ti";
-import { FaUtensils } from "react-icons/fa";
-import MenuFormModal from "./MenuFormModal";
+import { FaUtensils, FaPen, FaTrashAlt } from "react-icons/fa";
 import { useCategoryStore } from "@/store/useCategoryStore";
-import { useMenu } from "@/hooks/useMenu";
+import { useMenu } from "@/hooks/menu/useMenu";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
+import MenuModal from "./MenuModal";
+import OptionGroupPanel from "./OptionGroupPanel";
 
+/**
+ * 메뉴 패널 (카테고리별 메뉴 목록 + CRUD)
+ * - React Query + Zustand 완전 동기화 구조
+ * - useMemo 제거 → 즉시 반영 보장
+ */
 export default function MenuPanel() {
   const { activeCategory } = useCategoryStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
+  const [activeMenuId, setActiveMenuId] = useState(null); // 옵션 그룹 토글 상태
 
   const hasActiveCategory = !!activeCategory;
-  const menuList = useMemo(
-    () => activeCategory?.menuList ?? [],
-    [activeCategory]
-  );
+  const menuList = activeCategory?.menuList || []; // useMemo 제거로 즉시 반영 보장
   const hasMenus = menuList.length > 0;
 
   const storeId =
@@ -28,28 +32,36 @@ export default function MenuPanel() {
 
   const { create, update, remove } = useMenu(storeId);
 
+  /** 메뉴 등록 버튼 클릭 */
   const handleCreate = () => {
     setEditTarget(null);
     setModalOpen(true);
   };
 
+  /** 메뉴 수정 버튼 클릭 */
   const handleEdit = (menu) => {
     setEditTarget(menu);
     setModalOpen(true);
   };
 
+  /** 등록 / 수정 처리 */
   const handleSubmit = async (formData) => {
     try {
-      if (editTarget) await update.mutateAsync(formData);
-      else await create.mutateAsync(formData);
+      if (editTarget) {
+        await update.mutateAsync(formData);
+        alert("메뉴가 수정되었습니다.");
+      } else {
+        await create.mutateAsync(formData);
+        alert("메뉴가 등록되었습니다.");
+      }
       setModalOpen(false);
-      alert(editTarget ? "메뉴가 수정되었습니다." : "메뉴가 등록되었습니다.");
     } catch (err) {
       console.error("메뉴 등록/수정 실패:", err);
       alert("등록/수정 중 오류가 발생했습니다.");
     }
   };
 
+  /** 메뉴 삭제 처리 */
   const handleRemove = async (menuId) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
     try {
@@ -61,6 +73,12 @@ export default function MenuPanel() {
     }
   };
 
+  /** 메뉴 클릭 시 옵션 그룹 토글 */
+  const handleToggle = (menuId) => {
+    setActiveMenuId((prev) => (prev === menuId ? null : menuId));
+  };
+
+  /** 선택된 카테고리가 없을 때 */
   if (!hasActiveCategory) {
     return (
       <section className={styles.detailPanel}>
@@ -73,6 +91,7 @@ export default function MenuPanel() {
     );
   }
 
+  /** 메뉴 리스트 렌더링 */
   return (
     <section className={styles.detailPanel}>
       <div className={styles.detailHeader}>
@@ -89,10 +108,17 @@ export default function MenuPanel() {
           {menuList.map((menu, index) => {
             const key = menu.menuId ?? `${menu.menuName}-${index}`;
             const imageSrc = getAbsoluteImageUrl(menu);
+            const isActive = activeMenuId === menu.menuId;
 
             return (
               <div key={key} className={styles.menuItem}>
-                <div className={styles.menuHeader}>
+                {/* 메뉴 헤더 */}
+                <div
+                  className={`${styles.menuHeader} ${
+                    isActive ? styles.active : ""
+                  }`}
+                  onClick={() => handleToggle(menu.menuId)}
+                >
                   <div className={styles.menuLeft}>
                     <div className={styles.menuThumb}>
                       {imageSrc ? (
@@ -120,20 +146,35 @@ export default function MenuPanel() {
                     </div>
                     <div className={styles.menuButtons}>
                       <button
-                        className="btn btn-small btn-secondary"
-                        onClick={() => handleEdit(menu)}
+                        className="btn btn-sm btn-secondary-line"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(menu);
+                        }}
                       >
-                        <i className="fas fa-pen"></i> 수정
+                        <FaPen />
+                        수정
                       </button>
                       <button
-                        className="btn btn-small btn-danger"
-                        onClick={() => handleRemove(menu.menuId)}
+                        className="btn btn-sm btn-danger"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemove(menu.menuId);
+                        }}
                       >
-                        <i className="fas fa-trash-alt"></i> 삭제
+                        <FaTrashAlt />
+                        삭제
                       </button>
                     </div>
                   </div>
                 </div>
+
+                {/* 옵션 그룹 패널 */}
+                {isActive && (
+                  <div className={styles.optionPanelWrapper}>
+                    <OptionGroupPanel menuId={menu.menuId} />
+                  </div>
+                )}
               </div>
             );
           })}
@@ -146,7 +187,8 @@ export default function MenuPanel() {
         />
       )}
 
-      <MenuFormModal
+      {/* 메뉴 등록/수정 모달 */}
+      <MenuModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         mode={editTarget ? "edit" : "create"}
