@@ -7,12 +7,8 @@ const menuCategoryAPI = {
   async getList(storeId) {
     try {
       const res = await api.get(`/api/v1/store/${storeId}`);
-      const list = res?.data?.response?.vo?.menuCategoryList ?? [];
-      return Array.isArray(list)
-        ? list
-            .filter((v) => v.delYn === "N")
-            .sort((a, b) => a.displayOrder - b.displayOrder)
-        : [];
+      // 백엔드에서 이미 정렬 및 필터링된 리스트 제공
+      return res?.data?.response?.vo?.menuCategoryList ?? [];
     } catch (err) {
       handleApiError(err, "menuCategoryAPI.getList");
       return [];
@@ -22,7 +18,12 @@ const menuCategoryAPI = {
   /** 카테고리 등록 */
   async create(payload) {
     try {
-      const res = await api.post(`/api/v1/menu/category`, payload);
+      const clean = {
+        storeId: payload.storeId,
+        menuCaName: payload.menuCaName,
+        displayOrder: Math.max(Number(payload.displayOrder || 1), 1),
+      };
+      const res = await api.post(`/api/v1/menu/category`, clean);
       return res.data;
     } catch (err) {
       handleApiError(err, "menuCategoryAPI.create");
@@ -33,7 +34,13 @@ const menuCategoryAPI = {
   /** 카테고리 수정 */
   async update(payload) {
     try {
-      const res = await api.put(`/api/v1/menu/category`, payload);
+      const clean = {
+        menuCaId: payload.menuCaId,
+        storeId: payload.storeId,
+        menuCaName: payload.menuCaName,
+        displayOrder: Math.max(Number(payload.displayOrder || 1), 1),
+      };
+      const res = await api.put(`/api/v1/menu/category`, clean);
       return res.data;
     } catch (err) {
       handleApiError(err, "menuCategoryAPI.update");
@@ -41,7 +48,7 @@ const menuCategoryAPI = {
     }
   },
 
-  /** 카테고리 삭제 (Soft Delete) */
+  /** 카테고리 삭제 */
   async remove(menuCaId) {
     try {
       const res = await api.delete(`/api/v1/menu/category/${menuCaId}`);

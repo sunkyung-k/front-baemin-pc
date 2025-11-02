@@ -1,0 +1,205 @@
+import React, { useState, useMemo, useEffect, useCallback } from "react";
+import styles from "./OptionGroupPanel.module.scss";
+import { useCategoryStore } from "@/store/useCategoryStore";
+import EmptyState from "@/components/menu/EmptyState";
+import { FaPuzzlePiece, FaPlus, FaCog, FaTimes } from "react-icons/fa";
+import { TiPlus } from "react-icons/ti";
+import OptionGroupModal from "./OptionGroupModal";
+import OptionPanel from "./OptionPanel";
+import OptionModal from "./OptionModal";
+import { useMenuOptionGroup } from "@/hooks/menu/useMenuOptionGroup";
+import menuAPI from "@/service/menu/menuAPI";
+
+export default function OptionGroupPanel({ menuId }) {
+  const { activeCategory, setActiveCategory } = useCategoryStore();
+
+  // 그룹 모달 상태
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState(null);
+  const [mode, setMode] = useState("create");
+
+  // 옵션 모달 상태
+  const [optionModalOpen, setOptionModalOpen] = useState(false);
+  const [optionGroupTarget, setOptionGroupTarget] = useState(null);
+
+  // 그룹 토글 (하나만 열림)
+  const [openGroupId, setOpenGroupId] = useState(null);
+
+  const { remove, refreshMenu } = useMenuOptionGroup(menuId);
+
+  /** 메뉴 상세 최신화 */
+  useEffect(() => {
+    const fetchMenuDetail = async () => {
+      if (!activeCategory || !menuId) return;
+      try {
+        const updatedMenu = await menuAPI.getMenuDetail(menuId);
+        if (!updatedMenu) return;
+
+        const updatedList = activeCategory.menuList.map((m) =>
+          m.menuId === menuId ? updatedMenu : m
+        );
+        setActiveCategory({ ...activeCategory, menuList: updatedList });
+      } catch (err) {
+        console.error("메뉴 상세 로드 실패:", err);
+      }
+    };
+    fetchMenuDetail();
+  }, [menuId]);
+
+  /** targetMenu 구하기 */
+  const targetMenu = useMemo(() => {
+    if (!activeCategory?.menuList) return null;
+    return activeCategory.menuList.find((m) => m.menuId === menuId);
+  }, [activeCategory, menuId]);
+
+  const groupList = targetMenu?.menuOptionGroupList ?? [];
+
+  /** 그룹 토글 */
+  const toggleGroup = useCallback((groupId) => {
+    setOpenGroupId((prev) => (prev === groupId ? null : groupId));
+  }, []);
+
+  /** 그룹 모달 열기 */
+  const handleOpenGroupModal = useCallback((group = null, e) => {
+    if (e) e.stopPropagation();
+    setEditTarget(group);
+    setMode(group ? "edit" : "create");
+    setModalOpen(true);
+  }, []);
+
+  /** 그룹 모달 닫기 */
+  const handleCloseGroupModal = useCallback(async () => {
+    setModalOpen(false);
+    setEditTarget(null);
+    setMode("create");
+    await refreshMenu();
+  }, [refreshMenu]);
+
+  /** 옵션 모달 제어 */
+  const handleOpenOptionModal = useCallback((group, e) => {
+    if (e) e.stopPropagation();
+    setOptionGroupTarget(group);
+    setOptionModalOpen(true);
+  }, []);
+
+  const handleCloseOptionModal = useCallback(async () => {
+    setOptionGroupTarget(null);
+    setOptionModalOpen(false);
+    await refreshMenu();
+  }, [refreshMenu]);
+
+  /** 그룹 삭제 */
+  const handleRemoveGroup = useCallback(
+    async (groupId, e) => {
+      if (e) e.stopPropagation();
+      if (!window.confirm("정말 삭제하시겠습니까?")) return;
+      remove.mutate(groupId, {
+        onSuccess: async () => {
+          alert("옵션 그룹이 삭제되었습니다.");
+          await refreshMenu();
+        },
+      });
+    },
+    [remove, refreshMenu]
+  );
+
+  if (!targetMenu) {
+    return (
+      <div className={styles.emptyGroup}>
+        <p>선택한 메뉴 정보를 불러올 수 없습니다.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.optionGroupPanel}>
+      {/* 새 그룹 등록 버튼 */}
+      <button
+        type="button"
+        className={styles.addGroupButton}
+        onClick={(e) => handleOpenGroupModal(null, e)}
+      >
+        <TiPlus size={18} /> 새 옵션 그룹 등록
+      </button>
+
+      {/* 그룹 리스트 */}
+      {groupList.length === 0 ? (
+        <EmptyState
+          icon={<FaPuzzlePiece />}
+          title={`${targetMenu.menuName}의 등록된 옵션 그룹이 없습니다.`}
+          description="추가 토핑, 사이즈 등 옵션 구성을 등록해주세요."
+        />
+      ) : (
+        <div className={styles.optionGroupWrap}>
+          {groupList.map((group) => {
+            const isOpen = openGroupId === group.menuOptGrpId;
+            return (
+              <div key={group.menuOptGrpId} className={styles.optionGroupItem}>
+                <div
+                  className={styles.groupHeader}
+                  onClick={() => toggleGroup(group.menuOptGrpId)}
+                >
+                  <div className={styles.groupTitle}>
+                    <strong>{group.menuOptGrpName}</strong>
+                    <span>
+                      {group.requiredYn === "Y" ? "필수 선택" : "선택 가능"} (
+                      {group.requiredYn === "Y"
+                        ? `${group.minSelect ?? 1}개`
+                        : `최대 ${group.maxSelect ?? 0}개`}
+                      )
+                    </span>
+                  </div>
+                  <div
+                    className={styles.groupActions}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      className="btn btn-sm btn-secondary-line"
+                      title="옵션 등록"
+                      onClick={(e) => handleOpenOptionModal(group, e)}
+                    >
+                      <FaPlus />
+                    </button>
+                    <button
+                      className="btn btn-sm btn-secondary-line"
+                      title="옵션 그룹 수정"
+                      onClick={(e) => handleOpenGroupModal(group, e)}
+                    >
+                      <FaCog />
+                    </button>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      title="옵션 그룹 삭제"
+                      onClick={(e) => handleRemoveGroup(group.menuOptGrpId, e)}
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                </div>
+
+                {isOpen && <OptionPanel menuId={menuId} group={group} />}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 모달들 */}
+      <OptionGroupModal
+        key={`${menuId}-${mode}-${modalOpen ? "open" : "close"}`}
+        menuId={menuId}
+        isOpen={modalOpen}
+        onClose={handleCloseGroupModal}
+        defaultValues={editTarget}
+        mode={mode}
+      />
+
+      <OptionModal
+        menuId={menuId}
+        groupId={optionGroupTarget?.menuOptGrpId}
+        isOpen={optionModalOpen}
+        onClose={handleCloseOptionModal}
+      />
+    </div>
+  );
+}

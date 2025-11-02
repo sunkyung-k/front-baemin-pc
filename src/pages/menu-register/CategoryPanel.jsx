@@ -1,24 +1,28 @@
 import React, { useState, useMemo, useEffect } from "react";
 import styles from "./CategoryPanel.module.scss";
 import { TiPlus } from "react-icons/ti";
-import { MdModeEdit } from "react-icons/md";
-import { FaTrashAlt, FaLayerGroup } from "react-icons/fa";
+import { FaTrashAlt, FaLayerGroup, FaPen } from "react-icons/fa";
 import Modal from "@/components/common/Modal";
 import InputField from "@/components/form/InputField";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useMenuCategory } from "@/hooks/useMenuCategory";
+import { useMenuCategory } from "@/hooks/menu/useMenuCategory";
 import { dummyRegister } from "@/utills/formUtils";
 import EmptyState from "@/components/menu/EmptyState";
 import { useCategoryStore } from "@/store/useCategoryStore";
 
+/** yup 유효성 검사 스키마 (등록 전용) */
 const schema = yup.object().shape({
   categoryName: yup.string().required("카테고리명을 입력해주세요."),
   categoryOrder: yup
     .number()
+    .transform((value, originalValue) =>
+      String(originalValue).trim() === "" ? undefined : value
+    )
     .typeError("숫자만 입력 가능합니다.")
-    .required("정렬 순서를 입력해주세요."),
+    .required("정렬 순서를 입력해주세요.")
+    .min(1, "정렬 순서는 1 이상이어야 합니다."), // 1 이상만 허용
 });
 
 export default function CategoryPanel({ storeId }) {
@@ -37,11 +41,13 @@ export default function CategoryPanel({ storeId }) {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
+  /** 삭제되지 않은 카테고리만 표시 */
   const visibleCategories = useMemo(
     () => categories.filter((cat) => cat.delYn === "N"),
     [categories]
   );
 
+  /** 신규 카테고리 등록 */
   const onSubmit = (data) => {
     createCategory.mutate(
       {
@@ -58,6 +64,7 @@ export default function CategoryPanel({ storeId }) {
     );
   };
 
+  /** 수정 (수동 입력용) */
   const handleUpdate = (id) => {
     const target = editableValues[id];
     if (!target || !target.name?.trim()) {
@@ -65,13 +72,20 @@ export default function CategoryPanel({ storeId }) {
       return;
     }
 
+    const orderNum = Number(target.order ?? 0);
+    if (isNaN(orderNum) || orderNum < 1) {
+      alert("정렬 순서는 1 이상의 숫자만 입력 가능합니다."); // 0 이하 차단
+      return;
+    }
+
     updateCategory.mutate({
       menuCaId: id,
       menuCaName: target.name.trim(),
-      displayOrder: Number(target.order ?? 0),
+      displayOrder: orderNum,
     });
   };
 
+  /** 삭제 */
   const handleRemove = (id) => {
     if (window.confirm("정말 삭제하시겠습니까?")) {
       removeCategory.mutate(id, {
@@ -85,10 +99,12 @@ export default function CategoryPanel({ storeId }) {
     }
   };
 
+  /** 클릭 시 활성 토글 */
   const handleToggle = (id) => {
     setActiveId((prev) => (prev === id ? null : id));
   };
 
+  /** 활성 카테고리 상태 동기화 */
   useEffect(() => {
     if (!categories?.length) return;
 
@@ -117,12 +133,13 @@ export default function CategoryPanel({ storeId }) {
         <TiPlus size={18} /> 새 카테고리 등록
       </button>
 
+      {/* 카테고리 목록 */}
       {visibleCategories.length > 0 ? (
         <div className={styles.categoryList}>
           {visibleCategories.map((cat) => {
             const cur = editableValues?.[cat.menuCaId] || {
               name: cat.menuCaName ?? "",
-              order: cat.displayOrder ?? 0,
+              order: cat.displayOrder ?? 1,
             };
 
             return (
@@ -169,7 +186,7 @@ export default function CategoryPanel({ storeId }) {
                         label="정렬 순서"
                         name={`order_${cat.menuCaId}`}
                         type="number"
-                        value={cur.order ?? 0}
+                        value={cur.order ?? 1}
                         onChange={(e) =>
                           setEditableValues((prev) => ({
                             ...prev,
@@ -186,14 +203,14 @@ export default function CategoryPanel({ storeId }) {
                     <div className={styles.btnRow}>
                       <button
                         type="button"
-                        className={`${styles.btn} ${styles.secondary} ${styles.small}`}
+                        className="btn btn-sm btn-secondary-line"
                         onClick={() => handleUpdate(cat.menuCaId)}
                       >
-                        <MdModeEdit /> 수정
+                        <FaPen /> 수정
                       </button>
                       <button
                         type="button"
-                        className={`${styles.btn} ${styles.danger} ${styles.small}`}
+                        className="btn btn-sm btn-danger"
                         onClick={() => handleRemove(cat.menuCaId)}
                       >
                         <FaTrashAlt /> 삭제
@@ -213,6 +230,7 @@ export default function CategoryPanel({ storeId }) {
         />
       )}
 
+      {/* 등록 모달 */}
       <Modal
         isOpen={modalOpen}
         title="카테고리 등록"

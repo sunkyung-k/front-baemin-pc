@@ -4,7 +4,7 @@ import CategoryPanel from "./CategoryPanel";
 import MenuPanel from "./MenuPanel";
 import { IoClose } from "react-icons/io5";
 import { useCategoryStore } from "@/store/useCategoryStore";
-import { useMenuCategory } from "@/hooks/useMenuCategory";
+import { useMenuCategory } from "@/hooks/menu/useMenuCategory";
 
 export default function MenuLayout() {
   const storeId = 5; // 추후 실제 storeId 연동 예정
@@ -13,21 +13,23 @@ export default function MenuLayout() {
 
   /** 카테고리 삭제된 경우 활성 카테고리 초기화 */
   useEffect(() => {
+    // activeCategory 없으면 아무것도 안 함
     if (!activeCategory) return;
 
     const stillExists = categories?.some(
       (cat) => cat.menuCaId === activeCategory.menuCaId
     );
 
-    if (!stillExists) {
-      clearActiveCategory(); // Zustand의 activeCategory 초기화
+    // 카테고리가 삭제된 경우만 초기화
+    if (!stillExists && activeCategory !== null) {
+      clearActiveCategory();
     }
   }, [categories, activeCategory, clearActiveCategory]);
 
   /** 언마운트 시 전체 상태 정리 */
   useEffect(() => {
     return () => {
-      clearActiveCategory();
+      clearActiveCategory(); // 언마운트 시 1회만 실행
     };
   }, [clearActiveCategory]);
 

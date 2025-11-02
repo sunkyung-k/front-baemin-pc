@@ -24,7 +24,7 @@ const schema = yup.object().shape({
   soldoutYn: yup.string().required("품절 여부를 선택해주세요."),
 });
 
-export default function MenuFormModal({
+export default function MenuModal({
   isOpen,
   onClose,
   mode = "create", // "create" | "edit"

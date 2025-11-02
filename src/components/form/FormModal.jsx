@@ -3,9 +3,8 @@ import Modal from "@/components/common/Modal";
 
 /**
  * FormModal (공용 폼 모달)
- * - Modal.jsx를 내부적으로 사용
- * - 등록/수정/작성 등 모든 폼 모달에서 재사용
- * - RHF(useForm) 또는 일반 onSubmit 둘 다 호환
+ * - RHF(useForm)의 handleSubmit을 그대로 받음
+ * - e.preventDefault() 제거해야 검증 → submit 함수 호출됨
  */
 export default function FormModal({
   title,
@@ -20,7 +19,7 @@ export default function FormModal({
   return (
     <Modal isOpen={isOpen} title={title} onClose={onClose}>
       <form
-        onSubmit={onSubmit}
+        onSubmit={onSubmit} // ✅ RHF handleSubmit 직접 연결
         className={`form-modal ${className}`}
         noValidate
       >

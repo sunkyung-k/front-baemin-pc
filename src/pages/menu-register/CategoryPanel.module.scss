@@ -88,49 +88,7 @@
         display: flex;
         gap: fn-rem(8);
         justify-content: flex-end;
-
-        .delIco {
-          color: fn-color("danger");
-        }
       }
     }
   }
-
-  .emptyState {
-    text-align: center;
-    padding: fn-rem(60) fn-rem(30);
-    background: fn-color("gray-50");
-    border: 2px dashed fn-color("gray-200");
-    border-radius: radius("md");
-    color: fn-color("gray-500");
-    font-size: fn-rem(16);
-    margin-top: fn-rem(30);
-
-    .emptyIco {
-      width: fn-rem(40);
-      height: fn-rem(40);
-      display: inline-block;
-      margin-bottom: fn-rem(10);
-    }
-
-    p {
-      margin-bottom: fn-rem(8);
-      font-weight: 600;
-      color: fn-color("gray-600");
-    }
-
-    small {
-      font-size: fn-rem(12);
-      color: fn-color("gray-400");
-    }
-
-    .btn {
-      margin-top: fn-rem(20);
-    }
-  }
-}
-
-.modalForm {
-  display: flex;
-  flex-direction: column;
 }
