@@ -35,8 +35,10 @@ const storeAPI = {
       const res = await api.get(`/api/v1/store/my`);
       const data = res.data.response?.vo ?? res.data.response;
 
-      if (!data) {
-        console.warn("[storeAPI.getMyStore] 등록된 가게 없음 (정상)");
+      // ✅ [추가] storeId === 0 이면 ‘가게 없음’ 처리
+      if (!data || data.storeId === 0) {
+        console.warn("[storeAPI.getMyStore] 등록된 가게 없음 (storeId=0)");
+        authStore.getState().clearStoreId();
         return null;
       }
 
@@ -52,15 +54,13 @@ const storeAPI = {
     } catch (err) {
       const msg = err?.response?.data?.message || err.message;
 
-      // “등록된 가게가 없습니다”면 완전히 정상 흐름으로 처리
       if (msg?.includes("등록된 가게가 없습니다")) {
         console.warn("[storeAPI.getMyStore] 등록된 가게 없음 (정상)");
-        return null; // 🚫 절대 throw 안 함
+        return null;
       }
 
-      // 그 외 진짜 에러만 로그
       console.error("[storeAPI.getMyStore] 실제 오류 발생:", msg);
-      return null; // 여기서도 throw 안 함 (→ React Query onError 안탐)
+      return null;
     }
   },
 
