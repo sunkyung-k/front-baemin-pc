@@ -1,6 +1,12 @@
 @use "@/assets/scss/utils" as *;
 
 .checkbox-field {
+  display: flex;
+  flex-direction: column;
+  gap: space("sm");
+}
+
+.checkbox-box {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: space("sm");
@@ -35,6 +41,11 @@
     font-weight: 700;
   }
 
+  &.error {
+    border-color: fn-color("danger");
+    background: fn-color("danger-bg");
+  }
+
   input {
     accent-color: fn-color("primary");
     transform: scale(1.1);
@@ -61,4 +72,14 @@
   .checkbox-field {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+.hint {
+  font-size: font("sm");
+  color: fn-color("primary");
+}
+
+.checkbox-error {
+  font-size: font("sm");
+  color: fn-color("danger");
 }

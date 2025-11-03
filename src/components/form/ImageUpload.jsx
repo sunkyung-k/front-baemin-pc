@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 export default function ImageUpload({
   label = "이미지 업로드",
   name = "image",
+  hint = "",
   register,
   errorMessage,
   currentImageUrl = null,
@@ -56,13 +57,14 @@ export default function ImageUpload({
         accept="image/*"
         {...rest}
         ref={(el) => {
-          ref(el); // RHF ref 연결
-          fileInputRef.current = el; // 로컬 ref도 연결
+          ref(el);
+          fileInputRef.current = el;
         }}
         onChange={handleFileChange}
         style={{ display: "none" }}
       />
 
+      {hint && <p className="hint">{hint}</p>}
       {errorMessage && <p className="input-error">{errorMessage}</p>}
     </div>
   );

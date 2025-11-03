@@ -1,0 +1,29 @@
+@use "@/assets/scss/utils" as *;
+
+.searchBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: space("sm");
+  max-width: fn-rem(600);
+  width: 100%;
+  margin: 0 auto;
+}
+
+.searchBox input {
+  flex: 1;
+  height: fn-rem(44);
+  padding: 0 space("md");
+  font-size: font("lg");
+  border-radius: fn-rem(40);
+  border: 1px solid #ddd;
+
+  &::placeholder {
+    color: fn-color("gray-400");
+  }
+
+  &:focus {
+    outline: none;
+    border-color: fn-color("primary");
+  }
+}

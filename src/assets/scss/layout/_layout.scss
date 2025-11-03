@@ -110,6 +110,12 @@
   width: 100%;
   padding: 0 space("lg");
   margin: fn-rem(50) auto fn-rem(80);
+
+  &.home {
+    max-width: none;
+    padding: 0;
+    margin-top: 0;
+  }
 }
 
 .footer {

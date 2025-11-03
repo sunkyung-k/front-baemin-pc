@@ -7,54 +7,54 @@ export default function Checkbox({
   register,
   watch,
   value,
-  onChange,
   errorMessage,
+  hint,
 }) {
-  const selected = watch ? watch(name) || [] : value || [];
-
-  let inputProps = {};
-
-  if (typeof register === "function") {
-    const temp = register(name);
-    const isRHFRegister =
-      temp && (typeof temp.onBlur === "function" || temp.ref !== undefined);
-    if (isRHFRegister) {
-      inputProps = { ...temp };
-    }
-  }
-
-  // RHF 외의 수동 제어 (value, onChange가 있을 때)
-  if (onChange) inputProps.onChange = onChange;
+  const raw = watch ? watch(name) : value;
+  const selected = Array.isArray(raw)
+    ? raw.map(String)
+    : raw
+    ? [String(raw)]
+    : [];
 
   return (
     <>
-      {label && (
-        <label htmlFor={name} className="checkbox-label">
-          {label}
-        </label>
-      )}
-
       <div className="checkbox-field">
-        {options.map((option, index) => {
-          const valueItem = typeof option === "object" ? option.id.toString() : option;
-          const text = typeof option === "object" ? option.name : option;
-          const isChecked = selected.includes(valueItem);
+        {label && (
+          <label htmlFor={name} className="checkbox-label">
+            {label}
+          </label>
+        )}
 
-          return (
-            <label key={index} className="checkbox-input">
-              <input
-                type="checkbox"
-                name={name}
-                value={valueItem}
-                checked={isChecked}
-                {...inputProps}
-              />
-              <span>{text}</span>
-            </label>
-          );
-        })}
+        <div className="checkbox-box">
+          {options.map((option, index) => {
+            const valueItem =
+              typeof option === "object" ? option.id.toString() : option;
+            const text = typeof option === "object" ? option.name : option;
+            const isChecked = selected.includes(valueItem);
+
+            const reg = typeof register === "function" ? register(name) : {};
+
+            return (
+              <label
+                key={index}
+                className={`checkbox-input ${errorMessage ? "error" : ""}`}
+              >
+                <input
+                  type="checkbox"
+                  name={name}
+                  value={valueItem}
+                  checked={isChecked}
+                  {...reg}
+                />
+                <span>{text}</span>
+              </label>
+            );
+          })}
+        </div>
 
         {errorMessage && <p className="checkbox-error">{errorMessage}</p>}
+        {hint && <p className="hint">{hint}</p>}
       </div>
     </>
   );

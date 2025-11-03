@@ -1,0 +1,51 @@
+@use "@/assets/scss/utils" as *;
+
+.hours-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: space("sm");
+
+  .hours-label {
+    font-size: font("md");
+    font-weight: 600;
+    color: fn-color("gray-800");
+  }
+
+  .hours-box {
+    display: inline-flex;
+    align-items: center;
+    gap: space("xs");
+  }
+
+  .hours-sel {
+    width: fn-rem(120);
+    height: fn-rem(44);
+    padding: 0 space("sm");
+    border: 1px solid fn-color("gray-200");
+    border-radius: radius("sm");
+    font-size: font("md");
+    background: fn-color("white");
+    color: fn-color("dark");
+    transition: all 0.2s ease;
+
+    &::placeholder {
+      color: fn-color("gray-400");
+    }
+
+    &:focus {
+      outline: none;
+      border-color: fn-color("primary");
+    }
+
+    &.error {
+      border-color: fn-color("danger");
+      background: fn-color("danger-bg");
+    }
+  }
+
+  .hours-error {
+    font-size: font("sm");
+    color: fn-color("danger");
+  }
+}

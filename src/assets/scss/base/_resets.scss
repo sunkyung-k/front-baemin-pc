@@ -57,10 +57,6 @@ li {
 input:not([type="checkbox"]),
 textarea,
 select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-
   font-family: $font-family-default;
 }
 
