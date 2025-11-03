@@ -1,0 +1,43 @@
+.profile {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: space("sm");
+  padding: space("lg") space("xs");
+  border: 1px solid fn-color("border");
+  border-radius: radius("md");
+  background-color: fn-color("white");
+  text-align: center;
+
+  .pName {
+    font-size: font("xl");
+  }
+
+  .pId {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: space("xs");
+    font-size: font("md");
+    color: fn-color("gray-700");
+
+    span:first-child {
+      flex: 0 0 auto;
+    }
+
+    span:last-child {
+      flex: 1 1 auto;
+      word-break: break-word;
+    }
+  }
+
+  :global(.btn) {
+    padding: space("xs") space("md");
+  }
+
+  .income {
+    font-size: font("md");
+    font-weight: 700;
+    color: fn-color("primary");
+  }
+}

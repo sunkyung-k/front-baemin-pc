@@ -1,54 +1,45 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
+import Card from "../MypageCard";
+import { useStore } from "@/hooks/useStore";
+import { categoryAPI } from "@/service/categoryAPI";
+import { getAbsoluteImageUrl } from "@/utills/imageUtills";
+import { authStore } from "@/store/authStore";
 import InputField from "@/components/form/InputField";
-import ImageUpload from "@/components/form/ImageUpload";
 import TextareaField from "@/components/form/TextareaField";
 import Checkbox from "@/components/mypage/Checkbox";
-import TimeField from "@/components/mypage/TimeField";
-import Card from "../MypageCard";
-
+import HoursField from "@/components/mypage/HoursField";
+import ImageUpload from "@/components/form/ImageUpload";
 import stylesLayout from "../MypageLayout.module.scss";
-import stylesCrud from "./StoreCRUD.module.scss";
-
-import {
-  fetchStoreCategories,
-  fetchMyStore,
-  createStore,
-  updateStore,
-  removeStore,
-} from "@/service/storeAPI";
 
 /**
- * ✅ StoreCRUD.jsx
- * 점주(OWNER) 전용 가게 등록 / 수정 / 삭제 페이지
- * - 1개 계정 = 1개 가게
- * - Soft Delete (delYn='Y') 구조
- * - 등록 → 수정 자동 전환, 삭제 → 등록 폼으로 리셋
+ * ============================================
+ * ✅ StoreCRUD (Owner 전용)
+ * --------------------------------------------
+ * - 한 페이지에서 등록 / 수정 / 삭제 / 조회까지
+ * - React Hook Form + Yup 검증 + useStore 훅 연동
+ * - 팀원과 동일한 imageUtils 로 통일 (/static/imgs)
+ * ============================================
  */
 function StoreCRUD() {
-  /** ---------- [State 정의] ---------- **/
-  const [isEdit, setIsEdit] = useState(false); // true면 수정모드, false면 등록모드
-  const [storeId, setStoreId] = useState(null); // 현재 가게 id
-  const [options, setOptions] = useState({ category: [], days: [] });
-  const [mainImageUrl, setMainImageUrl] = useState(null); // 기존 이미지 미리보기 URL
+  const { myStore, create, update, remove } = useStore();
+  const [isEdit, setIsEdit] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [mainImageUrl, setMainImageUrl] = useState(null);
 
-  const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:9091";
+  const DAY_OPTIONS = ["월", "화", "수", "목", "금", "토", "일"];
 
-  /** ---------- [중복 호출 방지용] ---------- **/
-  const didFetchRef = useRef(false);
-
-  /** ---------- [검증 스키마 설정] ---------- **/
+  /** ✅ [1] 유효성 검증 스키마 */
   const schema = useMemo(
     () =>
       yup.object().shape({
         storeName: yup.string().required("가게 이름은 필수입니다."),
         phone: yup
           .string()
-          .matches(/^[0-9]{9,11}$/, "전화번호 형식이 올바르지 않습니다.")
+          .matches(/^[0-9-]+$/, "전화번호 형식이 올바르지 않습니다.")
           .required("전화번호를 입력해주세요."),
         addr: yup.string().required("주소를 입력해주세요."),
         minPrice: yup
@@ -74,25 +65,11 @@ function StoreCRUD() {
           .array()
           .min(1, "최소 1개 이상의 카테고리를 선택해주세요.")
           .required("카테고리를 선택해주세요."),
-        mainImage: yup
-          .mixed()
-          .test(
-            "file-required",
-            "메인 이미지를 업로드해주세요.",
-            function (value) {
-              // 수정 모드일 때 이미 업로드된 이미지가 있으면 통과
-              if (isEdit && mainImageUrl) return true;
-              if (!value) return false;
-              if (value instanceof FileList) return value.length > 0;
-              if (Array.isArray(value)) return value.length > 0;
-              return false;
-            }
-          ),
       }),
-    [isEdit, mainImageUrl]
+    []
   );
 
-  /** ---------- [RHF 세팅] ---------- **/
+  /** ✅ [2] RHF 세팅 */
   const {
     register,
     handleSubmit,
@@ -101,27 +78,20 @@ function StoreCRUD() {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: {
-      categoryIds: [],
-      days: [],
-      openTime: "09:00",
-      closeTime: "18:00",
-    },
+    defaultValues: { categoryIds: [], days: [] },
   });
 
-  /** ---------- [카테고리 데이터 로드] ---------- **/
+  /** ✅ [3] 카테고리 목록 로드 */
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const categories = await fetchStoreCategories();
-        const parsed = categories.map((item) => ({
-          id: item.caId,
-          name: item.caName,
-        }));
-        setOptions({
-          category: parsed,
-          days: ["월", "화", "수", "목", "금", "토", "일"],
-        });
+        const categories = await categoryAPI.getCategories();
+        setCategories(
+          categories.map((item) => ({
+            id: item.caId,
+            name: item.caName,
+          }))
+        );
       } catch (err) {
         console.error("카테고리 불러오기 실패:", err);
       }
@@ -129,95 +99,55 @@ function StoreCRUD() {
     loadCategories();
   }, []);
 
-  /** ---------- [빈 폼 기본값] ---------- **/
-  const emptyForm = {
-    storeName: "",
-    branchName: "",
-    phone: "",
-    addr: "",
-    addrDetail: "",
-    minPrice: 0,
-    origin: "",
-    notice: "",
-    categoryIds: [],
-    openTime: "09:00",
-    closeTime: "18:00",
-    days: [],
-    mainImage: undefined,
+  /** ✅ [4] myStore → form 변환 함수 */
+  const mapStoreToForm = (store) => {
+    if (!store) return {};
+    const hasBusinessHour = store.businessHour?.includes("~");
+    const openTime = hasBusinessHour
+      ? store.businessHour.split("~")[0].trim()
+      : store.hourList?.[0]?.openTime?.substring(0, 5) || "09:00";
+    const closeTime = hasBusinessHour
+      ? store.businessHour.split("~")[1].trim()
+      : store.hourList?.[0]?.closeTime?.substring(0, 5) || "18:00";
+
+    return {
+      storeName: store.storeName,
+      branchName: store.branchName,
+      phone: store.phone,
+      addr: store.addr,
+      addrDetail: store.addrDetail,
+      minPrice: store.minPrice,
+      origin: store.origin,
+      notice: store.notice,
+      categoryIds: store.categoryList.map((c) => c.category.caId.toString()),
+      openTime,
+      closeTime,
+      days:
+        store.hourList
+          ?.filter((h) => h.closeYn === "Y")
+          ?.map((h) => DAY_OPTIONS[h.dayOfWeek - 1]) || [],
+    };
   };
 
-  /** ---------- [내 가게 불러오기] ---------- **/
-  const loadMyStore = async () => {
-    try {
-      const myStore = await fetchMyStore();
-
-      if (!myStore || myStore.delYn === "Y") {
-        // 등록된 가게가 없으면 “등록 모드” 유지
-        if (!didFetchRef.current)
-          console.warn("등록된 가게가 없거나 삭제된 상태입니다.");
-        reset(emptyForm);
-        setIsEdit(false);
-        setStoreId(null);
-        setMainImageUrl(null);
-        return;
-      }
-
-      // ✅ 내 가게 존재 → 수정모드로 전환
-      setIsEdit(true);
-      setStoreId(myStore.storeId);
-
-      // 시간 데이터 세팅
-      const hourList = myStore.hourList || [];
-      const refHour =
-        hourList.find((h) => h.dayOfWeek === 1) || hourList[0] || {};
-      const openTime = refHour.openTime?.substring(0, 5) || "09:00";
-      const closeTime = refHour.closeTime?.substring(0, 5) || "18:00";
-
-      // 메인 이미지 세팅
-      const mainFile = myStore.fileList?.find((f) => f.mainYn === "Y");
-      setMainImageUrl(
-        mainFile?.storedName
-          ? `${API_BASE_URL}/static/imgs/${mainFile.storedName}`
-          : null
-      );
-
-      // ✅ 폼 데이터 채워넣기
-      reset({
-        ...emptyForm,
-        storeName: myStore.storeName,
-        branchName: myStore.branchName,
-        phone: myStore.phone,
-        addr: myStore.addr,
-        addrDetail: myStore.addrDetail,
-        minPrice: myStore.minPrice,
-        origin: myStore.origin,
-        notice: myStore.notice,
-        categoryIds: myStore.categoryList.map((c) =>
-          c.category.caId.toString()
-        ),
-        openTime,
-        closeTime,
-        days: hourList
-          .filter((h) => h.closeYn === "Y")
-          .map((h) => options.days[h.dayOfWeek - 1]),
-      });
-    } catch (err) {
-      console.error("내 가게 불러오기 실패:", err);
-      reset(emptyForm);
-      setIsEdit(false);
-      setStoreId(null);
-    }
-  };
-
-  /** ---------- [최초 1회만 실행 - StrictMode 대응] ---------- **/
+  /** ✅ [5] myStore 변경 시 폼 자동 세팅 */
   useEffect(() => {
-    if (!didFetchRef.current && options.days.length > 0) {
-      loadMyStore();
-      didFetchRef.current = true;
+    if (!myStore || myStore.delYn === "Y") {
+      reset();
+      setIsEdit(false);
+      setMainImageUrl(null);
+      return;
     }
-  }, [options.days]);
 
-  /** ---------- [등록/수정 처리] ---------- **/
+    setIsEdit(true);
+
+    // imageUtils 적용 (팀원 버전 호환)
+    const imageUrl = getAbsoluteImageUrl(myStore.fileList?.[0]);
+    setMainImageUrl(imageUrl);
+
+    reset(mapStoreToForm(myStore));
+  }, [myStore]);
+
+  /** ✅ [6] 등록 / 수정 */
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
@@ -230,10 +160,6 @@ function StoreCRUD() {
       formData.append("origin", data.origin);
       formData.append("notice", data.notice ?? "");
 
-      // 수정모드면 storeId 추가
-      if (isEdit) formData.append("storeId", storeId);
-
-      // 이미지
       if (data.mainImage?.[0]) {
         const file = data.mainImage[0];
         const ext = file.name.split(".").pop();
@@ -243,115 +169,109 @@ function StoreCRUD() {
         formData.append("mainImage", safeFile);
       }
 
-      // 카테고리
       const categoryIds = data.categoryIds.map((id) => Number(id));
       categoryIds.forEach((id) => formData.append("categoryIds", id));
 
-      // 요일 + 시간
       const selectedDays = data.days || [];
-      const hourList = options.days.map((day, idx) => ({
-        dayOfWeek: idx + 1,
-        openTime: `${data.openTime}:00`,
-        closeTime: `${data.closeTime}:00`,
-        closeYn: selectedDays.includes(day) ? "Y" : "N",
-      }));
-      hourList.forEach((h, i) => {
-        formData.append(`hourList[${i}].dayOfWeek`, h.dayOfWeek);
-        formData.append(`hourList[${i}].openTime`, h.openTime);
-        formData.append(`hourList[${i}].closeTime`, h.closeTime);
-        formData.append(`hourList[${i}].closeYn`, h.closeYn);
+      DAY_OPTIONS.forEach((day, idx) => {
+        const closeYn = selectedDays.includes(day) ? "Y" : "N";
+        formData.append(`hourList[${idx}].dayOfWeek`, idx + 1);
+        formData.append(`hourList[${idx}].openTime`, `${data.openTime}:00`);
+        formData.append(`hourList[${idx}].closeTime`, `${data.closeTime}:00`);
+        formData.append(`hourList[${idx}].closeYn`, closeYn);
       });
 
-      // ✅ 등록 vs 수정 구분 처리
       if (isEdit) {
-        await updateStore(formData);
-        alert("가게 정보가 수정되었습니다!");
+        if (!myStore?.storeId) {
+          alert("가게 정보 식별 실패: 다시 로그인 후 시도해주세요.");
+          return;
+        }
+        formData.append("storeId", myStore.storeId);
+        await update.mutateAsync(formData);
+        alert("가게 정보가 수정되었습니다.");
       } else {
-        await createStore(formData);
-        alert("가게가 성공적으로 등록되었습니다!");
+        await create.mutateAsync(formData);
+        alert("가게가 등록되었습니다!");
       }
-
-      // ✅ 등록/수정 후 새로고침 없이 즉시 최신 상태 반영
-      await loadMyStore();
     } catch (err) {
-      console.error("등록/수정 실패:", err.response?.data || err);
-      alert(err.response?.data?.message || "처리 중 오류가 발생했습니다.");
+      console.error("등록/수정 실패:", err);
+      alert("처리 중 오류가 발생했습니다.");
     }
   };
 
-  /** ---------- [Soft Delete] ---------- **/
+  /** ✅ [7] 삭제 */
   const handleDelete = async () => {
-    if (!window.confirm("정말 가게를 숨기시겠습니까?")) return;
+    if (!window.confirm("정말 가게를 삭제하시겠습니까?")) return;
     try {
-      await removeStore(storeId);
-      alert("가게가 숨김 처리되었습니다!");
-
-      // ✅ 상태 초기화 (등록 폼으로 전환)
-      reset(emptyForm);
+      await remove.mutateAsync(myStore?.storeId);
+      reset();
       setIsEdit(false);
-      setStoreId(null);
       setMainImageUrl(null);
+      authStore.getState().clearStoreId();
+      alert("가게가 삭제 처리되었습니다.");
     } catch (err) {
-      console.error("삭제 실패:", err.response?.data || err);
+      console.error("삭제 실패:", err);
       alert("삭제 처리 중 오류가 발생했습니다.");
     }
   };
 
-  /** ---------- [렌더링] ---------- **/
+  /** ✅ [8] 렌더링 */
   return (
-    <Card title={!isEdit ? "가게 등록" : "가게 수정"}>
+    <Card title={isEdit ? "가게 수정" : "가게 등록"}>
       <form onSubmit={handleSubmit(onSubmit)} className={stylesLayout.form}>
-        {/* ✅ 카테고리 선택 */}
-        <div className={stylesLayout.formGroup}>
-          <Checkbox
-            label="카테고리 선택"
-            name="categoryIds"
-            options={options.category}
-            register={register}
-            watch={watch}
-            errorMessage={errors.categoryIds?.message}
-          />
-        </div>
+        <Checkbox
+          label="카테고리 선택"
+          name="categoryIds"
+          options={categories}
+          register={register}
+          watch={watch}
+          hint="가게 업종을 선택해주세요. (중복 선택 가능)"
+          errorMessage={errors.categoryIds?.message}
+        />
 
-        {/* ✅ 기본 정보 */}
         <InputField
           label="가게 이름"
           name="storeName"
           register={register}
           errorMessage={errors.storeName?.message}
         />
+
         <InputField
           label="지점명 (선택)"
           name="branchName"
           register={register}
         />
 
-        {/* ✅ 이미지 */}
         <ImageUpload
-          label="가게 이미지"
+          label="가게 대표 이미지"
           name="mainImage"
           register={register}
           errorMessage={errors.mainImage?.message}
           currentImageUrl={mainImageUrl}
+          hint="JPG, PNG 형식 / 최대 50MB까지 업로드 가능합니다."
         />
 
-        {/* ✅ 연락처, 주소 */}
         <InputField
           label="전화번호"
           name="phone"
-          type="number"
+          type="tel"
           register={register}
           errorMessage={errors.phone?.message}
         />
+
         <InputField
           label="주소"
           name="addr"
           register={register}
           errorMessage={errors.addr?.message}
         />
-        <InputField label="상세주소" name="addrDetail" register={register} />
 
-        {/* ✅ 최소 주문금액, 원산지, 공지 */}
+        <InputField
+          label="상세주소 (선택)"
+          name="addrDetail"
+          register={register}
+        />
+
         <InputField
           label="최소 주문 금액"
           name="minPrice"
@@ -359,52 +279,41 @@ function StoreCRUD() {
           register={register}
           errorMessage={errors.minPrice?.message}
         />
+
         <TextareaField
           label="원산지 표시"
           name="origin"
           register={register}
           errorMessage={errors.origin?.message}
         />
+
         <TextareaField
           label="공지사항 (선택)"
           name="notice"
           register={register}
         />
 
-        {/* ✅ 영업시간 */}
-        <div className={stylesLayout.formGroup}>
-          <label className={stylesCrud.label}>영업시간</label>
-          <div className={stylesCrud.timeGroup}>
-            <TimeField
-              name="openTime"
-              register={register}
-              errorMessage={errors.openTime?.message}
-            />
-            <span>~</span>
-            <TimeField
-              name="closeTime"
-              register={register}
-              errorMessage={errors.closeTime?.message}
-            />
-          </div>
-        </div>
+        <HoursField
+          label="영업시간"
+          register={register}
+          openError={errors.openTime?.message}
+          closeError={errors.closeTime?.message}
+          hint="모든 요일 동일하게 적용됩니다."
+        />
 
-        {/* ✅ 휴무 요일 */}
-        <div className={stylesLayout.formGroup}>
-          <Checkbox
-            label="휴무 요일"
-            name="days"
-            options={options.days}
-            register={register}
-            watch={watch}
-          />
-        </div>
+        <Checkbox
+          label="휴무 요일"
+          name="days"
+          options={DAY_OPTIONS}
+          register={register}
+          watch={watch}
+        />
 
-        {/* ✅ 버튼 (등록 ↔ 수정/삭제) */}
         <div className="btnWrap btnWrap-center">
           <button type="submit" className="btn btn-default btn-primary">
             {isEdit ? "수정" : "등록"}
           </button>
+
           {isEdit && (
             <button
               type="button"

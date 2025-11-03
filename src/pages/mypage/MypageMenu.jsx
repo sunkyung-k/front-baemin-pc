@@ -1,52 +1,56 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { NavLink } from "react-router-dom";
 import { authStore } from "@/store/authStore";
-import { fetchMyStore } from "@/service/storeAPI";
-
+import { useStore } from "@/hooks/useStore";
+import MypageProfile from "./MypageProfile";
 import styles from "./MypageMenu.module.scss";
 
 function MypageMenu() {
-  const { userName } = authStore();
-  const [storeName, setStoreName] = useState("등록된 가게 없음");
-  const [isEdit, setIsEdit] = useState(false);
+  const { userId, userName, userRole } = authStore();
+  const { myStore, isLoading } = useStore();
 
-  useEffect(() => {
-    const loadMyStore = async () => {
-      try {
-        const myStore = await fetchMyStore();
-        if (myStore) {
-          setStoreName(myStore.storeName || "미등록");
-          setIsEdit(true);
-        } else {
-          setStoreName("등록된 가게 없음");
-          setIsEdit(false);
-        }
-      } catch {
-        // 불필요한 콘솔 제거
-        setStoreName("로드 실패");
-        setIsEdit(false);
-      }
-    };
-    loadMyStore();
-  }, []);
+  const storeName = myStore?.storeName || "등록된 가게 없음";
+  const isEdit = !!myStore;
+
+  const menuItems =
+    userRole === "ROLE_OWNER"
+      ? [
+          { to: "/mypage/order/manage", label: "주문 관리" },
+          {
+            to: "/mypage/store",
+            label: isEdit ? "가게 수정" : "가게 등록",
+          },
+          ...(myStore
+            ? [{ to: `/menuRegister/${myStore.storeId}`, label: "메뉴 관리" }]
+            : []),
+          { to: "/mypage/account", label: "계정 설정" },
+        ]
+      : [
+          { to: "/mypage/order/info", label: "주문 정보" },
+          { to: "/mypage/account", label: "계정 설정" },
+        ];
 
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.profile}>
-        <strong>{userName}님</strong>
-        <span>가게명: {storeName}</span>
-        <div className={styles.income}>총 수입 ₩1,203,000</div>
-      </div>
+      <MypageProfile
+        userName={userName}
+        userId={userId}
+        userRole={userRole}
+        storeName={isLoading ? "로딩 중..." : storeName}
+      />
 
       <nav className={styles.navMenu}>
-        <a href="#" className={`${styles.navItem} ${styles.active}`}>
-          주문 관리
-        </a>
-        <a href="/mypage/store" className={styles.navItem}>
-          {isEdit ? "가게 수정" : "가게 등록"}
-        </a>
-        <a href="#" className={styles.navItem}>
-          계정 설정
-        </a>
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) =>
+              `${styles.navItem} ${isActive ? styles.active : ""}`
+            }
+          >
+            {item.label}
+          </NavLink>
+        ))}
       </nav>
     </aside>
   );

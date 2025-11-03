@@ -6,29 +6,7 @@
   padding: 24px;
   background-color: fn-color("gray-bg");
   border-radius: radius("md");
-  max-width: fn-rem(260);
-}
-.profile {
-  padding: 20px;
-  border: 1px solid fn-color("border");
-  text-align: center;
-  border-radius: radius("md");
-  background-color: fn-color("white");
-}
-.profile strong {
-  font-size: font("xl");
-}
-.profile span {
-  display: block;
-  margin-top: space("xs");
-  font-size: font("md");
-  color: fn-color("gray-700");
-}
-.income {
-  margin-top: space("sm");
-  font-size: font("lg");
-  font-weight: 700;
-  color: fn-color("primary");
+  width: fn-rem(260);
 }
 
 .navMenu {
@@ -56,6 +34,6 @@
 
 @media (max-width: bp("md")) {
   .sidebar {
-    max-width: none;
+    width: 100%;
   }
 }

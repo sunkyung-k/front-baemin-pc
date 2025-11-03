@@ -1,21 +1,24 @@
+// src/utils/imageUtils.js
+
 /**
- * 메뉴 객체로부터 절대 경로 이미지 URL 반환
- * - storedId, storedName, uuid, fileName 등 다양한 형태 지원
+ * 업로드된 엔티티(메뉴, 가게, 리뷰 등) 객체로부터 절대 경로 이미지 URL 반환 (공용)
+ * - storedId, storedName, uuid, fileName 등 다양한 속성명 지원
  * - filePath가 /static, /upload 등 어떤 형태든 안전하게 처리
  */
-export const getAbsoluteImageUrl = (menu) => {
-  if (!menu) return null;
+export const getAbsoluteImageUrl = (entity) => {
+  if (!entity) return null;
 
   const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:9090";
-  const filePath = typeof menu.filePath === "string" ? menu.filePath : "";
+  const filePath = typeof entity.filePath === "string" ? entity.filePath : "";
 
-  // 파일명 후보를 순서대로 탐색
+  // 파일명 후보를 순서대로 탐색 (엔티티 종류 관계없이 커버)
   const fileName =
-    menu.storedId ||
-    menu.storedName ||
-    menu.fileThumbName ||
-    menu.uuid ||
-    menu.fileName ||
+    entity.storedId ||
+    entity.storedName ||
+    entity.fileThumbName ||
+    entity.uuid ||
+    entity.fileName ||
+    entity.imageName ||
     "";
 
   if (!fileName) return null;
