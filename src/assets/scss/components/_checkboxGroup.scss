@@ -1,0 +1,97 @@
+@use "@/assets/scss/utils" as *;
+
+.chk-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: space("xs");
+
+  .input-label {
+    font-size: font("md");
+    color: fn-color("gray-800");
+    font-weight: 600;
+  }
+
+  .chk-options {
+    display: inline-flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: space("md");
+    padding: fn-rem(10) space("md") fn-rem(10) 0;
+    border-radius: radius("sm");
+    background: fn-color("white");
+    width: 100%;
+    transition: border-color 0.2s ease;
+
+    &:focus-within {
+      border-color: fn-color("primary");
+    }
+  }
+
+  &.row {
+    .chk-options {
+      flex-direction: row;
+      gap: space("lg");
+    }
+    .chk-label {
+      width: auto !important;
+    }
+  }
+
+  .chk-option {
+    display: flex;
+    align-items: center;
+    gap: space("xs");
+    cursor: pointer;
+
+    input {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      width: fn-rem(18);
+      height: fn-rem(18);
+      border: 1px solid fn-color("gray-300");
+      border-radius: radius("xs");
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      accent-color: fn-color("primary");
+      // transform: scale(1.1);
+
+      &:checked {
+        background: fn-color("primary");
+        border-color: fn-color("primary");
+        color: fn-color("primary");
+        font-weight: 700;
+
+        &::after {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -55%) rotate(45deg);
+          width: fn-rem(4);
+          height: fn-rem(8);
+          border-right: 2px solid fn-color("white");
+          border-bottom: 2px solid fn-color("white");
+        }
+      }
+    }
+
+    .chk-label {
+      font-size: font("md");
+      color: fn-color("dark");
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
+
+  .input-error {
+    font-size: font("sm");
+    color: fn-color("danger");
+    margin-top: fn-rem(2);
+  }
+}

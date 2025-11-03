@@ -9,6 +9,8 @@ import OrderInfo from "../pages/mypage/user/OrderInfo";
 import MypageAccount from "../pages/mypage/MypageAccount";
 import MenuLayout from "../pages/menu-register/MenuLayout";
 import StoreList from "../pages/store-list/StoreList";
+import StoreDetailLayout from "../pages/store-detail/StoreDetailLayout";
+import MenuTabContent from "../pages/store-detail/components/menu/MenuTabContent";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +24,16 @@ export const router = createBrowserRouter([
       {
         path: "store/list",
         Component: StoreList,
+      },
+      {
+        path: "store",
+        Component: StoreDetailLayout,
+        children: [
+          {
+            path: ":storeId",
+            Component: MenuTabContent,
+          },
+        ],
       },
       {
         path: "mypage",

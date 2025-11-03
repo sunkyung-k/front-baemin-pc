@@ -88,6 +88,17 @@ const storeAPI = {
       throw err;
     }
   },
+  /** 유저용 가게 상세 조회 (로그인 불필요) */
+  async getStoreDetail(storeId) {
+    try {
+      console.log(`[storeAPI] getStoreDetail 호출 (storeId=${storeId})`);
+      const res = await api.get(`/api/v1/store/${storeId}`);
+      return res.data;
+    } catch (err) {
+      handleApiError(err, "storeAPI.getStoreDetail");
+      throw err;
+    }
+  },
 };
 
 export default storeAPI;

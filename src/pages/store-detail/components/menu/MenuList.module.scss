@@ -1,0 +1,48 @@
+@use "sass:color";
+.menuListWrap {
+  display: flex;
+  flex-direction: column;
+  gap: space("lg");
+}
+
+.categoryTabs {
+  display: flex;
+  gap: space("sm");
+  margin-bottom: space("lg");
+}
+
+.tab {
+  padding: space("sm") space("lg");
+  border-radius: radius("full");
+  border: 1px solid fn-color("gray-200");
+  background: fn-color("white");
+  color: fn-color("gray-700");
+  font-size: font("md");
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    border-color: fn-color("primary");
+    box-shadow: 0 0 0 2px color.scale(fn-color("primary"), $lightness: 40%);
+  }
+
+  &.active {
+    background: fn-color("primary-bg");
+    border-color: fn-color("primary");
+    color: fn-color("primary");
+    font-weight: 600;
+  }
+}
+
+.categoryTitle {
+  font-size: font("xl");
+  font-weight: 600;
+  color: fn-color("gray-800");
+  margin-bottom: space("md");
+}
+
+.menuItems {
+  display: flex;
+  flex-direction: column;
+  gap: space("lg");
+}
