@@ -1,7 +1,12 @@
 import React from "react";
+import Card from "../MypageCard";
 
 function OrderInfo(props) {
-  return <div>주문 정보_유저용</div>;
+  return (
+    <div>
+      <Card title="주문 정보">ㅇㅁㄴㄹㅇㄴㅁㄹ</Card>
+    </div>
+  );
 }
 
 export default OrderInfo;

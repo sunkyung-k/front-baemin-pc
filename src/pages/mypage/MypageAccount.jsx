@@ -1,7 +1,12 @@
 import React from "react";
+import Card from "./MypageCard";
 
 function MypageAccount(props) {
-  return <div>계정 설정_공통</div>;
+  return (
+    <div>
+      <Card title="계정 설정">ㅇㅁㄴㄹㅇㄴㅁㄹ</Card>
+    </div>
+  );
 }
 
 export default MypageAccount;
