@@ -9,8 +9,11 @@
 
 export const QUERY_KEYS = {
   /** 가게(Store) */
-  STORE: (storeId) => ["store", storeId],
   STORE_LIST: ["storeList"],
+  STORE_SEARCH: (params) => ["storeSearch", params],
+  STORE_DETAIL: (storeId) => ["storeDetail", storeId],
+  MY_STORE: ["myStore"],
+  STORE_CATEGORY_LIST: ["storeCategoryList"],
 
   /** 메뉴 카테고리(Menu Category) */
   MENU_CATEGORY_LIST: (storeId) => ["menuCategoryList", storeId],
