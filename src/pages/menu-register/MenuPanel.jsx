@@ -5,9 +5,9 @@ import { TiPlus } from "react-icons/ti";
 import { FaUtensils, FaPen, FaTrashAlt } from "react-icons/fa";
 import { useCategoryStore } from "@/store/useCategoryStore";
 import { useMenu } from "@/hooks/menu/useMenu";
-import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 import MenuModal from "./MenuModal";
 import OptionGroupPanel from "./OptionGroupPanel";
+import { getAbsoluteImageUrl } from "../../utills/imageUtills";
 
 /**
  * 메뉴 패널 (카테고리별 메뉴 목록 + CRUD)
@@ -21,7 +21,7 @@ export default function MenuPanel() {
   const [activeMenuId, setActiveMenuId] = useState(null); // 옵션 그룹 토글 상태
 
   const hasActiveCategory = !!activeCategory;
-  const menuList = activeCategory?.menuList || []; // useMemo 제거로 즉시 반영 보장
+  const menuList = activeCategory?.menuList || [];
   const hasMenus = menuList.length > 0;
 
   const storeId =
@@ -32,19 +32,16 @@ export default function MenuPanel() {
 
   const { create, update, remove } = useMenu(storeId);
 
-  /** 메뉴 등록 버튼 클릭 */
   const handleCreate = () => {
     setEditTarget(null);
     setModalOpen(true);
   };
 
-  /** 메뉴 수정 버튼 클릭 */
   const handleEdit = (menu) => {
     setEditTarget(menu);
     setModalOpen(true);
   };
 
-  /** 등록 / 수정 처리 */
   const handleSubmit = async (formData) => {
     try {
       if (editTarget) {
@@ -61,7 +58,6 @@ export default function MenuPanel() {
     }
   };
 
-  /** 메뉴 삭제 처리 */
   const handleRemove = async (menuId) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
     try {
@@ -73,12 +69,10 @@ export default function MenuPanel() {
     }
   };
 
-  /** 메뉴 클릭 시 옵션 그룹 토글 */
   const handleToggle = (menuId) => {
     setActiveMenuId((prev) => (prev === menuId ? null : menuId));
   };
 
-  /** 선택된 카테고리가 없을 때 */
   if (!hasActiveCategory) {
     return (
       <section className={styles.detailPanel}>
@@ -91,7 +85,6 @@ export default function MenuPanel() {
     );
   }
 
-  /** 메뉴 리스트 렌더링 */
   return (
     <section className={styles.detailPanel}>
       <div className={styles.detailHeader}>
@@ -112,7 +105,6 @@ export default function MenuPanel() {
 
             return (
               <div key={key} className={styles.menuItem}>
-                {/* 메뉴 헤더 */}
                 <div
                   className={`${styles.menuHeader} ${
                     isActive ? styles.active : ""
@@ -169,7 +161,6 @@ export default function MenuPanel() {
                   </div>
                 </div>
 
-                {/* 옵션 그룹 패널 */}
                 {isActive && (
                   <div className={styles.optionPanelWrapper}>
                     <OptionGroupPanel menuId={menu.menuId} />
@@ -187,7 +178,6 @@ export default function MenuPanel() {
         />
       )}
 
-      {/* 메뉴 등록/수정 모달 */}
       <MenuModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

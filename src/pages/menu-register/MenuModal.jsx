@@ -8,7 +8,7 @@ import TextareaField from "@/components/form/TextareaField";
 import RadioGroup from "@/components/form/RadioGroup";
 import ImageUpload from "@/components/form/ImageUpload";
 import { useCategoryStore } from "@/store/useCategoryStore";
-import { getAbsoluteImageUrl } from "@/utills/imageUtills";
+import { getAbsoluteImageUrl } from "../../utills/imageUtills";
 
 // 유효성 검사 스키마
 const schema = yup.object().shape({

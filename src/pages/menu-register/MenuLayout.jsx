@@ -5,11 +5,33 @@ import MenuPanel from "./MenuPanel";
 import { IoClose } from "react-icons/io5";
 import { useCategoryStore } from "@/store/useCategoryStore";
 import { useMenuCategory } from "@/hooks/menu/useMenuCategory";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function MenuLayout() {
-  const storeId = 5; // 추후 실제 storeId 연동 예정
-  const { categories } = useMenuCategory(storeId); // React Query에서 실시간 데이터 가져옴
+  /** 라우터 파라미터로 storeId 받기 */
+  const { storeId } = useParams();
+  const navigate = useNavigate();
+
+  /** storeId가 없을 경우 마이페이지로 리다이렉트 (예외 처리) */
+  useEffect(() => {
+    if (!storeId) navigate("/mypage");
+  }, [storeId, navigate]);
+
+  /** storeId 기반으로 메뉴 카테고리 조회 */
+  const { categories } = useMenuCategory(storeId);
   const { activeCategory, clearActiveCategory } = useCategoryStore();
+
+  /** 닫기 버튼 동작 */
+  const handleClose = () => {
+    // state.from 값에 따라 분기
+    if (location.state?.from === "mypage") {
+      navigate("/mypage");
+    } else if (location.state?.from === "store") {
+      navigate(`/store/${storeId}`);
+    } else {
+      navigate(-1); // 기본적으로는 이전 페이지로
+    }
+  };
 
   /** 카테고리 삭제된 경우 활성 카테고리 초기화 */
   useEffect(() => {
@@ -37,7 +59,7 @@ export default function MenuLayout() {
     <div className={styles.wrap}>
       <main className={styles.main}>
         {/* 닫기 버튼 */}
-        <button type="button" className={styles.close}>
+        <button type="button" className={styles.close} onClick={handleClose}>
           <IoClose />
         </button>
 

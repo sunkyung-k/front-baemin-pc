@@ -52,7 +52,7 @@ export const router = createBrowserRouter([
     Component: Login,
   },
   {
-    path: "/menuRegister:storeId",
+    path: "/menuRegister/:storeId",
     Component: MenuLayout,
   },
 ]);
