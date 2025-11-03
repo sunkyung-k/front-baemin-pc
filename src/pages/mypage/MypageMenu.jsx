@@ -21,7 +21,13 @@ function MypageMenu() {
             label: isEdit ? "가게 수정" : "가게 등록",
           },
           ...(myStore
-            ? [{ to: `/menuRegister/${myStore.storeId}`, label: "메뉴 관리" }]
+            ? [
+                {
+                  to: `/menuRegister/${myStore.storeId}`,
+                  label: "메뉴 관리",
+                  state: { from: "mypage" },
+                },
+              ]
             : []),
           { to: "/mypage/account", label: "계정 설정" },
         ]
