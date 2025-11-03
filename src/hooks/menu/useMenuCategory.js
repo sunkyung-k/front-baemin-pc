@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import menuCategoryAPI from "@/service/menu/menuCategoryAPI";
 import { QUERY_KEYS } from "@/constants/queryKeys";
-import { useAfterMutation } from "@/hooks/menu/useAfterMutation";
+import { useAfterMutation } from "@/hooks/common/useAfterMutation";
 import { useCategoryStore } from "@/store/useCategoryStore";
 
 /**

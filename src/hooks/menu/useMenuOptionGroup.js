@@ -3,7 +3,7 @@ import menuOptionGroupAPI from "@/service/menu/menuOptionGroupAPI";
 import menuAPI from "@/service/menu/menuAPI";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useCategoryStore } from "@/store/useCategoryStore";
-import { useAfterMutation } from "@/hooks/menu/useAfterMutation";
+import { useAfterMutation } from "@/hooks/common/useAfterMutation";
 
 /**
  * 메뉴 옵션 그룹 CRUD 훅 (React Query + Zustand 완전 동기화형)
