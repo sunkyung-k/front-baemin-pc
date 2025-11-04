@@ -4,10 +4,7 @@ import { useStore } from "@/hooks/useStore";
 import styles from "./MypageProfile.module.scss";
 
 export default function MypageProfile() {
-  // 로그인 유저 기본 정보 (Zustand)
   const { userName, userId, userRole } = authStore();
-
-  // 점주(OWNER)일 경우 React Query 캐시 기반으로 내 가게 정보 조회
   const { myStore, isLoading } = useStore();
 
   // React Query에서 가져온 가게명 (로딩/미등록 상태 구분)
@@ -21,7 +18,11 @@ export default function MypageProfile() {
       label: storeName,
       subText: "총 수입",
       value: "₩1,203,000",
-      button: null,
+      button: (
+        <button type="button" className="btn btn-round btn-primary">
+          내 가게 보기
+        </button>
+      ),
     },
     ROLE_USER: {
       labelTxt: "ID:",
@@ -29,11 +30,9 @@ export default function MypageProfile() {
       subText: "보유 포인트",
       value: "₩1,203,000",
       button: (
-        <div>
-          <button type="button" className="btn btn-round btn-primary">
-            포인트 충전
-          </button>
-        </div>
+        <button type="button" className="btn btn-round btn-primary">
+          포인트 충전
+        </button>
       ),
     },
   };
@@ -50,10 +49,10 @@ export default function MypageProfile() {
           <span>{info.label}</span>
         </p>
       )}
-      {info.button}
       <div className={styles.income}>
         {info.subText} : {info.value}
       </div>
+      <div>{info.button}</div>
     </div>
   );
 }

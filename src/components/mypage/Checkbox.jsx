@@ -6,56 +6,44 @@ export default function Checkbox({
   options = [],
   register,
   watch,
-  value,
   errorMessage,
   hint,
+  onChangeCustom,
 }) {
-  const raw = watch ? watch(name) : value;
-  const selected = Array.isArray(raw)
-    ? raw.map(String)
-    : raw
-    ? [String(raw)]
-    : [];
+  const selected = watch?.(name) || [];
 
   return (
-    <>
-      <div className="checkbox-field">
-        {label && (
-          <label htmlFor={name} className="checkbox-label">
-            {label}
-          </label>
-        )}
+    <div className="checkbox-field">
+      {label && <label className="checkbox-label">{label}</label>}
 
-        <div className="checkbox-box">
-          {options.map((option, index) => {
-            const valueItem =
-              typeof option === "object" ? option.id.toString() : option;
-            const text = typeof option === "object" ? option.name : option;
-            const isChecked = selected.includes(valueItem);
+      <div className="checkbox-box">
+        {options.map((option, index) => {
+          const valueItem =
+            typeof option === "object" ? option.id.toString() : option;
+          const text = typeof option === "object" ? option.name : option;
+          const isChecked = selected.includes(valueItem);
 
-            const reg = typeof register === "function" ? register(name) : {};
-
-            return (
-              <label
-                key={index}
-                className={`checkbox-input ${errorMessage ? "error" : ""}`}
-              >
-                <input
-                  type="checkbox"
-                  name={name}
-                  value={valueItem}
-                  checked={isChecked}
-                  {...reg}
-                />
-                <span>{text}</span>
-              </label>
-            );
-          })}
-        </div>
-
-        {errorMessage && <p className="checkbox-error">{errorMessage}</p>}
-        {hint && <p className="hint">{hint}</p>}
+          return (
+            <label
+              key={index}
+              className={`checkbox-input ${errorMessage ? "error" : ""}`}
+            >
+              <input
+                type="checkbox"
+                value={valueItem}
+                checked={isChecked}
+                {...register(name, {
+                  onChange: (e) => onChangeCustom?.(e),
+                })}
+              />
+              <span>{text}</span>
+            </label>
+          );
+        })}
       </div>
-    </>
+
+      {errorMessage && <p className="checkbox-error">{errorMessage}</p>}
+      {hint && <p className="hint">{hint}</p>}
+    </div>
   );
 }

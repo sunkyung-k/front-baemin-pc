@@ -23,12 +23,15 @@ export default function ImageUpload({
     } else {
       setPreview(currentImageUrl);
     }
-    onChange(e); // 💥 반드시 RHF의 onChange 호출해줘야 RHF가 인식함
+    onChange(e);
   };
 
   useEffect(() => {
     if (currentImageUrl && !fileInputRef.current?.files[0]) {
       setPreview(currentImageUrl);
+    } else if (!currentImageUrl) {
+      setPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }, [currentImageUrl]);
 
@@ -43,6 +46,13 @@ export default function ImageUpload({
       <div
         className={`image-preview ${errorMessage ? "error" : ""}`}
         onClick={() => fileInputRef.current?.click()}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            fileInputRef.current?.click();
+          }
+        }}
       >
         {preview ? (
           <img src={preview} alt="미리보기" className="preview-img" />
@@ -50,7 +60,6 @@ export default function ImageUpload({
           <span className="plus-icon">+</span>
         )}
       </div>
-
       <input
         id={name}
         type="file"

@@ -1,102 +1,65 @@
 import React, { useMemo } from "react";
 
 /**
- * 공용 HoursField
- * RHF + 수동 상태(value/onChange) 둘 다 대응
- * InputField 스타일 완벽 통일 버전
+ * HoursField (react-hook-form 완전 대응 버전)
+ * yup required 검증 정상 작동하도록 RHF의 value 직접 연결
  */
 export default function HoursField({
   label = "영업시간",
   openName = "openTime",
   closeName = "closeTime",
-  errorMessage,
-  register, // RHF or dummyRegister
-  value, // 수동 제어용 { open, close }
-  onChange, // 수동 제어용
-  minHour = 0, // 시작 00시
-  maxHour = 23, // 종료 23시 (24시 제외)
+  openError,
+  closeError,
+  register,
+  watch, // 추가 (RHF 값 추적)
   hint = "",
-  disabled = false,
-  className = "",
 }) {
-  /** ✅ 00:00 ~ 23:00 (1시간 단위) 생성 **/
+  // 00:00 ~ 23:00까지 시간 옵션 생성
   const timeOptions = useMemo(() => {
-    const times = [];
-    for (let hour = minHour; hour <= maxHour; hour++) {
-      const h = String(hour).padStart(2, "0");
-      times.push(`${h}:00`);
-    }
-    return times;
-  }, [minHour, maxHour]);
+    return Array.from(
+      { length: 24 },
+      (_, i) => `${String(i).padStart(2, "0")}:00`
+    );
+  }, []);
 
-  /** ✅ RHF register 감지 **/
-  let openProps = {};
-  let closeProps = {};
+  // RHF에서 실시간 값 가져오기
+  const openValue = watch ? watch(openName) || "" : "";
+  const closeValue = watch ? watch(closeName) || "" : "";
 
-  if (typeof register === "function") {
-    const openTemp = register(openName);
-    const closeTemp = register(closeName);
-
-    const isRHFRegister =
-      openTemp &&
-      (typeof openTemp.onBlur === "function" || openTemp.ref !== undefined);
-
-    if (isRHFRegister) {
-      openProps = { ...openTemp };
-      closeProps = { ...closeTemp };
-    }
-  }
-
-  /** ✅ 수동 제어 모드 (value/onChange) **/
-  if (onChange) {
-    openProps.onChange = (e) => onChange({ ...value, open: e.target.value });
-    closeProps.onChange = (e) => onChange({ ...value, close: e.target.value });
-  }
-
-  /** ✅ 렌더링 **/
   return (
-    <div className={`hours-field ${className}`}>
-      {label && (
-        <label className="hours-label" htmlFor={openName}>
-          {label}
-        </label>
-      )}
+    <div className="hours-field">
+      {label && <label className="hours-label">{label}</label>}
 
       <div className="hours-box">
         <select
-          id={openName}
-          name={openName}
-          disabled={disabled}
-          className={`hours-sel ${errorMessage ? "error" : ""}`}
-          {...openProps}
+          {...register(openName)}
+          value={openValue}
+          className={`hours-sel ${openError ? "error" : ""}`}
         >
           <option value="">시작 시간</option>
-          {timeOptions.map((time) => (
-            <option key={time} value={time}>
-              {time}
+          {timeOptions.map((t) => (
+            <option key={t} value={t}>
+              {t}
             </option>
           ))}
         </select>
-
         <span className="hours-divider">~</span>
-
         <select
-          id={closeName}
-          name={closeName}
-          disabled={disabled}
-          className={`hours-sel ${errorMessage ? "error" : ""}`}
-          {...closeProps}
+          {...register(closeName)}
+          value={closeValue}
+          className={`hours-sel ${closeError ? "error" : ""}`}
         >
           <option value="">종료 시간</option>
-          {timeOptions.map((time) => (
-            <option key={time} value={time}>
-              {time}
+          {timeOptions.map((t) => (
+            <option key={t} value={t}>
+              {t}
             </option>
           ))}
         </select>
       </div>
 
-      {errorMessage && <p className="hours-error">{errorMessage}</p>}
+      {openError && <p className="hours-error">{openError}</p>}
+      {closeError && !openError && <p className="hours-error">{closeError}</p>}
       {hint && <p className="hint">{hint}</p>}
     </div>
   );

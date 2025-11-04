@@ -35,7 +35,7 @@ const storeAPI = {
       const res = await api.get(`/api/v1/store/my`);
       const data = res.data.response?.vo ?? res.data.response;
 
-      // ✅ [추가] storeId === 0 이면 ‘가게 없음’ 처리
+      // storeId === 0 이면 ‘가게 없음’ 처리
       if (!data || data.storeId === 0) {
         console.warn("[storeAPI.getMyStore] 등록된 가게 없음 (storeId=0)");
         authStore.getState().clearStoreId();
@@ -69,7 +69,7 @@ const storeAPI = {
       const res = await api.put("/api/v1/store", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log("✏️ [storeAPI] 가게 수정 성공:", res.data);
+      console.log("[storeAPI] 가게 수정 성공:", res.data);
       return res.data;
     } catch (err) {
       handleApiError(err, "storeAPI.update");
@@ -88,6 +88,7 @@ const storeAPI = {
       throw err;
     }
   },
+
   /** 유저용 가게 상세 조회 (로그인 불필요) */
   async getStoreDetail(storeId) {
     try {

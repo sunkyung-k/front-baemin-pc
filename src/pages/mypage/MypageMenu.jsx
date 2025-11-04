@@ -18,7 +18,7 @@ function MypageMenu() {
           { to: "/mypage/order/manage", label: "주문 관리" },
           {
             to: "/mypage/store",
-            label: isEdit ? "가게 수정" : "가게 등록",
+            label: isEdit ? "가게 관리" : "가게 등록",
           },
           ...(myStore
             ? [
