@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router";
 import { FaHeart, FaUser, FaBookOpen, FaBars, FaTimes } from "react-icons/fa";
 import { RiEBike2Fill } from "react-icons/ri";
 import { authStore } from "@/store/authStore";
+import { eventSourceRef } from "../../utills/eventSourceRef";
 
 function Header() {
   const { isAuthenticated, clearAuth, getUserRole } = authStore();
@@ -11,6 +12,11 @@ function Header() {
   const handleLogout = () => {
     clearAuth();
     localStorage.removeItem("auth-info");
+    // SSE 연결 종료하기
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
     navigate("/login");
   };
 
