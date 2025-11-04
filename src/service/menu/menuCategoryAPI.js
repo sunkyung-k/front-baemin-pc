@@ -10,8 +10,8 @@ const menuCategoryAPI = {
       // 백엔드에서 이미 정렬 및 필터링된 리스트 제공
       return res?.data?.response?.vo?.menuCategoryList ?? [];
     } catch (err) {
-      handleApiError(err, "menuCategoryAPI.getList");
-      return [];
+      const msg = handleApiError(err, "menuCategoryAPI.getList");
+      throw new Error(msg);
     }
   },
 
@@ -26,8 +26,8 @@ const menuCategoryAPI = {
       const res = await api.post(`/api/v1/menu/category`, clean);
       return res.data;
     } catch (err) {
-      handleApiError(err, "menuCategoryAPI.create");
-      throw err;
+      const msg = handleApiError(err, "menuCategoryAPI.create");
+      throw new Error(msg);
     }
   },
 
@@ -43,8 +43,8 @@ const menuCategoryAPI = {
       const res = await api.put(`/api/v1/menu/category`, clean);
       return res.data;
     } catch (err) {
-      handleApiError(err, "menuCategoryAPI.update");
-      throw err;
+      const msg = handleApiError(err, "menuCategoryAPI.update");
+      throw new Error(msg);
     }
   },
 
@@ -54,8 +54,8 @@ const menuCategoryAPI = {
       const res = await api.delete(`/api/v1/menu/category/${menuCaId}`);
       return res?.data ?? { resultCode: "200", response: "OK" };
     } catch (err) {
-      handleApiError(err, "menuCategoryAPI.remove");
-      throw err;
+      const msg = handleApiError(err, "menuCategoryAPI.remove");
+      throw new Error(msg);
     }
   },
 };

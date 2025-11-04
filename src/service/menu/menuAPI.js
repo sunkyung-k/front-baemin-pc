@@ -43,18 +43,18 @@ const menuAPI = {
       return res?.data?.response?.vo ?? {};
     } catch (err) {
       handleApiError(err, "menuAPI.getCategoryWithMenus");
-      return {};
+      throw err;
     }
   },
 
-  /**  단일 메뉴 상세 조회 (옵션 그룹 포함) */
+  /** 단일 메뉴 상세 조회 (옵션 그룹 포함) */
   async getMenuDetail(menuId) {
     try {
       const res = await api.get(`/api/v1/menu/${menuId}`);
       return res?.data?.response?.vo ?? null;
     } catch (err) {
       handleApiError(err, "menuAPI.getMenuDetail");
-      return null;
+      throw err;
     }
   },
 };

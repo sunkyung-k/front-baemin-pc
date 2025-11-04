@@ -1,3 +1,4 @@
+// src/components/menu/MenuItem.jsx
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useOutletContext } from "react-router-dom";
@@ -8,6 +9,7 @@ import CheckboxGroup from "@/components/form/CheckboxGroup";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 import useBasket from "@/hooks/useBasket";
 import { authStore } from "@/store/authStore";
+import { useHandleError } from "@/hooks/common/useHandleError";
 import styles from "./MenuItem.module.scss";
 
 /**
@@ -23,6 +25,7 @@ export default function MenuItem({ menuId }) {
   const { addMenu } = useBasket();
   const { userId, userRole } = authStore.getState();
   const isUser = userRole?.includes("USER");
+  const handleError = useHandleError();
 
   /** 현재 가게 ID (storeDetail에서 전달받음) */
   const { storeDetail } = useOutletContext();
@@ -40,17 +43,30 @@ export default function MenuItem({ menuId }) {
   const imageUrl = getAbsoluteImageUrl(menu);
   const optionGroups = menu.menuOptionGroupList || [];
 
-  /** 옵션 변경 핸들러 */
+  /** 옵션 변경 핸들러
+   *  - radio: 단일값
+   *  - checkbox: 배열값 (maxSelect 검사 후 업데이트)
+   */
   const handleChange = (groupId, value, type, maxSelect = 0) => {
     setSelectedValues((prev) => {
-      if (type === "radio") return { ...prev, [groupId]: value };
+      if (type === "radio") {
+        return { ...prev, [groupId]: value };
+      }
+
+      // checkbox (value는 배열)
       if (Array.isArray(value)) {
         if (maxSelect > 0 && value.length > maxSelect) {
-          console.warn(`최대 ${maxSelect}개까지만 선택할 수 있습니다.`);
+          // 사용자에게 명확한 안내 alert (공통 훅 사용)
+          handleError(
+            new Error(`최대 ${maxSelect}개까지만 선택할 수 있습니다.`),
+            "MenuItem.maxSelect"
+          );
+          // 상태 변경하지 않음
           return prev;
         }
         return { ...prev, [groupId]: value };
       }
+
       return prev;
     });
   };
@@ -73,7 +89,11 @@ export default function MenuItem({ menuId }) {
     });
 
     if (missing) {
-      console.warn(`${missing.menuOptGrpName} 옵션을 선택해주세요!`);
+      // 사용자용 메시지: 공통 훅으로 alert
+      handleError(
+        new Error(`${missing.menuOptGrpName} 옵션을 선택해주세요!`),
+        "MenuItem.optionSelect"
+      );
       return;
     }
 
@@ -99,7 +119,7 @@ export default function MenuItem({ menuId }) {
     // useBasket 내부에서 confirm + API 처리
     addMenu.mutate(payload, {
       onSuccess: () => setIsOpen(false),
-      onError: (err) => console.error("장바구니 담기 실패:", err),
+      onError: (err) => handleError(err, "MenuItem.addMenu"),
     });
   };
 

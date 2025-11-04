@@ -6,6 +6,7 @@ import FormModal from "@/components/form/FormModal";
 import InputField from "@/components/form/InputField";
 import RadioGroup from "@/components/form/RadioGroup";
 import { useMenuOptionGroup } from "@/hooks/menu/useMenuOptionGroup";
+import { useHandleError } from "@/hooks/common/useHandleError";
 
 /* ===============================
    유효성 스키마
@@ -17,7 +18,7 @@ const schema = yup.object().shape({
     .number()
     .typeError("숫자만 입력 가능합니다.")
     .required("정렬 순서를 입력해주세요.")
-    .min(1, "정렬 순서는 1 이상이어야 합니다."), // 추가됨
+    .min(1, "정렬 순서는 1 이상이어야 합니다."),
   maxSelect: yup
     .number()
     .typeError("숫자만 입력 가능합니다.")
@@ -26,13 +27,13 @@ const schema = yup.object().shape({
       then: (schema) =>
         schema
           .required("최대 선택 개수를 입력해주세요.")
-          .min(1, "최대 선택 개수는 1 이상이어야 합니다."), // 추가됨
+          .min(1, "최대 선택 개수는 1 이상이어야 합니다."),
       otherwise: (schema) => schema.notRequired(),
     }),
 });
 
 /* ===============================
-   옵션 그룹 등록/수정 모달
+   옵션 그룹 등록/수정 모달 (v2 alert)
 ================================= */
 export default function OptionGroupModal({
   menuId,
@@ -41,7 +42,8 @@ export default function OptionGroupModal({
   mode = "create",
   defaultValues = null,
 }) {
-  const { create, update } = useMenuOptionGroup(menuId);
+  const { create, update, refreshMenu } = useMenuOptionGroup(menuId);
+  const handleError = useHandleError();
 
   const {
     register,
@@ -65,68 +67,56 @@ export default function OptionGroupModal({
   /** 모달 열릴 때 기존 데이터 세팅 */
   useEffect(() => {
     if (isOpen) {
-      if (defaultValues) {
-        reset({
-          groupName: defaultValues.menuOptGrpName ?? "",
-          requiredYn: defaultValues.requiredYn ?? "Y",
-          maxSelect:
-            defaultValues.requiredYn === "N"
-              ? defaultValues.maxSelect ?? null
-              : null,
-          displayOrder: defaultValues.displayOrder ?? null,
-        });
-      } else {
-        reset({
-          groupName: "",
-          requiredYn: "Y",
-          maxSelect: null,
-          displayOrder: null,
-        });
-      }
+      reset(
+        defaultValues
+          ? {
+              groupName: defaultValues.menuOptGrpName ?? "",
+              requiredYn: defaultValues.requiredYn ?? "Y",
+              maxSelect:
+                defaultValues.requiredYn === "N"
+                  ? defaultValues.maxSelect ?? null
+                  : null,
+              displayOrder: defaultValues.displayOrder ?? null,
+            }
+          : {
+              groupName: "",
+              requiredYn: "Y",
+              maxSelect: null,
+              displayOrder: null,
+            }
+      );
     }
   }, [isOpen, defaultValues, reset]);
 
-  /** 닫힐 때 폼 초기화 */
+  /** 닫힐 때 초기화 */
   const handleClose = useCallback(() => {
     reset();
     onClose();
   }, [reset, onClose]);
 
   /** 제출 */
-  const handleFormSubmit = (data) => {
-    const maxSelectValue = data.requiredYn === "N" ? Number(data.maxSelect) : 0;
-    const displayOrderValue = Number(data.displayOrder);
-
+  const handleFormSubmit = async (data) => {
     const payload = {
       menuId,
       menuOptGrpName: data.groupName,
       requiredYn: data.requiredYn,
       minSelect: data.requiredYn === "Y" ? 1 : 0,
-      maxSelect: maxSelectValue,
-      displayOrder: displayOrderValue,
+      maxSelect: data.requiredYn === "N" ? Number(data.maxSelect) : 0,
+      displayOrder: Number(data.displayOrder),
       ...(mode === "edit" && defaultValues?.menuOptGrpId
         ? { menuOptGrpId: defaultValues.menuOptGrpId }
         : {}),
     };
 
-    console.log("🟢 [handleFormSubmit] payload:", payload);
-
     const mutation = mode === "edit" ? update : create;
 
-    mutation.mutate(payload, {
-      onSuccess: (res) => {
-        console.log("[onSuccess]", res);
-        alert(
-          mode === "edit"
-            ? "옵션 그룹이 수정되었습니다."
-            : "옵션 그룹이 등록되었습니다."
-        );
-        handleClose();
-      },
-      onError: (err) => {
-        console.error("[onError]", err);
-      },
-    });
+    try {
+      await mutation.mutateAsync(payload);
+      await refreshMenu();
+      handleClose();
+    } catch (err) {
+      handleError(err, "OptionGroupModal.handleSubmit");
+    }
   };
 
   return (
