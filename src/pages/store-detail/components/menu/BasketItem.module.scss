@@ -1,0 +1,61 @@
+.item {
+  padding: space("md");
+  border-radius: radius("sm");
+  background: fn-color("gray-50");
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: space("md");
+
+  :global(.btn-sm) {
+    padding: space("sm");
+    color: fn-color("dark");
+  }
+}
+
+.info {
+  padding-top: space("md");
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.name {
+  font-size: font("lg");
+  color: fn-color("gray-800");
+  font-weight: 500;
+
+  span {
+    display: block;
+    padding-top: space("xs");
+    font-size: font("sm");
+    font-weight: 400;
+  }
+}
+
+/* 삭제 버튼 전용 */
+.removeBtn {
+  width: fn-rem(28);
+  height: fn-rem(28);
+  border: 1px solid fn-color("gray-300");
+  border-radius: radius("sm");
+  background: fn-color("white");
+  color: fn-color("gray-700");
+  font-size: font("md");
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    background: fn-color("gray-100");
+  }
+}
+
+.price {
+  font-size: font("md");
+  font-weight: 600;
+  color: fn-color("gray-900");
+  text-align: right;
+}

@@ -5,9 +5,7 @@
   align-items: center;
   justify-content: center;
   gap: space("xs");
-  padding: fn-rem(4) space("sm");
   background: fn-color("gray-50");
-
   user-select: none;
   transition: background 0.2s ease;
 
@@ -17,7 +15,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: radius("sm");
+    border-radius: fn-rem(4);
     border: 1px solid fn-color("gray-300");
     background: fn-color("white");
     font-size: font("lg");
@@ -42,7 +40,7 @@
     font-size: font("md");
     font-weight: 600;
     color: fn-color("gray-900");
-    min-width: fn-rem(22);
+    width: fn-rem(30);
     text-align: center;
   }
 

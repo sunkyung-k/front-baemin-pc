@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import menuCategoryAPI from "@/service/menu/menuCategoryAPI";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useAfterMutation } from "@/hooks/common/useAfterMutation";
-import { useCategoryStore } from "@/store/useCategoryStore";
+import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 
 /**
  * 메뉴 카테고리 CRUD 훅
@@ -16,7 +16,7 @@ export const useMenuCategory = (storeId) => {
 
   /** UI 상태 (현재 선택된 카테고리) */
   const { activeCategory, setActiveCategory, clearActiveCategory } =
-    useCategoryStore();
+    useMenuCategoryStore();
 
   /** 메뉴 카테고리 목록 조회 */
   const {

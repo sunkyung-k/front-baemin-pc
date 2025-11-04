@@ -33,6 +33,11 @@ export const QUERY_KEYS = {
   MENU_OPTION_LIST: (menuOptGrpId) => ["menuOptionList", menuOptGrpId],
   MENU_OPTION_DETAIL: (menuOptId) => ["menuOptionDetail", menuOptId],
 
+  /** 장바구니(Basket) */
+  BASKET: ["basket"], // 전체 장바구니 조회
+  BASKET_DETAIL: (basketId) => ["basketDetail", basketId],
+  BASKET_ITEM_LIST: (basketId) => ["basketItemList", basketId],
+
   /** 유틸성 (캐시 전체 초기화 등) */
   ALL_MENUS: ["allMenus"],
   ALL_OPTIONS: ["allOptions"],

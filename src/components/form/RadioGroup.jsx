@@ -5,18 +5,7 @@ import React from "react";
  * - RHF(register) 또는 수동 onChange 둘 다 호환
  * - 동일 name을 가진 여러 옵션을 묶어서 사용
  * - 라벨/정렬/에러메시지 포함
- *
- * 예시:
- * <RadioGroup
- *   label="품절 여부"
- *   name="soldOutYn"
- *   options={[
- *     { label: "판매중", value: "N" },
- *     { label: "품절", value: "Y" },
- *   ]}
- *   register={register}
- *   errorMessage={errors.soldOutYn?.message}
- * />
+ * - label: string 또는 ReactNode 모두 지원 (ex. <><span>곱빼기</span><span>(+₩1,000)</span></>)
  */
 export default function RadioGroup({
   label,
@@ -48,9 +37,12 @@ export default function RadioGroup({
               value={opt.value}
               {...registerProps}
               checked={isRHF ? undefined : value === opt.value}
-              onChange={isRHF ? undefined : onChange}
+              onChange={isRHF ? undefined : onChange || (() => {})}
             />
-            <span className="radio-label">{opt.label}</span>
+            {/* ✅ 문자열/노드 둘 다 지원 */}
+            <span className="radio-label">
+              {typeof opt.label === "string" ? opt.label : opt.label}
+            </span>
           </label>
         ))}
       </div>

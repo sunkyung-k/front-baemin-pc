@@ -10,7 +10,7 @@ import * as yup from "yup";
 import { useMenuCategory } from "@/hooks/menu/useMenuCategory";
 import { dummyRegister } from "@/utills/formUtils";
 import EmptyState from "@/components/menu/EmptyState";
-import { useCategoryStore } from "@/store/useCategoryStore";
+import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 
 /** yup 유효성 검사 스키마 (등록 전용) */
 const schema = yup.object().shape({
@@ -30,7 +30,7 @@ export default function CategoryPanel({ storeId }) {
   const [editableValues, setEditableValues] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
 
-  const { setActiveCategory, clearActiveCategory } = useCategoryStore();
+  const { setActiveCategory, clearActiveCategory } = useMenuCategoryStore();
   const { categories, createCategory, updateCategory, removeCategory } =
     useMenuCategory(storeId);
 

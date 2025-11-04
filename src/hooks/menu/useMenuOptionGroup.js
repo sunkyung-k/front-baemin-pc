@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import menuOptionGroupAPI from "@/service/menu/menuOptionGroupAPI";
 import menuAPI from "@/service/menu/menuAPI";
 import { QUERY_KEYS } from "@/constants/queryKeys";
-import { useCategoryStore } from "@/store/useCategoryStore";
+import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useAfterMutation } from "@/hooks/common/useAfterMutation";
 
 /**
@@ -11,7 +11,7 @@ import { useAfterMutation } from "@/hooks/common/useAfterMutation";
  * - Zustand: activeCategory.menuList 즉시 반영
  */
 export const useMenuOptionGroup = (menuId) => {
-  const { activeCategory, setActiveCategory } = useCategoryStore();
+  const { activeCategory, setActiveCategory } = useMenuCategoryStore();
 
   /** 메뉴 상세 최신화 후 Zustand에 즉시 반영 */
   const refreshMenu = async () => {

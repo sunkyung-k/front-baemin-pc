@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import menuOptionAPI from "@/service/menu/menuOptionAPI";
 import menuAPI from "@/service/menu/menuAPI";
 import { QUERY_KEYS } from "@/constants/queryKeys";
-import { useCategoryStore } from "@/store/useCategoryStore";
+import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useAfterMutation } from "@/hooks/common/useAfterMutation";
 
 /**
@@ -10,7 +10,7 @@ import { useAfterMutation } from "@/hooks/common/useAfterMutation";
  * - 옵션 등록 / 수정 / 삭제 후 즉시 메뉴 상세 갱신
  */
 export const useMenuOption = (menuId) => {
-  const { activeCategory, setActiveCategory } = useCategoryStore();
+  const { activeCategory, setActiveCategory } = useMenuCategoryStore();
 
   /** 메뉴 상세 재조회 후 Zustand 동기화 */
   const refreshMenu = async () => {

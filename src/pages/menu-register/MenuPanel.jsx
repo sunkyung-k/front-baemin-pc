@@ -3,7 +3,7 @@ import styles from "./MenuPanel.module.scss";
 import EmptyState from "@/components/menu/EmptyState";
 import { TiPlus } from "react-icons/ti";
 import { FaUtensils, FaPen, FaTrashAlt } from "react-icons/fa";
-import { useCategoryStore } from "@/store/useCategoryStore";
+import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useMenu } from "@/hooks/menu/useMenu";
 import MenuModal from "./MenuModal";
 import OptionGroupPanel from "./OptionGroupPanel";
@@ -15,7 +15,7 @@ import { getAbsoluteImageUrl } from "../../utills/imageUtills";
  * - useMemo 제거 → 즉시 반영 보장
  */
 export default function MenuPanel() {
-  const { activeCategory } = useCategoryStore();
+  const { activeCategory } = useMenuCategoryStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [activeMenuId, setActiveMenuId] = useState(null); // 옵션 그룹 토글 상태

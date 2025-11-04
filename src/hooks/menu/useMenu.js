@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import menuAPI from "@/service/menu/menuAPI";
 import menuCategoryAPI from "@/service/menu/menuCategoryAPI";
 import { QUERY_KEYS } from "@/constants/queryKeys";
-import { useCategoryStore } from "@/store/useCategoryStore";
+import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 
 /**
  *  메뉴 CRUD 훅 (React Query + Zustand 완전 동기화)
@@ -10,7 +10,7 @@ import { useCategoryStore } from "@/store/useCategoryStore";
  */
 export const useMenu = (storeId) => {
   const queryClient = useQueryClient();
-  const { activeCategory, setActiveCategory } = useCategoryStore();
+  const { activeCategory, setActiveCategory } = useMenuCategoryStore();
   const queryKey = QUERY_KEYS.MENU_CATEGORY_LIST(storeId);
 
   /** 최신 목록으로 Query + Zustand 동시에 갱신 */

@@ -1,0 +1,132 @@
+@use "sass:color";
+
+.overlay {
+  display: none;
+
+  @media (max-width: bp("lg")) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 150;
+    animation: fadeIn 0.3s ease;
+  }
+}
+
+.basketBox {
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("md");
+  background: fn-color("white");
+  padding: space("lg");
+  display: flex;
+  flex-direction: column;
+  gap: space("lg");
+  position: sticky;
+  top: fn-rem(100);
+  transition: all 0.3s ease;
+
+  /** 반응형: lg 이하일 때 하단 고정 + 토글 */
+  @media (max-width: bp("lg")) {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    z-index: 200;
+    border-radius: radius("md") radius("md") 0 0;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+    border: none;
+    padding: 0;
+    overflow: hidden;
+    background: fn-color("white");
+    transition: max-height 0.3s ease;
+
+    &.closed {
+      max-height: fn-rem(60);
+    }
+
+    &.open {
+      max-height: fn-rem(500);
+    }
+
+    :global(.btn-primary) {
+      border-radius: 0;
+      min-height: fn-rem(50);
+    }
+  }
+}
+
+/** 토글 헤더 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: fn-color("gray-100");
+  padding: space("md") space("lg");
+  cursor: pointer;
+  min-height: fn-rem(60);
+
+  @media (min-width: bp("lg")) {
+    cursor: default;
+    background: transparent;
+    padding: 0;
+    min-height: auto;
+  }
+
+  :global(.btn-sm) {
+    padding: space("sm");
+    color: fn-color("dark");
+  }
+}
+
+.title {
+  font-size: font("xl");
+  font-weight: 700;
+  color: fn-color("gray-900");
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: space("lg");
+  transition: max-height 0.3s ease;
+
+  @media (max-width: bp("lg")) {
+    background: fn-color("white");
+    overflow-y: auto;
+    max-height: calc(100vh - fn-rem(150));
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: space("sm");
+}
+
+.empty {
+  font-size: font("md");
+  text-align: center;
+  color: fn-color("gray-600");
+  padding: space("lg") 0;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

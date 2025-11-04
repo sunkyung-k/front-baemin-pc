@@ -6,7 +6,7 @@ import { devtools } from "zustand/middleware";
  * React Query는 서버 데이터 관리, Zustand는 UI 제어 전용
  * 메뉴 등록/삭제 시 즉시 반영되도록 항상 새 객체로 교체
  */
-export const useCategoryStore = create(
+export const useMenuCategoryStore = create(
   devtools((set, get) => ({
     activeCategory: null,
 

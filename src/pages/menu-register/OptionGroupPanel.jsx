@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import styles from "./OptionGroupPanel.module.scss";
-import { useCategoryStore } from "@/store/useCategoryStore";
+import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import EmptyState from "@/components/menu/EmptyState";
 import { FaPuzzlePiece, FaPlus, FaCog, FaTimes } from "react-icons/fa";
 import { TiPlus } from "react-icons/ti";
@@ -11,7 +11,7 @@ import { useMenuOptionGroup } from "@/hooks/menu/useMenuOptionGroup";
 import menuAPI from "@/service/menu/menuAPI";
 
 export default function OptionGroupPanel({ menuId }) {
-  const { activeCategory, setActiveCategory } = useCategoryStore();
+  const { activeCategory, setActiveCategory } = useMenuCategoryStore();
 
   // 그룹 모달 상태
   const [modalOpen, setModalOpen] = useState(false);

@@ -3,7 +3,7 @@ import styles from "./MenuLayout.module.scss";
 import CategoryPanel from "./CategoryPanel";
 import MenuPanel from "./MenuPanel";
 import { IoClose } from "react-icons/io5";
-import { useCategoryStore } from "@/store/useCategoryStore";
+import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useMenuCategory } from "@/hooks/menu/useMenuCategory";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -19,7 +19,7 @@ export default function MenuLayout() {
 
   /** storeId 기반으로 메뉴 카테고리 조회 */
   const { categories } = useMenuCategory(storeId);
-  const { activeCategory, clearActiveCategory } = useCategoryStore();
+  const { activeCategory, clearActiveCategory } = useMenuCategoryStore();
 
   /** 닫기 버튼 동작 */
   const handleClose = () => {

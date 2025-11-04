@@ -7,7 +7,7 @@ import InputField from "@/components/form/InputField";
 import TextareaField from "@/components/form/TextareaField";
 import RadioGroup from "@/components/form/RadioGroup";
 import ImageUpload from "@/components/form/ImageUpload";
-import { useCategoryStore } from "@/store/useCategoryStore";
+import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { getAbsoluteImageUrl } from "../../utills/imageUtills";
 
 // 유효성 검사 스키마
@@ -31,7 +31,7 @@ export default function MenuModal({
   defaultValues = null,
   onSubmit,
 }) {
-  const { activeCategory } = useCategoryStore();
+  const { activeCategory } = useMenuCategoryStore();
 
   const {
     register,
