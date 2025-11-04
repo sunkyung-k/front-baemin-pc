@@ -6,7 +6,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import FormModal from "@/components/form/FormModal";
 import InputField from "@/components/form/InputField";
 import RadioGroup from "@/components/form/RadioGroup";
-import useMenuOption from "../../hooks/menu/useMenuOption";
+import useMenuOption from "@/hooks/menu/useMenuOption";
+import { useHandleError } from "@/hooks/common/useHandleError";
 
 /* 유효성 스키마 */
 const schema = yup.object().shape({
@@ -27,7 +28,8 @@ export default function OptionModal({
   mode = "create",
   defaultValues = null,
 }) {
-  const { create, update } = useMenuOption(menuId);
+  const { create, update, refreshMenu } = useMenuOption(menuId);
+  const handleError = useHandleError();
 
   const {
     register,
@@ -44,7 +46,6 @@ export default function OptionModal({
     },
   });
 
-  /** 모달 열릴 때 기존 데이터 세팅 */
   useEffect(() => {
     if (isOpen) {
       reset({
@@ -55,9 +56,8 @@ export default function OptionModal({
     }
   }, [isOpen, defaultValues, reset]);
 
-  /** 제출 핸들러 */
-  const handleFormSubmit = (data) => {
-    const basePayload = {
+  const handleFormSubmit = async (data) => {
+    const payload = {
       menuOptGrpId: groupId,
       menuOptName: data.menuOptName,
       price: Number(data.price ?? 0),
@@ -65,35 +65,23 @@ export default function OptionModal({
       delYn: "N",
       maxSelect: 0,
       displayOrder: defaultValues?.displayOrder ?? 1,
+      ...(mode === "edit" && defaultValues?.menuOptId
+        ? { menuOptId: defaultValues.menuOptId }
+        : {}),
     };
-
-    const payload =
-      mode === "edit"
-        ? { ...basePayload, menuOptId: defaultValues?.menuOptId }
-        : basePayload;
-
-    console.log(
-      `🟩 [OptionModal payload / ${mode}]`,
-      JSON.stringify(payload, null, 2)
-    );
 
     const mutation = mode === "edit" ? update : create;
 
-    mutation.mutate(payload, {
-      onSuccess: () => {
-        alert(
-          mode === "edit" ? "옵션이 수정되었습니다." : "옵션이 등록되었습니다."
-        );
-        reset();
-        onClose();
-      },
-      onError: (err) => {
-        console.error(`옵션 ${mode === "edit" ? "수정" : "등록"} 실패:`, err);
-      },
-    });
+    try {
+      await mutation.mutateAsync(payload);
+      await refreshMenu();
+      reset();
+      onClose();
+    } catch (err) {
+      handleError(err, "OptionModal.handleFormSubmit");
+    }
   };
 
-  /** Portal 렌더링 */
   if (!isOpen) return null;
 
   return createPortal(
@@ -138,6 +126,6 @@ export default function OptionModal({
         )}
       />
     </FormModal>,
-    document.body // 모달이 루트 트리 외부로 렌더링되어 부모 이벤트 영향 없음
+    document.body
   );
 }

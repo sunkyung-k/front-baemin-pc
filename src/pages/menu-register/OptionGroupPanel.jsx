@@ -9,23 +9,21 @@ import OptionPanel from "./OptionPanel";
 import OptionModal from "./OptionModal";
 import { useMenuOptionGroup } from "@/hooks/menu/useMenuOptionGroup";
 import menuAPI from "@/service/menu/menuAPI";
+import { useHandleError } from "@/hooks/common/useHandleError";
+import { useConfirmDelete } from "@/hooks/common/useConfirmDelete";
 
 export default function OptionGroupPanel({ menuId }) {
   const { activeCategory, setActiveCategory } = useMenuCategoryStore();
-
-  // 그룹 모달 상태
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [mode, setMode] = useState("create");
-
-  // 옵션 모달 상태
   const [optionModalOpen, setOptionModalOpen] = useState(false);
   const [optionGroupTarget, setOptionGroupTarget] = useState(null);
-
-  // 그룹 토글 (하나만 열림)
   const [openGroupId, setOpenGroupId] = useState(null);
 
   const { remove, refreshMenu } = useMenuOptionGroup(menuId);
+  const handleError = useHandleError();
+  const { handleDelete } = useConfirmDelete();
 
   /** 메뉴 상세 최신화 */
   useEffect(() => {
@@ -34,13 +32,12 @@ export default function OptionGroupPanel({ menuId }) {
       try {
         const updatedMenu = await menuAPI.getMenuDetail(menuId);
         if (!updatedMenu) return;
-
         const updatedList = activeCategory.menuList.map((m) =>
           m.menuId === menuId ? updatedMenu : m
         );
         setActiveCategory({ ...activeCategory, menuList: updatedList });
       } catch (err) {
-        console.error("메뉴 상세 로드 실패:", err);
+        handleError(err, "OptionGroupPanel.fetchMenuDetail");
       }
     };
     fetchMenuDetail();
@@ -55,9 +52,10 @@ export default function OptionGroupPanel({ menuId }) {
   const groupList = targetMenu?.menuOptionGroupList ?? [];
 
   /** 그룹 토글 */
-  const toggleGroup = useCallback((groupId) => {
-    setOpenGroupId((prev) => (prev === groupId ? null : groupId));
-  }, []);
+  const toggleGroup = useCallback(
+    (groupId) => setOpenGroupId((prev) => (prev === groupId ? null : groupId)),
+    []
+  );
 
   /** 그룹 모달 열기 */
   const handleOpenGroupModal = useCallback((group = null, e) => {
@@ -75,13 +73,12 @@ export default function OptionGroupPanel({ menuId }) {
     await refreshMenu();
   }, [refreshMenu]);
 
-  /** 옵션 모달 제어 */
+  /** 옵션 모달 열기/닫기 */
   const handleOpenOptionModal = useCallback((group, e) => {
     if (e) e.stopPropagation();
     setOptionGroupTarget(group);
     setOptionModalOpen(true);
   }, []);
-
   const handleCloseOptionModal = useCallback(async () => {
     setOptionGroupTarget(null);
     setOptionModalOpen(false);
@@ -91,14 +88,14 @@ export default function OptionGroupPanel({ menuId }) {
   /** 그룹 삭제 */
   const handleRemoveGroup = useCallback(
     async (groupId, e) => {
-      if (e) e.stopPropagation();
-      if (!window.confirm("정말 삭제하시겠습니까?")) return;
-      remove.mutate(groupId, {
-        onSuccess: async () => {
-          alert("옵션 그룹이 삭제되었습니다.");
-          await refreshMenu();
-        },
-      });
+      e?.stopPropagation?.();
+      try {
+        // ✅ handleDelete 제거 — remove 내부에서 이미 confirm/alert 수행
+        await remove.mutateAsync(groupId);
+        await refreshMenu();
+      } catch (err) {
+        handleError(err, "OptionGroupPanel.handleRemoveGroup");
+      }
     },
     [remove, refreshMenu]
   );
@@ -113,7 +110,6 @@ export default function OptionGroupPanel({ menuId }) {
 
   return (
     <div className={styles.optionGroupPanel}>
-      {/* 새 그룹 등록 버튼 */}
       <button
         type="button"
         className={styles.addGroupButton}
@@ -122,7 +118,6 @@ export default function OptionGroupPanel({ menuId }) {
         <TiPlus size={18} /> 새 옵션 그룹 등록
       </button>
 
-      {/* 그룹 리스트 */}
       {groupList.length === 0 ? (
         <EmptyState
           icon={<FaPuzzlePiece />}
@@ -184,7 +179,6 @@ export default function OptionGroupPanel({ menuId }) {
         </div>
       )}
 
-      {/* 모달들 */}
       <OptionGroupModal
         key={`${menuId}-${mode}-${modalOpen ? "open" : "close"}`}
         menuId={menuId}

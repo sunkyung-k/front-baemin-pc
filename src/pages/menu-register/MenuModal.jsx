@@ -8,9 +8,9 @@ import TextareaField from "@/components/form/TextareaField";
 import RadioGroup from "@/components/form/RadioGroup";
 import ImageUpload from "@/components/form/ImageUpload";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
-import { getAbsoluteImageUrl } from "../../utills/imageUtills";
+import { getAbsoluteImageUrl } from "@/utills/imageUtills";
+import { useHandleError } from "@/hooks/common/useHandleError";
 
-// 유효성 검사 스키마
 const schema = yup.object().shape({
   menuName: yup.string().required("메뉴명을 입력해주세요."),
   price: yup
@@ -27,11 +27,12 @@ const schema = yup.object().shape({
 export default function MenuModal({
   isOpen,
   onClose,
-  mode = "create", // "create" | "edit"
+  mode = "create",
   defaultValues = null,
   onSubmit,
 }) {
   const { activeCategory } = useMenuCategoryStore();
+  const handleError = useHandleError();
 
   const {
     register,
@@ -45,46 +46,46 @@ export default function MenuModal({
       menuName: "",
       price: "",
       description: "",
-      soldoutYn: "N", // 기본값: 판매중
+      soldoutYn: "N",
       ...defaultValues,
     },
   });
 
-  /** 모달 열릴 때 defaultValues 반영 */
   useEffect(() => {
     if (isOpen) {
       reset(defaultValues || { soldoutYn: "N" });
     }
   }, [isOpen, defaultValues, reset]);
 
-  /** 폼 제출 핸들러 */
   const handleFormSubmit = (data) => {
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
+      formData.append(
+        "menuCategoryId",
+        activeCategory?.menuCaId || activeCategory?.menuCategoryId || ""
+      );
+      formData.append("menuName", data.menuName);
+      formData.append("description", data.description);
+      formData.append("price", data.price);
+      formData.append("soldoutYn", data.soldoutYn);
 
-    formData.append(
-      "menuCategoryId",
-      activeCategory?.menuCaId || activeCategory?.menuCategoryId || ""
-    );
-    formData.append("menuName", data.menuName);
-    formData.append("description", data.description);
-    formData.append("price", data.price);
-    formData.append("soldoutYn", data.soldoutYn);
+      const fileField = data.menuImage;
+      if (fileField instanceof FileList && fileField.length > 0) {
+        formData.append("mainImage", fileField[0]);
+      } else if (fileField instanceof File) {
+        formData.append("mainImage", fileField);
+      }
 
-    const fileField = data.menuImage;
-    if (fileField instanceof FileList && fileField.length > 0) {
-      formData.append("mainImage", fileField[0]);
-    } else if (fileField instanceof File) {
-      formData.append("mainImage", fileField);
+      if (mode === "edit" && defaultValues?.menuId) {
+        formData.append("menuId", defaultValues.menuId);
+      }
+
+      onSubmit(formData);
+    } catch (err) {
+      handleError(err, "MenuModal.submit");
     }
-
-    if (mode === "edit" && defaultValues?.menuId) {
-      formData.append("menuId", defaultValues.menuId);
-    }
-
-    onSubmit(formData);
   };
 
-  /** 기존 이미지 미리보기 처리 */
   const currentImageUrl =
     mode === "edit" && defaultValues
       ? getAbsoluteImageUrl(defaultValues)

@@ -11,8 +11,9 @@ import { useMenuCategory } from "@/hooks/menu/useMenuCategory";
 import { dummyRegister } from "@/utills/formUtils";
 import EmptyState from "@/components/menu/EmptyState";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
+import { useHandleError } from "@/hooks/common/useHandleError";
 
-/**  yup 유효성 검사 스키마 (등록 + 수정 공용) */
+/** ✅ yup 유효성 검사 스키마 (등록 + 수정 공용) */
 const schema = yup.object().shape({
   categoryName: yup.string().required("카테고리명을 입력해주세요."),
   categoryOrder: yup
@@ -34,6 +35,7 @@ export default function CategoryPanel({ storeId }) {
   const { setActiveCategory, clearActiveCategory } = useMenuCategoryStore();
   const { categories, createCategory, updateCategory, removeCategory } =
     useMenuCategory(storeId);
+  const handleError = useHandleError();
 
   /** 등록용 RHF */
   const {
@@ -49,7 +51,7 @@ export default function CategoryPanel({ storeId }) {
     [categories]
   );
 
-  /**  신규 카테고리 등록 */
+  /** ✅ 신규 카테고리 등록 */
   const onSubmit = (data) => {
     createCategory.mutate(
       {
@@ -62,11 +64,12 @@ export default function CategoryPanel({ storeId }) {
           reset();
           setModalOpen(false);
         },
+        onError: (err) => handleError(err, "CategoryPanel.create"),
       }
     );
   };
 
-  /**  수정 시 yup 유효성 검사 + 인풋 하단 에러메시지 표시 */
+  /** ✅ 수정 시 yup 유효성 검사 + 인풋 하단 에러메시지 표시 */
   const handleUpdate = (id) => {
     const target = editableValues[id];
     if (!target) return;
@@ -77,16 +80,21 @@ export default function CategoryPanel({ storeId }) {
           categoryName: target.name,
           categoryOrder: target.order,
         },
-        { abortEarly: false } // 여러 에러 모두 잡기
+        { abortEarly: false }
       );
 
       // 유효성 통과 → 에러 초기화 후 업데이트
       setEditableErrors((prev) => ({ ...prev, [id]: {} }));
-      updateCategory.mutate({
-        menuCaId: id,
-        menuCaName: target.name.trim(),
-        displayOrder: Number(target.order),
-      });
+      updateCategory.mutate(
+        {
+          menuCaId: id,
+          menuCaName: target.name.trim(),
+          displayOrder: Number(target.order),
+        },
+        {
+          onError: (err) => handleError(err, "CategoryPanel.update"),
+        }
+      );
     } catch (err) {
       if (err.inner?.length) {
         const errorObj = {};
@@ -102,18 +110,17 @@ export default function CategoryPanel({ storeId }) {
     }
   };
 
-  /** 삭제 */
+  /** ✅ 삭제 (중복 confirm 제거) */
   const handleRemove = (id) => {
-    if (window.confirm("정말 삭제하시겠습니까?")) {
-      removeCategory.mutate(id, {
-        onSuccess: () => {
-          if (id === activeId) {
-            setActiveId(null);
-            clearActiveCategory();
-          }
-        },
-      });
-    }
+    removeCategory.mutate(id, {
+      onSuccess: () => {
+        if (id === activeId) {
+          setActiveId(null);
+          clearActiveCategory();
+        }
+      },
+      onError: (err) => handleError(err, "CategoryPanel.remove"),
+    });
   };
 
   /** 클릭 시 활성 토글 */
@@ -150,7 +157,7 @@ export default function CategoryPanel({ storeId }) {
         <TiPlus size={18} /> 새 카테고리 등록
       </button>
 
-      {/*  카테고리 목록 */}
+      {/* ✅ 카테고리 목록 */}
       {visibleCategories.length > 0 ? (
         <div className={styles.categoryList}>
           {visibleCategories.map((cat) => {
@@ -180,7 +187,7 @@ export default function CategoryPanel({ storeId }) {
                     className={styles.categoryEdit}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {/*  카테고리명 */}
+                    {/* 카테고리명 */}
                     <div className={styles.formGroup}>
                       <InputField
                         label="카테고리명"
@@ -201,7 +208,7 @@ export default function CategoryPanel({ storeId }) {
                       />
                     </div>
 
-                    {/*  정렬 순서 */}
+                    {/* 정렬 순서 */}
                     <div className={styles.formGroup}>
                       <InputField
                         label="정렬 순서"
@@ -252,7 +259,7 @@ export default function CategoryPanel({ storeId }) {
         />
       )}
 
-      {/*  등록 모달 */}
+      {/* ✅ 등록 모달 */}
       <Modal
         isOpen={modalOpen}
         title="카테고리 등록"

@@ -3,6 +3,8 @@ import menuAPI from "@/service/menu/menuAPI";
 import menuCategoryAPI from "@/service/menu/menuCategoryAPI";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
+import { useHandleError } from "@/hooks/common/useHandleError";
+import { useConfirmDelete } from "@/hooks/common/useConfirmDelete";
 
 /**
  *  메뉴 CRUD 훅 (React Query + Zustand 완전 동기화)
@@ -12,28 +14,25 @@ export const useMenu = (storeId) => {
   const queryClient = useQueryClient();
   const { activeCategory, setActiveCategory } = useMenuCategoryStore();
   const queryKey = QUERY_KEYS.MENU_CATEGORY_LIST(storeId);
+  const handleError = useHandleError();
+  const { handleDelete } = useConfirmDelete();
 
   /** 최신 목록으로 Query + Zustand 동시에 갱신 */
   const refreshAll = async () => {
     try {
-      // 서버에서 최신 카테고리 목록 가져오기
       const freshList = await menuCategoryAPI.getList(storeId);
-
-      // React Query 캐시 갱신
       queryClient.setQueryData(queryKey, freshList);
 
-      // Zustand의 activeCategory도 최신 데이터로 교체
       if (activeCategory) {
         const updated = freshList.find(
           (cat) => cat.menuCaId === activeCategory.menuCaId
         );
         if (updated) {
-          //  완전 새 객체로 덮어쓰기 (React 강제 렌더 트리거)
           setActiveCategory({ ...structuredClone(updated), storeId });
         }
       }
     } catch (err) {
-      console.error("[useMenu] refreshAll error:", err);
+      handleError(err, "useMenu.refreshAll");
     }
   };
 
@@ -41,18 +40,25 @@ export const useMenu = (storeId) => {
   const create = useMutation({
     mutationFn: menuAPI.create,
     onSuccess: refreshAll,
+    onError: (err) => handleError(err, "useMenu.create"),
   });
 
   /** 메뉴 수정 */
   const update = useMutation({
     mutationFn: menuAPI.update,
     onSuccess: refreshAll,
+    onError: (err) => handleError(err, "useMenu.update"),
   });
 
   /** 메뉴 삭제 */
   const remove = useMutation({
-    mutationFn: menuAPI.remove,
-    onSuccess: refreshAll,
+    mutationFn: async (menuId) => {
+      const { success } = await handleDelete(
+        () => menuAPI.remove(menuId),
+        "useMenu.remove"
+      );
+      if (success) await refreshAll();
+    },
   });
 
   return { create, update, remove };
