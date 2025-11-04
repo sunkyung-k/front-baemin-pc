@@ -5,6 +5,9 @@
   flex: 0 0 fn-rem(400);
   border-right: 1px solid fn-color("gray-200");
   background: fn-color("white");
+  @media (max-width: bp("lg")) {
+    border-right: 0;
+  }
 
   .categoryHeader {
     margin-bottom: fn-rem(20);

@@ -10,7 +10,7 @@ export default function MenuList() {
   const { storeId } = useParams();
   const [active, setActive] = useState("전체");
 
-  /** 가게 상세 API 호출 */
+  /** 가게 상세 + 메뉴 목록 조회 */
   const { data, isLoading, isError } = useQuery({
     queryKey: QUERY_KEYS.STORE_DETAIL(storeId),
     queryFn: () => storeAPI.getStoreDetail(storeId),
@@ -19,7 +19,7 @@ export default function MenuList() {
 
   const store = data?.response?.vo || null;
 
-  /** 메뉴 있는 카테고리만 필터링 */
+  /** 메뉴가 포함된 카테고리만 필터링 */
   const categories = useMemo(() => {
     if (!store?.menuCategoryList) return [];
     return store.menuCategoryList.filter(
@@ -27,36 +27,38 @@ export default function MenuList() {
     );
   }, [store]);
 
-  /** 전체 메뉴 목록 */
-  const allMenus = useMemo(() => {
-    return categories.flatMap((cat) =>
-      (cat.menuList || []).map((menu) => ({
-        ...menu,
-        categoryName: cat.menuCaName,
-      }))
-    );
-  }, [categories]);
+  /** 모든 카테고리의 메뉴를 평탄화 (allMenus) */
+  const allMenus = useMemo(
+    () =>
+      categories.flatMap((cat) =>
+        (cat.menuList || []).map((menu) => ({
+          ...menu,
+          categoryName: cat.menuCaName,
+        }))
+      ),
+    [categories]
+  );
 
-  /** 탭 구성 */
-  const categoryTabs = useMemo(() => {
-    const names = categories.map((cat) => cat.menuCaName);
-    return ["전체", ...names];
-  }, [categories]);
+  /** 카테고리 탭 구성 (전체 + 각 카테고리명) */
+  const categoryTabs = useMemo(
+    () => ["전체", ...categories.map((cat) => cat.menuCaName)],
+    [categories]
+  );
 
-  /** 필터링된 메뉴 */
-  const filteredMenus = useMemo(() => {
-    if (active === "전체") return allMenus;
-    return allMenus.filter((m) => m.categoryName === active);
-  }, [active, allMenus]);
+  /** 현재 선택된 탭 기준으로 메뉴 필터링 */
+  const filteredMenus = useMemo(
+    () =>
+      active === "전체"
+        ? allMenus
+        : allMenus.filter((m) => m.categoryName === active),
+    [active, allMenus]
+  );
 
-  /** 로딩 / 에러 처리 */
-  if (isLoading) return <p className={styles.loading}>로딩 중...</p>;
-  if (isError || !store) return null;
-  if (!categories.length || !allMenus.length) return null;
+  // if (isLoading) return <p className={styles.loading}>로딩 중...</p>;
+  // if (isError || !store || !categories.length || !allMenus.length) return null;
 
   return (
     <div className={styles.menuListWrap}>
-      {/* 카테고리 탭 */}
       <div className={styles.categoryTabs}>
         {categoryTabs.map((cat) => (
           <button
@@ -69,7 +71,6 @@ export default function MenuList() {
         ))}
       </div>
 
-      {/* 메뉴 렌더링 */}
       {filteredMenus.length > 0 && (
         <>
           <h3 className={styles.categoryTitle}>{active}</h3>

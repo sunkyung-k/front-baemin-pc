@@ -1,22 +1,78 @@
 .wrap {
   height: 100%;
   background: fn-color("gray-bg");
+  padding: fn-rem(60) fn-rem(20) fn-rem(30);
 }
 
 .main {
-  margin: fn-rem(60) fn-rem(20) fn-rem(30);
-
   border-radius: radius("lg");
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   display: flex;
   overflow: hidden;
   height: calc(100vh - fn-rem(90));
+
+  @media (max-width: bp("lg")) {
+    height: 100%;
+    min-height: 100%;
+    flex-direction: column;
+    border-radius: 0;
+    box-shadow: none;
+    overflow-y: auto;
+  }
 }
 
 .panelWrapper {
   display: flex;
   flex: 1;
   position: relative;
+
+  @media (max-width: bp("lg")) {
+    flex-direction: column;
+  }
+}
+
+/* 모바일 전용 레이아웃 */
+.mobileLayout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  background: fn-color("white");
+  border-radius: radius("md");
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* 모바일 탭 영역 */
+.mobileTabs {
+  display: flex;
+  overflow-x: auto;
+  background: fn-color("gray-50");
+  border-bottom: 1px solid fn-color("gray-200");
+  padding: fn-rem(8);
+  gap: fn-rem(8);
+
+  .tab {
+    flex: 0 0 auto;
+    padding: fn-rem(8) fn-rem(16);
+    font-size: font("sm");
+    color: fn-color("gray-700");
+    background: fn-color("white");
+    border: 1px solid fn-color("gray-200");
+    border-radius: radius("md");
+    white-space: nowrap;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: fn-color("gray-100");
+    }
+
+    &.active {
+      background: fn-color("primary");
+      color: fn-color("white");
+      border-color: fn-color("primary");
+      font-weight: 600;
+    }
+  }
 }
 
 .close {
@@ -29,8 +85,14 @@
   font-size: fn-rem(26);
   cursor: pointer;
   transition: color 0.2s ease;
+  z-index: 10;
 
   &:hover {
     color: fn-color("gray-600");
+  }
+
+  @media (max-width: bp("lg")) {
+    top: fn-rem(10);
+    right: fn-rem(10);
   }
 }

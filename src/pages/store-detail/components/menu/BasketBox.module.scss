@@ -67,7 +67,7 @@
   min-height: fn-rem(60);
 
   @media (min-width: bp("lg")) {
-    cursor: default;
+    // cursor: default;
     background: transparent;
     padding: 0;
     min-height: auto;

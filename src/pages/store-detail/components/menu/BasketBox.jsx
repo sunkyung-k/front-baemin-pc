@@ -3,28 +3,31 @@ import styles from "./BasketBox.module.scss";
 import { FaTrashAlt } from "react-icons/fa";
 import useBasket from "@/hooks/useBasket";
 import BasketItem from "./BasketItem";
+import LoadingSpinner from "../../../../components/LoadingSpinner";
 
 /**
  * BasketBox
- * - USER 전용 (MenuTabContent에서만 노출)
- * - lg 이하에서는 하단 고정 + 토글 열림/닫힘 가능
+ * ------------------------------------------------------
+ * - USER 전용 장바구니 UI
+ * - useBasket 훅과 React Query로 상태 동기화
  */
 export default function BasketBox() {
   const { basketQuery, increase, decrease, removeItem, clearAll, orderAll } =
     useBasket();
-
   const basket = basketQuery?.data;
   const isEmpty = !basket || !basket.itemList || basket.itemList.length === 0;
   const [isOpen, setIsOpen] = useState(false);
 
-  if (basketQuery?.isLoading) return <p>장바구니 불러오는 중...</p>;
-  if (basketQuery?.isError) return <p>장바구니를 불러오지 못했습니다.</p>;
+  if (basketQuery?.isLoading) return "";
+  // if (basketQuery?.isError) return <p>장바구니를 불러오지 못했습니다.</p>;
 
+  /** 장바구니 전체 비우기 */
   const handleClear = () => {
     if (!window.confirm("장바구니를 모두 비우시겠습니까?")) return;
     clearAll.mutate();
   };
 
+  /** 전체 주문 처리 */
   const handleOrder = () => {
     if (!window.confirm("주문을 진행하시겠습니까?")) return;
     orderAll.mutate({
@@ -35,8 +38,9 @@ export default function BasketBox() {
 
   return (
     <>
+      {/* 장바구니 열림 시 배경 딤처리 */}
       {isOpen && (
-        <div className={styles.overlay} onClick={() => setIsOpen(false)}></div>
+        <div className={styles.overlay} onClick={() => setIsOpen(false)} />
       )}
 
       <div
@@ -44,6 +48,7 @@ export default function BasketBox() {
           isOpen ? styles.open : styles.closed
         }`}
       >
+        {/* 헤더(타이틀 + 전체삭제 버튼) */}
         <div className={styles.header} onClick={() => setIsOpen(!isOpen)}>
           <h3 className={styles.title}>장바구니</h3>
           {!isEmpty && (
@@ -61,7 +66,7 @@ export default function BasketBox() {
           )}
         </div>
 
-        {/* 실제 장바구니 내용 */}
+        {/* 장바구니 항목 목록 */}
         <div className={styles.content}>
           <ul className={styles.list}>
             {!isEmpty ? (
@@ -79,6 +84,8 @@ export default function BasketBox() {
             )}
           </ul>
         </div>
+
+        {/* 주문 버튼 */}
         <button
           className="btn btn-default btn-primary"
           onClick={!isEmpty ? handleOrder : undefined}

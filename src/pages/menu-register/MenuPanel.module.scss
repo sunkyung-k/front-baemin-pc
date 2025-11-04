@@ -4,16 +4,19 @@
   flex-direction: column;
   height: 100%;
   background: fn-color("white");
-  padding: fn-rem(30) fn-rem(50) 0; // 아래 패딩 제거 (리스트 쪽에서 관리)
+  padding: fn-rem(30) fn-rem(50) 0;
+  @media (max-width: bp("lg")) {
+    padding: fn-rem(20);
+  }
 }
 
 .detailHeader {
-  flex-shrink: 0; // ✅ 헤더 고정
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: fn-color("white");
-  position: sticky; // ✅ 스크롤해도 고정
+  position: sticky;
   top: 0;
   z-index: 10;
   padding-bottom: fn-rem(20);
@@ -64,9 +67,7 @@
 .menuHeader {
   background: fn-color("white");
   padding: fn-rem(20);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+
   cursor: pointer;
   transition: background 0.2s;
 
@@ -114,6 +115,7 @@
 }
 
 .menuInfo {
+  width: calc(100% - fn-rem(80));
   h4 {
     font-size: font("lg");
     font-weight: 700;
@@ -127,7 +129,10 @@
 }
 
 .menuRight {
-  text-align: right;
+  padding-top: space("md");
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .menuPrice {

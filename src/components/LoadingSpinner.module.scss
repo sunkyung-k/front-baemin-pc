@@ -12,13 +12,11 @@
   color: #555;
   font-family: "Pretendard", "Noto Sans KR", sans-serif;
   animation: fadeIn 0.2s ease-in-out;
-  background-color: rgba($color: fn-color("dark"), $alpha: 0.3);
-
+  z-index: -1;
+  background-color: fn-color("white");
   &.fullscreen {
     position: fixed;
     inset: 0;
-    background: rgba(255, 255, 255, 0.8);
-    z-index: 9999;
   }
 }
 

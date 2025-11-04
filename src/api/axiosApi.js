@@ -5,7 +5,7 @@ import { handleApiError } from "@/utills/handleApiError";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:9090",
-  withCredentials: true, // ✅ 쿠키 기반 refresh 지원
+  withCredentials: true, // 쿠키 기반 refresh 지원
 });
 
 // 요청 인터셉터 : JWT 자동 주입

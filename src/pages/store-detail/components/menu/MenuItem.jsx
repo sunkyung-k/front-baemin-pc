@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useOutletContext } from "react-router-dom";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import menuAPI from "@/service/menu/menuAPI";
 import RadioGroup from "@/components/form/RadioGroup";
@@ -11,46 +12,40 @@ import styles from "./MenuItem.module.scss";
 
 /**
  * MenuItem
- * ------------------------------------------------------------
+ * ------------------------------------------------------
+ * - 단일 메뉴 카드 + 옵션 선택 + 장바구니 담기
  * - 필수 옵션 검증
- * - USER만 '담기' 버튼 노출
- * - 다른 가게 메뉴 담기 확인(confirm)은 useBasket 훅에서 처리
- * ------------------------------------------------------------
+ * - useBasket 훅을 통해 confirm 로직 및 API 요청 처리
  */
 export default function MenuItem({ menuId }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValues, setSelectedValues] = useState({});
-
-  /** 장바구니 훅 */
   const { addMenu } = useBasket();
   const { userId, userRole } = authStore.getState();
   const isUser = userRole?.includes("USER");
 
+  /** 현재 가게 ID (storeDetail에서 전달받음) */
+  const { storeDetail } = useOutletContext();
+  const currentStoreId = storeDetail?.storeId;
+
   /** 메뉴 상세 조회 */
-  const {
-    data: menu,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: menu, isError } = useQuery({
     queryKey: QUERY_KEYS.MENU_DETAIL(menuId),
     queryFn: () => menuAPI.getMenuDetail(menuId),
     enabled: !!menuId,
   });
 
-  if (isLoading) return <p>로딩 중...</p>;
-  if (isError || !menu) return <p>메뉴 정보를 불러올 수 없습니다.</p>;
+  if (isError || !menu) return "";
 
   const imageUrl = getAbsoluteImageUrl(menu);
   const optionGroups = menu.menuOptionGroupList || [];
 
-  /** 옵션 선택 핸들러 */
+  /** 옵션 변경 핸들러 */
   const handleChange = (groupId, value, type, maxSelect = 0) => {
     setSelectedValues((prev) => {
-      if (type === "radio") {
-        return { ...prev, [groupId]: value };
-      } else if (Array.isArray(value)) {
+      if (type === "radio") return { ...prev, [groupId]: value };
+      if (Array.isArray(value)) {
         if (maxSelect > 0 && value.length > maxSelect) {
-          // UI 알림 대신 콘솔에만 기록 — 필요하면 토스트로 교체
           console.warn(`최대 ${maxSelect}개까지만 선택할 수 있습니다.`);
           return prev;
         }
@@ -60,11 +55,11 @@ export default function MenuItem({ menuId }) {
     });
   };
 
-  /** 담기 버튼 클릭 */
+  /** '담기' 버튼 클릭 시 실행 */
   const handleAdd = (e) => {
     e.stopPropagation();
 
-    // 1️⃣ 필수 옵션 체크
+    // 필수 옵션 검증
     const requiredGroups = optionGroups.filter(
       (g) =>
         g.requiredYn === "Y" &&
@@ -74,17 +69,15 @@ export default function MenuItem({ menuId }) {
 
     const missing = requiredGroups.find((g) => {
       const val = selectedValues[g.menuOptGrpId];
-      if (Array.isArray(val)) return val.length === 0;
-      return !val;
+      return Array.isArray(val) ? val.length === 0 : !val;
     });
 
     if (missing) {
-      // 기존 alert 제거 — 향후 토스트로 대체 권장
       console.warn(`${missing.menuOptGrpName} 옵션을 선택해주세요!`);
       return;
     }
 
-    // 2️⃣ 선택된 옵션 정리
+    // 선택된 옵션 정리
     const optionList = Object.values(selectedValues)
       .flat()
       .map((optId) => ({
@@ -92,34 +85,21 @@ export default function MenuItem({ menuId }) {
         quantity: 1,
       }));
 
-    // 3️⃣ 서버로 전달할 payload 구성
+    // 장바구니에 전달할 데이터
     const payload = {
       userId,
       menu: {
         menuId: menu.menuId,
-        storeId: menu.storeId, // useBasket 훅에서 비교용
+        storeId: currentStoreId,
         quantity: 1,
         optionList,
       },
     };
 
-    console.log("[장바구니 담기 요청]", payload);
-
-    // 4️⃣ 단순 호출 — 다른 가게 확인, clearAll, confirm은 훅 내부 처리
+    // useBasket 내부에서 confirm + API 처리
     addMenu.mutate(payload, {
-      onSuccess: () => {
-        // alert 제거: 대신 UI 상태(옵션창 닫기) 및 콘솔 기록
-        setIsOpen(false);
-        console.log(`${menu.menuName} 장바구니에 담겼습니다.`);
-        // 필요하면 여기서 토스트를 띄우도록 교체:
-        // e.g. toast.success(`${menu.menuName} 장바구니에 담겼습니다.`);
-      },
-      onError: (err) => {
-        // alert 제거: 콘솔에 에러만 기록
-        console.error("장바구니 담기 실패:", err);
-        // 필요하면 여기서 토스트를 띄우도록 교체:
-        // e.g. toast.error("장바구니 담기 중 오류가 발생했습니다.");
-      },
+      onSuccess: () => setIsOpen(false),
+      onError: (err) => console.error("장바구니 담기 실패:", err),
     });
   };
 
@@ -137,7 +117,6 @@ export default function MenuItem({ menuId }) {
             <div className={styles.noImg}></div>
           )}
         </div>
-
         <div className={styles.info}>
           <div className={styles.texts}>
             <h4 className={styles.name}>{menu.menuName}</h4>
@@ -147,13 +126,9 @@ export default function MenuItem({ menuId }) {
         </div>
       </div>
 
-      {/* 옵션 그룹 */}
+      {/* 옵션 선택 UI */}
       {isOpen && (
-        <div
-          className={styles.optionBox}
-          onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-        >
+        <div className={styles.optionBox} onClick={(e) => e.stopPropagation()}>
           {optionGroups
             .filter(
               (group) =>
@@ -170,21 +145,17 @@ export default function MenuItem({ menuId }) {
                 maxSelect,
                 menuOptionList,
               } = group;
-
               const isRequired = requiredYn === "Y";
               const type = isRequired ? "radio" : "checkbox";
 
               const labelText = (
                 <>
                   {menuOptGrpName}{" "}
-                  {isRequired ? (
-                    <span className={styles.radioTag}>필수</span>
-                  ) : (
-                    <span className={styles.radioTag}>
-                      선택
-                      {maxSelect > 0 && ` (최대 ${maxSelect}개)`}
-                    </span>
-                  )}
+                  <span className={styles.radioTag}>
+                    {isRequired
+                      ? "필수"
+                      : `선택${maxSelect > 0 ? ` (최대 ${maxSelect}개)` : ""}`}
+                  </span>
                 </>
               );
 
@@ -229,7 +200,6 @@ export default function MenuItem({ menuId }) {
               );
             })}
 
-          {/* USER만 '담기' 버튼 표시 */}
           {isUser && (
             <button className="btn btn-default btn-primary" onClick={handleAdd}>
               담기

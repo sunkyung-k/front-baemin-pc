@@ -7,11 +7,9 @@ import BasketBox from "./BasketBox";
 export default function MenuTabContent() {
   const { storeDetail } = useOutletContext();
   const { userRole } = authStore.getState();
+  const isUser = userRole?.includes("USER");
 
-  if (!userRole) return null;
-
-  const isUser = userRole.includes("USER");
-
+  /** USER만 장바구니 영역 표시 */
   return (
     <div
       className={`${styles.menuTabContainer} ${
@@ -19,7 +17,7 @@ export default function MenuTabContent() {
       }`}
     >
       <section className={styles.leftArea}>
-        <MenuList />
+        <MenuList storeDetail={storeDetail} />
       </section>
 
       {isUser && (

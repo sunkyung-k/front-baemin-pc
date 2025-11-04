@@ -4,6 +4,13 @@
   background: fn-color("gray-50");
 }
 
+.soldout {
+  position: relative;
+  :global(.btn-sm) {
+    z-index: 3;
+  }
+}
+
 .header {
   display: flex;
   align-items: flex-start;
@@ -16,19 +23,12 @@
   }
 }
 
-.info {
-  padding-top: space("md");
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .name {
   font-size: font("lg");
   color: fn-color("gray-800");
   font-weight: 500;
 
-  span {
+  .options {
     display: block;
     padding-top: space("xs");
     font-size: font("sm");
@@ -36,21 +36,29 @@
   }
 }
 
-/* 삭제 버튼 전용 */
-.removeBtn {
-  width: fn-rem(28);
-  height: fn-rem(28);
-  border: 1px solid fn-color("gray-300");
-  border-radius: radius("sm");
-  background: fn-color("white");
-  color: fn-color("gray-700");
-  font-size: font("md");
-  cursor: pointer;
-  transition: 0.2s;
+.soldoutBadge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  color: fn-color("white");
+  font-size: font("lg");
+  font-weight: 600;
+  padding: fn-rem(3) fn-rem(6);
+  border-radius: fn-rem(4);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  &:hover {
-    background: fn-color("gray-100");
-  }
+.info {
+  padding-top: space("md");
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .price {
