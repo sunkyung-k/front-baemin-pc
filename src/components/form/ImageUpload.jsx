@@ -73,8 +73,8 @@ export default function ImageUpload({
         style={{ display: "none" }}
       />
 
-      {hint && <p className="hint">{hint}</p>}
       {errorMessage && <p className="input-error">{errorMessage}</p>}
+      {hint && <p className="hint">{hint}</p>}
     </div>
   );
 }

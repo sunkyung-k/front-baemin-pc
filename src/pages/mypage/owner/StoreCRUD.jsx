@@ -65,20 +65,10 @@ const mapStoreToForm = (store, DAY_OPTIONS) => {
 const schema = yup.object().shape({
   categoryIds: yup
     .array()
-    .min(1, "최소 1개 이상의 카테고리를 선택해주세요.")
-    .required(),
-  storeName: yup.string().required("가게명은 필수입니다."),
-  mainImage: yup
-    .mixed()
-    .test(
-      "file-required",
-      "가게 대표 이미지를 등록해주세요.",
-      function (value) {
-        const isEdit = this.options.context?.isEdit;
-        if (!isEdit) return value && value.length > 0;
-        return true;
-      }
-    ),
+    .min(1, "카테고리를 최소 1개 이상 선택해주세요.")
+    .required("카테고리를 선택해주세요."),
+  storeName: yup.string().required("가게명을 입력해주세요."),
+  mainImage: yup.mixed().required("가게 대표 이미지를 등록해주세요."),
   phone: yup
     .string()
     .required("전화번호를 입력해주세요.")
@@ -154,7 +144,7 @@ export default function StoreCRUD() {
     } else {
       setMainImageUrl(null);
     }
-  }, [myStore, reset, DAY_OPTIONS]);
+  }, [myStore, reset]);
 
   /* 휴무 요일 체크박스 상태 핸들러 */
   const handleDaysChange = (e) => {
@@ -177,16 +167,17 @@ export default function StoreCRUD() {
 
   /* 폼 제출 (등록/수정) 처리 */
   const onSubmit = async (data) => {
-    if (
-      !window.confirm(
-        isEdit ? "가게 정보를 수정하시겠습니까?" : "가게를 등록하시겠습니까?"
-      )
-    )
-      return;
+    const confirmText = isEdit
+      ? "가게 정보를 수정하시겠습니까?"
+      : "가게를 등록하시겠습니까?";
+
+    if (!window.confirm(confirmText)) return;
+
     try {
-      // FormData 구성
       const formData = new FormData();
-      [
+
+      /** 기본 필드 */
+      const basicFields = [
         "storeName",
         "branchName",
         "addr",
@@ -194,46 +185,58 @@ export default function StoreCRUD() {
         "origin",
         "notice",
         "phone",
-      ].forEach((k) => formData.append(k, data[k] || ""));
+      ];
+      basicFields.forEach((key) => formData.append(key, data[key] || ""));
+
+      /** 숫자형 필드 처리 */
       formData.append("minPrice", Number(data.minPrice.replace(/,/g, "")));
 
-      if (data.mainImage?.[0]) formData.append("mainImage", data.mainImage[0]);
-      data.categoryIds.forEach((id) =>
+      /** 대표 이미지 처리 */
+      if (data.mainImage?.[0]) {
+        formData.append("mainImage", data.mainImage[0]);
+      }
+      // 수정 모드일 때 새 이미지 없으면 append 안 함 → 기존 유지됨
+
+      /** 카테고리 배열 처리 */
+      (data.categoryIds || []).forEach((id) =>
         formData.append("categoryIds", Number(id))
       );
 
-      // 영업시간/휴무일 배열 구성 (API 형식에 맞게 변환)
+      /** 영업시간/휴무일 처리 */
       const selectedDays = data.days || [];
       const isNoHoliday = selectedDays.includes("휴무 없음");
 
-      DAY_OPTIONS.slice(0, 7).forEach((day, i) => {
-        const closeYn = isNoHoliday
-          ? "N"
-          : selectedDays.includes(day)
-          ? "Y"
-          : "N";
-        formData.append(`hourList[${i}].dayOfWeek`, i + 1);
-        formData.append(`hourList[${i}].openTime`, `${data.openTime}:00`);
-        formData.append(`hourList[${i}].closeTime`, `${data.closeTime}:00`);
-        formData.append(`hourList[${i}].closeYn`, closeYn);
+      const hours = DAY_OPTIONS.slice(0, 7).map((day, i) => ({
+        dayOfWeek: i + 1,
+        openTime: `${data.openTime}:00`,
+        closeTime: `${data.closeTime}:00`,
+        closeYn: isNoHoliday ? "N" : selectedDays.includes(day) ? "Y" : "N",
+      }));
+
+      hours.forEach((hour, i) => {
+        Object.entries(hour).forEach(([key, value]) =>
+          formData.append(`hourList[${i}].${key}`, value)
+        );
       });
 
-      // API 호출 및 후처리
+      /** API 호출 */
       if (isEdit) {
         if (!myStore?.storeId) {
           alert("수정할 가게 정보를 찾을 수 없습니다. 다시 시도해주세요.");
           return;
         }
+
         formData.append("storeId", myStore.storeId);
         await update.mutateAsync(formData);
         alert("가게 정보가 수정되었습니다.");
-        reset(data, { keepValues: true }); // 수정 후 값 유지
       } else {
         await create.mutateAsync(formData);
-        alert("가게가 등록되었습니다!");
-        reset({}, { keepValues: true }); // 등록 후 폼 초기화
-        setIsEdit(true); // 수정 모드로 전환
+        alert("가게가 등록되었습니다.");
       }
+
+      /** 후처리 */
+      reset(data, { keepValues: true });
+      if (!isEdit) setIsEdit(true);
     } catch (err) {
       console.error("등록/수정 실패:", err);
     }
