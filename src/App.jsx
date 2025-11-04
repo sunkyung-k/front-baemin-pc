@@ -1,6 +1,8 @@
 import { RouterProvider } from "react-router-dom";
 import { router } from "./router/router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import OrderStatusNotifier from "./components/order/OrderStatusNotifier";
+import { ToastContainer } from "react-toastify";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,6 +18,12 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      {/* SSE 구독 + Toast 알림 */}
+      <OrderStatusNotifier />
+
+      {/* Toast 알림 컨테이너 */}
+      <ToastContainer position="bottom-right" autoClose={5000} />
+
       <RouterProvider router={router} />
     </QueryClientProvider>
   );
