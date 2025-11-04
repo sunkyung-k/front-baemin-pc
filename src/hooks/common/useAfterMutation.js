@@ -1,25 +1,20 @@
 import { useQueryClient } from "@tanstack/react-query";
 
+/** AfterMutation 타입 상수 */
+export const AFTER_TYPES = {
+  LIST: "list",
+  DETAIL: "detail",
+  CUSTOM: "custom",
+};
+
 /**
- *  범용 CRUD 후처리 훅 (전역 공용)
- *
- * - 모든 도메인(가게, 메뉴, 장바구니, 회원 등)에 사용 가능
- * - type:
- *   - "list"   → 목록형 데이터 (invalidate)
- *   - "detail" → 상세형 데이터 (refetch)
- *   - "custom" → 직접 지정한 후처리 함수 실행
- * - onSync: Zustand 등 로컬 상태 갱신 함수 (선택)
- *
- * 사용 예시:
+ * 범용 CRUD 후처리 훅 (최신 리팩토링 버전)
  * ------------------------------------------------------
- * const afterMutation = useAfterMutation("detail", refreshStore);
- * onSettled: () => afterMutation(QUERY_KEYS.STORE_DETAIL(storeId));
- *
- * const afterMutation = useAfterMutation("list");
- * onSettled: () => afterMutation(["storeList"]);
- * ------------------------------------------------------
+ * - React Query + Zustand 완전 병행 구조
+ * - 서버 재요청 최소화, 캐시 즉시 반영 중심
+ * - 모든 도메인(가게, 메뉴, 장바구니 등)에 공용 사용 가능
  */
-export const useAfterMutation = (type = "list", onSync = null) => {
+export const useAfterMutation = (type = AFTER_TYPES.LIST, onSync = null) => {
   const queryClient = useQueryClient();
 
   const handleAfterMutation = async (queryKey) => {
@@ -29,30 +24,34 @@ export const useAfterMutation = (type = "list", onSync = null) => {
     }
 
     try {
+      // 공통: onSync 먼저 실행 (Zustand나 로컬 스토어 동기화)
+      let newData = null;
+      if (typeof onSync === "function") {
+        newData = await onSync(queryClient); // 반환값 있으면 React Query 캐시에 반영됨
+      }
+
+      // 타입별 후처리
       switch (type) {
-        /** 목록 데이터 (invalidate only) */
-        case "list": {
+        case AFTER_TYPES.LIST:
           await queryClient.invalidateQueries({ queryKey });
-          if (typeof onSync === "function") await onSync();
           break;
-        }
 
-        /** 상세 데이터 (즉시 refetch) */
-        case "detail": {
-          await queryClient.refetchQueries({ queryKey });
-          if (typeof onSync === "function") await onSync();
+        case AFTER_TYPES.DETAIL:
+          if (newData) {
+            // 서버 요청 없이 캐시 즉시 업데이트 (성능 향상)
+            queryClient.setQueryData(queryKey, newData);
+          } else {
+            // fallback: 서버 refetch (기존 로직 유지)
+            await queryClient.refetchQueries({ queryKey });
+          }
           break;
-        }
 
-        /** 커스텀 타입: onSync만 실행 */
-        case "custom": {
-          if (typeof onSync === "function") await onSync(queryClient);
+        case AFTER_TYPES.CUSTOM:
+          // onSync만 실행됨
           break;
-        }
 
-        default: {
+        default:
           console.warn(`[useAfterMutation] Unknown type: ${type}`);
-        }
       }
     } catch (err) {
       console.error("[useAfterMutation] Error:", err);
