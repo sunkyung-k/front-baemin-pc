@@ -7,11 +7,15 @@
   background-color: fn-color("primary");
   z-index: 1;
 
+  @media (max-width: bp("md")) {
+    padding: 0 space("md");
+  }
+
   &-inner {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: fn-rem(60);
+    height: $header-height;
   }
 
   .logo {
@@ -35,6 +39,15 @@
     justify-content: center;
     gap: space("lg");
     transform: translate(-50%, -50%);
+
+    @media (max-width: bp("md")) {
+      position: static;
+      width: 100%;
+      height: $gnb-height-mobile;
+      border-top: 1px solid rgba($color: fn-color("primary-bg"), $alpha: 0.2);
+      background-color: fn-color("primary");
+      transform: none;
+    }
 
     a {
       position: relative;
@@ -76,19 +89,6 @@
       &:hover {
         background: fn-color("primary-bg");
       }
-    }
-  }
-
-  @media (max-width: bp("md")) {
-    padding: 0 space("md");
-
-    .nav {
-      position: static;
-      width: 100%;
-      padding: space("md") 0;
-      border-top: 1px solid rgba($color: fn-color("primary-bg"), $alpha: 0.2);
-      background-color: fn-color("primary");
-      transform: none;
     }
   }
 }

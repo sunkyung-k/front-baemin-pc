@@ -1,0 +1,60 @@
+.storeCard {
+  overflow: hidden;
+  flex: 0 0 calc((100% - 2 * space("xl")) / 3);
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("lg");
+  transition: 0.3s ease;
+
+  @media (max-width: bp("md")) {
+    flex: 0 0 calc((100% - 1 * space("xl")) / 2);
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    border-color: fn-color("primary");
+  }
+}
+
+.thumb {
+  width: 100%;
+  height: fn-rem(180);
+  background: fn-color("gray-100");
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .noImage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: fn-color("gray-500");
+  }
+}
+
+.info {
+  padding: space("md");
+
+  h3 {
+    font-size: font("xl");
+    margin-bottom: space("xs");
+    font-weight: 700;
+    color: fn-color("gray-900");
+  }
+
+  p {
+    font-size: font("sm");
+    color: fn-color("gray-600");
+  }
+}
+
+.rating {
+  font-size: font("lg");
+  color: #ffc107;
+  margin-top: space("sm");
+}

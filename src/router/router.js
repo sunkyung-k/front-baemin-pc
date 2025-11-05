@@ -8,10 +8,11 @@ import OrderManage from "../pages/mypage/owner/OrderManage";
 import OrderInfo from "../pages/mypage/user/OrderInfo";
 import MypageAccount from "../pages/mypage/MypageAccount";
 import MenuLayout from "../pages/menu-register/MenuLayout";
-import StoreList from "../pages/store-list/StoreList";
+import StoreListLayout from "../pages/store-list/StoreListLayout";
 import StoreDetailLayout from "../pages/store-detail/StoreDetailLayout";
 import MenuTabContent from "../pages/store-detail/components/menu/MenuTabContent";
 import Join from "../pages/join/Join";
+import StoreList from "../pages/store-list/StoreList";
 
 export const router = createBrowserRouter([
   {
@@ -21,20 +22,15 @@ export const router = createBrowserRouter([
       {
         index: true,
         Component: Home,
-      },
-      {
-        path: "store/list",
-        Component: StoreList,
+        handle: { layoutClass: "wide" },
       },
       {
         path: "store",
-        Component: StoreDetailLayout,
+        Component: StoreListLayout,
         children: [
-          {
-            path: ":storeId",
-            Component: MenuTabContent,
-          },
+          { path: "list", Component: StoreList }, // ✅ /store/list
         ],
+        handle: { layoutClass: "wide" },
       },
       {
         path: "mypage",

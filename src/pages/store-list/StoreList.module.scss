@@ -1,162 +1,21 @@
-@use "@/assets/scss/utils/variables" as *;
-
-.storeList {
-  width: 100%;
-  max-width: 1100px;
+.main {
+  max-width: fn-rem(1200);
   margin: 0 auto;
-  padding: space("lg");
+  width: 100%;
+  padding: 0 space("lg");
+}
 
-  /* ✅ ① 주소 검색창 */
-  .addressBox {
-    display: flex;
-    align-items: center;
-    gap: space("sm");
-    background: fn-color("gray-50");
-    border-radius: radius("lg");
-    padding: space("md");
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+.storeGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space("xl");
+  margin-top: space("md");
+}
 
-    .locationBtn {
-      border: none;
-      background: fn-color("primary-bg");
-      color: fn-color("primary");
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 16px;
-      transition: 0.2s;
-
-      &:hover {
-        background: fn-color("primary");
-        color: #fff;
-      }
-    }
-
-    .addressInput {
-      flex: 1;
-      border: none;
-      background: transparent;
-      font-size: font("lg");
-      outline: none;
-    }
-  }
-
-  /* ✅ ② 메뉴/가게명 검색창 */
-  .menuSearch {
-    display: flex;
-    align-items: center;
-    margin-top: space("md");
-    background: #fff;
-    border: 1px solid fn-color("gray-200");
-    border-radius: radius("lg");
-    padding: space("sm") space("md");
-
-    input {
-      flex: 1;
-      border: none;
-      outline: none;
-      font-size: font("md");
-      color: fn-color("gray-800");
-    }
-
-    .searchBtn {
-      border: none;
-      background: transparent;
-      color: fn-color("primary");
-      cursor: pointer;
-      font-size: 18px;
-    }
-  }
-
-  /* ✅ ③ 카테고리 탭 */
-  .categoryTabs {
-    display: flex;
-    justify-content: flex-start;
-    gap: space("md");
-    margin-top: space("lg");
-    border-bottom: 1px solid fn-color("gray-200");
-    flex-wrap: wrap;
-
-    .tab {
-      background: none;
-      border: none;
-      padding: space("sm") space("md");
-      font-size: font("md");
-      color: fn-color("gray-600");
-      cursor: pointer;
-      border-radius: radius("md");
-      transition: all 0.2s;
-
-      &.active {
-        background: fn-color("primary");
-        color: #fff;
-        font-weight: 600;
-      }
-
-      &:hover {
-        background: fn-color("primary-bg");
-        color: fn-color("primary");
-      }
-    }
-  }
-
-  /* ✅ ④ 가게 카드 리스트 */
-  .storeGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: space("lg");
-    margin-top: space("lg");
-
-    .storeCard {
-      background: #fff;
-      border: 1px solid fn-color("gray-200");
-      border-radius: radius("lg");
-      overflow: hidden;
-      padding: space("md");
-      transition: 0.2s;
-
-      &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      }
-
-      .thumb {
-        height: 120px;
-        background: fn-color("gray-100");
-        border-radius: radius("md");
-      }
-
-      .info {
-        margin-top: space("sm");
-
-        h3 {
-          font-size: font("lg");
-          font-weight: 600;
-          margin-bottom: space("xs");
-        }
-
-        p {
-          font-size: font("sm");
-          color: fn-color("gray-600");
-        }
-
-        .rating {
-          display: inline-block;
-          margin-top: space("xs");
-          font-size: font("sm");
-          color: #ffb800;
-        }
-      }
-    }
-  }
-
-  .empty {
-    text-align: center;
-    color: fn-color("gray-500");
-    padding: space("xl");
-  }
+.loadingWrap,
+.emptyWrap {
+  text-align: center;
+  color: fn-color("gray-600");
+  font-size: font("lg");
+  padding: space("xl") 0;
 }

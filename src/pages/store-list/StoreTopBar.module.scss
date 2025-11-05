@@ -1,0 +1,102 @@
+.topBar {
+  position: sticky;
+  top: $header-height;
+  display: flex;
+  flex-direction: column;
+  gap: space("md");
+  padding: space("md") 0;
+  border-bottom: 1px solid fn-color("gray-200");
+  background: fn-color("white");
+  z-index: 10;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+
+  @media (max-width: bp("md")) {
+    top: $header-height + $gnb-height-mobile;
+  }
+
+  /* 🔹 미묘한 그림자 추가 (스크롤 있을 때만 표시) */
+  &.scrolled {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.tabWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: space("md");
+  padding-left: space("md");
+}
+
+.searchToggleBtn {
+  font-size: fn-rem(20);
+  color: fn-color("gray-700");
+  width: fn-rem(40);
+  height: fn-rem(40);
+  border-radius: radius(full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: fn-color("gray-100");
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    background: fn-color("primary");
+    color: fn-color("white");
+    box-shadow: 0 4px 10px rgba($color: fn-color("primary"), $alpha: 0.3);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: inset 0 2px 3px rgba($color: fn-color("primary"), $alpha: 0.4);
+  }
+}
+
+.categoryTabs {
+  display: flex;
+  gap: space("sm");
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  padding-right: space("md");
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (max-width: bp("md")) {
+    width: calc(100% - fn-rem(40) - space("sm"));
+    flex-wrap: nowrap;
+  }
+}
+
+.tab {
+  border-radius: radius("lg");
+  padding: space("xs") space("md");
+  font-size: font("md");
+  color: fn-color("gray-700");
+  background: fn-color("gray-50");
+  border: 1px solid transparent;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover:not(.active) {
+    color: fn-color("primary");
+    background-color: fn-color("primary-bg");
+    border-color: fn-color("primary");
+  }
+
+  &.active {
+    background: fn-color("primary");
+    border-color: fn-color("primary");
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba($color: fn-color("primary"), $alpha: 0.3);
+  }
+}
