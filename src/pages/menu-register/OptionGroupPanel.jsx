@@ -90,7 +90,7 @@ export default function OptionGroupPanel({ menuId }) {
     async (groupId, e) => {
       e?.stopPropagation?.();
       try {
-        // ✅ handleDelete 제거 — remove 내부에서 이미 confirm/alert 수행
+        //  handleDelete 제거 — remove 내부에서 이미 confirm/alert 수행
         await remove.mutateAsync(groupId);
         await refreshMenu();
       } catch (err) {

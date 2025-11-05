@@ -15,14 +15,13 @@ export default function StoreDetailLayout() {
     queryKey: [QUERY_KEYS.STORE_DETAIL, storeId],
     queryFn: () => storeAPI.getStoreDetail(storeId),
     enabled: !!storeId,
-    onError: (err) => handleError(err, "StoreDetailLayout.getStoreDetail"), // ✅ alert 띄움
+    onError: (err) => handleError(err, "StoreDetailLayout.getStoreDetail"),
   });
 
   if (isLoading)
-    if (isError || !data)
-      // return <LoadingSpinner fullscreen message="가게 정보를 불러오는 중..." />;
+    return <LoadingSpinner fullscreen message="가게 정보를 불러오는 중..." />;
 
-      return <div>가게 정보를 불러올 수 없습니다.</div>;
+  if (isError || !data) return <div>가게 정보를 불러올 수 없습니다.</div>;
 
   const storeDetail = data?.response?.vo ?? data;
 

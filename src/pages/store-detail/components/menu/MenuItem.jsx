@@ -1,4 +1,3 @@
-// src/components/menu/MenuItem.jsx
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useOutletContext } from "react-router-dom";
@@ -16,8 +15,7 @@ import styles from "./MenuItem.module.scss";
  * MenuItem
  * ------------------------------------------------------
  * - 단일 메뉴 카드 + 옵션 선택 + 장바구니 담기
- * - 필수 옵션 검증
- * - useBasket 훅을 통해 confirm 로직 및 API 요청 처리
+ * - 필수 옵션 검증 및 alert 처리
  */
 export default function MenuItem({ menuId }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +25,6 @@ export default function MenuItem({ menuId }) {
   const isUser = userRole?.includes("USER");
   const handleError = useHandleError();
 
-  /** 현재 가게 ID (storeDetail에서 전달받음) */
   const { storeDetail } = useOutletContext();
   const currentStoreId = storeDetail?.storeId;
 
@@ -43,39 +40,30 @@ export default function MenuItem({ menuId }) {
   const imageUrl = getAbsoluteImageUrl(menu);
   const optionGroups = menu.menuOptionGroupList || [];
 
-  /** 옵션 변경 핸들러
-   *  - radio: 단일값
-   *  - checkbox: 배열값 (maxSelect 검사 후 업데이트)
-   */
+  /** 옵션 변경 핸들러 */
   const handleChange = (groupId, value, type, maxSelect = 0) => {
     setSelectedValues((prev) => {
       if (type === "radio") {
         return { ...prev, [groupId]: value };
       }
-
-      // checkbox (value는 배열)
       if (Array.isArray(value)) {
         if (maxSelect > 0 && value.length > maxSelect) {
-          // 사용자에게 명확한 안내 alert (공통 훅 사용)
           handleError(
             new Error(`최대 ${maxSelect}개까지만 선택할 수 있습니다.`),
             "MenuItem.maxSelect"
           );
-          // 상태 변경하지 않음
           return prev;
         }
         return { ...prev, [groupId]: value };
       }
-
       return prev;
     });
   };
 
-  /** '담기' 버튼 클릭 시 실행 */
+  /** 담기 버튼 */
   const handleAdd = (e) => {
     e.stopPropagation();
 
-    // 필수 옵션 검증
     const requiredGroups = optionGroups.filter(
       (g) =>
         g.requiredYn === "Y" &&
@@ -89,7 +77,6 @@ export default function MenuItem({ menuId }) {
     });
 
     if (missing) {
-      // 사용자용 메시지: 공통 훅으로 alert
       handleError(
         new Error(`${missing.menuOptGrpName} 옵션을 선택해주세요!`),
         "MenuItem.optionSelect"
@@ -97,7 +84,6 @@ export default function MenuItem({ menuId }) {
       return;
     }
 
-    // 선택된 옵션 정리
     const optionList = Object.values(selectedValues)
       .flat()
       .map((optId) => ({
@@ -105,7 +91,6 @@ export default function MenuItem({ menuId }) {
         quantity: 1,
       }));
 
-    // 장바구니에 전달할 데이터
     const payload = {
       userId,
       menu: {
@@ -116,7 +101,6 @@ export default function MenuItem({ menuId }) {
       },
     };
 
-    // useBasket 내부에서 confirm + API 처리
     addMenu.mutate(payload, {
       onSuccess: () => setIsOpen(false),
       onError: (err) => handleError(err, "MenuItem.addMenu"),
@@ -128,7 +112,6 @@ export default function MenuItem({ menuId }) {
       className={`${styles.box} ${isOpen ? styles.open : ""}`}
       onClick={() => setIsOpen((prev) => !prev)}
     >
-      {/* 메뉴 카드 */}
       <div className={styles.menuCard}>
         <div className={styles.thumb}>
           {imageUrl ? (
@@ -146,79 +129,70 @@ export default function MenuItem({ menuId }) {
         </div>
       </div>
 
-      {/* 옵션 선택 UI */}
       {isOpen && (
         <div className={styles.optionBox} onClick={(e) => e.stopPropagation()}>
-          {optionGroups
-            .filter(
-              (group) =>
-                Array.isArray(group.menuOptionList) &&
-                group.menuOptionList.some(
-                  (opt) => opt.availableYn === "Y" && opt.delYn === "N"
-                )
-            )
-            .map((group) => {
-              const {
-                menuOptGrpId,
-                menuOptGrpName,
-                requiredYn,
-                maxSelect,
-                menuOptionList,
-              } = group;
-              const isRequired = requiredYn === "Y";
-              const type = isRequired ? "radio" : "checkbox";
+          {optionGroups.map((group) => {
+            const {
+              menuOptGrpId,
+              menuOptGrpName,
+              requiredYn,
+              maxSelect,
+              menuOptionList,
+            } = group;
+            const isRequired = requiredYn === "Y";
+            const type = isRequired ? "radio" : "checkbox";
 
-              const labelText = (
-                <>
-                  {menuOptGrpName}{" "}
-                  <span className={styles.radioTag}>
-                    {isRequired
-                      ? "필수"
-                      : `선택${maxSelect > 0 ? ` (최대 ${maxSelect}개)` : ""}`}
-                  </span>
-                </>
-              );
+            const labelText = (
+              <>
+                {menuOptGrpName}{" "}
+                <span className={styles.radioTag}>
+                  {isRequired
+                    ? "필수"
+                    : `선택${maxSelect > 0 ? ` (최대 ${maxSelect}개)` : ""}`}
+                </span>
+              </>
+            );
 
-              const options = (menuOptionList || [])
-                .filter((opt) => opt.availableYn === "Y" && opt.delYn === "N")
-                .map((opt) => ({
-                  value: opt.menuOptId.toString(),
-                  label: (
-                    <>
-                      <span>{opt.menuOptName}</span>
-                      {opt.price > 0 && (
-                        <span>+₩{opt.price.toLocaleString()}</span>
-                      )}
-                    </>
-                  ),
-                }));
+            const options = (menuOptionList || [])
+              .filter((opt) => opt.availableYn === "Y" && opt.delYn === "N")
+              .map((opt) => ({
+                value: opt.menuOptId.toString(),
+                label: (
+                  <>
+                    <span>{opt.menuOptName}</span>
+                    {opt.price > 0 && (
+                      <span>+₩{opt.price.toLocaleString()}</span>
+                    )}
+                  </>
+                ),
+              }));
 
-              return isRequired ? (
-                <RadioGroup
-                  key={menuOptGrpId}
-                  label={labelText}
-                  name={`radio-${menuOptGrpId}`}
-                  direction="column"
-                  value={selectedValues[menuOptGrpId] || ""}
-                  onChange={(e) =>
-                    handleChange(menuOptGrpId, e.target.value, "radio")
-                  }
-                  options={options}
-                />
-              ) : (
-                <CheckboxGroup
-                  key={menuOptGrpId}
-                  label={labelText}
-                  name={`checkbox-${menuOptGrpId}`}
-                  direction="column"
-                  values={selectedValues[menuOptGrpId] || []}
-                  onChange={(vals) =>
-                    handleChange(menuOptGrpId, vals, "checkbox", maxSelect)
-                  }
-                  options={options}
-                />
-              );
-            })}
+            return isRequired ? (
+              <RadioGroup
+                key={menuOptGrpId}
+                label={labelText}
+                name={`radio-${menuOptGrpId}`}
+                direction="column"
+                value={selectedValues[menuOptGrpId] || ""}
+                onChange={(e) =>
+                  handleChange(menuOptGrpId, e.target.value, "radio")
+                }
+                options={options}
+              />
+            ) : (
+              <CheckboxGroup
+                key={menuOptGrpId}
+                label={labelText}
+                name={`checkbox-${menuOptGrpId}`}
+                direction="column"
+                values={selectedValues[menuOptGrpId] || []}
+                onChange={(vals) =>
+                  handleChange(menuOptGrpId, vals, "checkbox", maxSelect)
+                }
+                options={options}
+              />
+            );
+          })}
 
           {isUser && (
             <button className="btn btn-default btn-primary" onClick={handleAdd}>

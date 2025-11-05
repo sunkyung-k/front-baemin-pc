@@ -5,6 +5,12 @@ import { useAfterMutation, AFTER_TYPES } from "@/hooks/common/useAfterMutation";
 import { useBasketStore } from "@/store/useBasketStore";
 import { authStore } from "@/store/authStore";
 
+/**
+ * useBasket 훅
+ * ------------------------------------------------------
+ * - React Query + Zustand 병행 관리 구조
+ * - 장바구니 / 결제 페이지 모두 재사용 가능
+ */
 export const useBasket = () => {
   const { setBasket, clearBasket } = useBasketStore();
   const { userRole } = authStore.getState();
