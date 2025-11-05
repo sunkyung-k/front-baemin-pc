@@ -1,12 +1,3 @@
-.main {
-  max-width: fn-rem(1200);
-  margin: space("xxl") auto 0;
-  padding: 0 space("xl");
-  display: flex;
-  flex-direction: column;
-  gap: fn-rem(70);
-}
-
 .home {
   &Tit {
     font-size: font("xxl");
@@ -37,6 +28,15 @@
   :global(.searchBox) {
     margin-top: space("md");
   }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: fn-rem(70);
+  max-width: fn-rem(1200);
+  margin: space("xxl") auto 0;
+  padding: 0 space("lg");
 }
 
 .categoryGrid {

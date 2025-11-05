@@ -7,7 +7,7 @@ import { FaLocationCrosshairs } from "react-icons/fa6";
  */
 function ImportAddress({ userAddress, onGetLocation }) {
   return (
-    <div className="searchBox">
+    <div className="input-round">
       <button
         type="button"
         className="btn btn-default btn-round btn-primary-line"
