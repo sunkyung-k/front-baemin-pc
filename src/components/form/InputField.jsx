@@ -73,7 +73,11 @@ export default function InputField({
 
   return (
     <div className="input-field">
-      {label && <label htmlFor={name}>{label}</label>}
+      {label && (
+        <label htmlFor={name} className="input-label">
+          {label}
+        </label>
+      )}
 
       <input
         id={name}

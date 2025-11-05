@@ -55,3 +55,28 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none; /* Chrome, Safari, Edge */
   margin: 0;
 }
+
+/* input round (메인, 가게리스트) */
+.input-round {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: space("sm");
+  max-width: fn-rem(600);
+  width: 100%;
+  margin: 0 auto;
+
+  input {
+    flex: 1;
+    height: fn-rem(44);
+    padding: 0 space("md");
+    font-size: font("lg");
+    border-radius: fn-rem(40);
+    border: 1px solid fn-color("gray-200");
+    background-color: fn-color("gray-50");
+
+    &::placeholder {
+      color: fn-color("gray-400");
+    }
+  }
+}
