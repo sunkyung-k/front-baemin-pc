@@ -1,0 +1,74 @@
+.joinContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: space("xxxl") 0;
+  background-color: fn-color("gray-50");
+  overflow-y: auto;
+}
+
+.joinBox {
+  background: fn-color("white");
+  margin: fn-rem(100) 0;
+  padding: space("xxl");
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("md");
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 520px;
+  text-align: left;
+}
+
+.title {
+  color: fn-color("primary");
+  font-size: font("xxl");
+  font-weight: 700;
+  margin-bottom: space("xl");
+  text-align: center;
+}
+
+.joinForm {
+  display: flex;
+  flex-direction: column;
+  gap: space("lg");
+}
+
+.loginText {
+  margin-top: space("xl");
+  font-size: font("md");
+  color: fn-color("gray-600");
+  text-align: center;
+}
+
+.emailField {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: space("xs");
+  width: 100%;
+  .emailBox {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: space("xs");
+  }
+
+  :global(.input-field) {
+    width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .joinBox {
+    padding: space("xl");
+    max-width: 90%;
+  }
+
+  .title {
+    font-size: font("xl");
+  }
+
+  .joinForm {
+    gap: space("md");
+  }
+}
