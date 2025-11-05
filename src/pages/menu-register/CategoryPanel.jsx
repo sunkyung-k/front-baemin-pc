@@ -13,7 +13,6 @@ import EmptyState from "@/components/menu/EmptyState";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useHandleError } from "@/hooks/common/useHandleError";
 
-/** ✅ yup 유효성 검사 스키마 (등록 + 수정 공용) */
 const schema = yup.object().shape({
   categoryName: yup.string().required("카테고리명을 입력해주세요."),
   categoryOrder: yup
@@ -37,7 +36,6 @@ export default function CategoryPanel({ storeId }) {
     useMenuCategory(storeId);
   const handleError = useHandleError();
 
-  /** 등록용 RHF */
   const {
     register,
     handleSubmit,
@@ -45,13 +43,11 @@ export default function CategoryPanel({ storeId }) {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  /** 삭제되지 않은 카테고리만 표시 */
   const visibleCategories = useMemo(
     () => categories.filter((cat) => cat.delYn === "N"),
     [categories]
   );
 
-  /** ✅ 신규 카테고리 등록 */
   const onSubmit = (data) => {
     createCategory.mutate(
       {
@@ -69,7 +65,6 @@ export default function CategoryPanel({ storeId }) {
     );
   };
 
-  /** ✅ 수정 시 yup 유효성 검사 + 인풋 하단 에러메시지 표시 */
   const handleUpdate = (id) => {
     const target = editableValues[id];
     if (!target) return;
@@ -83,7 +78,6 @@ export default function CategoryPanel({ storeId }) {
         { abortEarly: false }
       );
 
-      // 유효성 통과 → 에러 초기화 후 업데이트
       setEditableErrors((prev) => ({ ...prev, [id]: {} }));
       updateCategory.mutate(
         {
@@ -110,7 +104,6 @@ export default function CategoryPanel({ storeId }) {
     }
   };
 
-  /** ✅ 삭제 (중복 confirm 제거) */
   const handleRemove = (id) => {
     removeCategory.mutate(id, {
       onSuccess: () => {
@@ -123,12 +116,10 @@ export default function CategoryPanel({ storeId }) {
     });
   };
 
-  /** 클릭 시 활성 토글 */
   const handleToggle = (id) => {
     setActiveId((prev) => (prev === id ? null : id));
   };
 
-  /** 활성 카테고리 상태 동기화 */
   useEffect(() => {
     if (!categories?.length) return;
 
@@ -157,7 +148,6 @@ export default function CategoryPanel({ storeId }) {
         <TiPlus size={18} /> 새 카테고리 등록
       </button>
 
-      {/* ✅ 카테고리 목록 */}
       {visibleCategories.length > 0 ? (
         <div className={styles.categoryList}>
           {visibleCategories.map((cat) => {
@@ -187,7 +177,6 @@ export default function CategoryPanel({ storeId }) {
                     className={styles.categoryEdit}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {/* 카테고리명 */}
                     <div className={styles.formGroup}>
                       <InputField
                         label="카테고리명"
@@ -208,7 +197,6 @@ export default function CategoryPanel({ storeId }) {
                       />
                     </div>
 
-                    {/* 정렬 순서 */}
                     <div className={styles.formGroup}>
                       <InputField
                         label="정렬 순서"
@@ -259,7 +247,6 @@ export default function CategoryPanel({ storeId }) {
         />
       )}
 
-      {/* ✅ 등록 모달 */}
       <Modal
         isOpen={modalOpen}
         title="카테고리 등록"

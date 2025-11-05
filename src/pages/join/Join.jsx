@@ -9,6 +9,7 @@ import SelectBox from "@/components/form/SelectBox";
 import { Link, useNavigate } from "react-router-dom";
 import authAPI from "@/service/authAPI";
 import { cleanNumber, cleanBirth } from "@/utills/valueFormatter";
+import { useHandleError } from "@/hooks/common/useHandleError";
 
 /* ============================================================
   회원가입 유효성 스키마
@@ -21,7 +22,7 @@ const schema = yup.object().shape({
     .string()
     .required("아이디를 입력해주세요.")
     .matches(
-      /^(?=.*[a-z])(?=.*\d)[a-z\d]{4,20}$/,
+      ID_REGEX,
       "아이디는 영문 소문자와 숫자를 모두 포함해 4~20자 이내로 입력해주세요."
     ),
   password: yup
@@ -41,7 +42,6 @@ const schema = yup.object().shape({
       if (!value) return false;
       const [year, month, day] = value.split("-").map(Number);
       const date = new Date(year, month - 1, day);
-      // 날짜 객체의 월/일이 입력값과 실제 일치하는지 검사
       return (
         date.getFullYear() === year &&
         date.getMonth() + 1 === month &&
@@ -49,20 +49,31 @@ const schema = yup.object().shape({
       );
     }),
   gender: yup.string().required("성별을 선택해주세요."),
+
   phone: yup
     .string()
     .required("전화번호를 입력해주세요.")
-    .matches(/^[0-9-]{9,13}$/, "전화번호 형식이 올바르지 않습니다."),
+    .matches(/^[0-9-]{8,13}$/, "전화번호 형식이 올바르지 않습니다."),
+
   emailId: yup.string().required("이메일 아이디를 입력해주세요."),
   emailDomain: yup.string().required("이메일 도메인을 선택해주세요."),
   userType: yup.string().required("회원구분을 선택해주세요."),
+
+  /** 사업자등록번호: OWNER일 때만 필수 */
   businessNumber: yup.string().when("userType", {
     is: "OWNER",
     then: (schema) =>
       schema
-        .transform((v) => v.replace(/-/g, ""))
         .required("사업자등록번호를 입력해주세요.")
-        .matches(/^\d{10}$/, "사업자등록번호는 숫자 10자리여야 합니다."),
+        .test(
+          "valid-business",
+          "사업자등록번호는 숫자 10자리여야 합니다.",
+          (val) => {
+            if (!val) return false;
+            const digits = cleanNumber(val);
+            return /^\d{10}$/.test(digits);
+          }
+        ),
     otherwise: (schema) => schema.notRequired(),
   }),
 });
@@ -72,6 +83,7 @@ export default function Join() {
   const [selectedType, setSelectedType] = useState("USER");
   const [emailDomainType, setEmailDomainType] = useState("");
   const [loading, setLoading] = useState(false);
+  const handleError = useHandleError();
 
   const {
     register,
@@ -94,8 +106,6 @@ export default function Join() {
   /** 회원가입 요청 */
   const onSubmit = async (data) => {
     const fullEmail = `${data.emailId}@${data.emailDomain}`;
-
-    // 공통 정제 유틸 적용
     const payload = {
       userId: data.userId,
       passwd: data.password,
@@ -118,23 +128,20 @@ export default function Join() {
         alert("회원가입이 완료되었습니다!");
         navigate("/login");
       } else {
-        alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+        throw new Error("회원가입에 실패했습니다. 다시 시도해주세요.");
       }
     } catch (err) {
-      console.error("회원가입 오류:", err);
-      alert("서버 오류로 회원가입에 실패했습니다.");
+      handleError(err, "authAPI.register");
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className={styles.joinContainer}>
       <div className={styles.joinBox}>
         <h2 className={styles.title}>회원가입</h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.joinForm}>
-          {/* 아이디 */}
           <InputField
             label="아이디"
             name="userId"
@@ -143,7 +150,6 @@ export default function Join() {
             errorMessage={errors.userId?.message}
           />
 
-          {/* 비밀번호 */}
           <InputField
             label="비밀번호"
             type="password"
@@ -153,7 +159,6 @@ export default function Join() {
             errorMessage={errors.password?.message}
           />
 
-          {/* 비밀번호 확인 */}
           <InputField
             label="비밀번호 확인"
             type="password"
@@ -163,7 +168,6 @@ export default function Join() {
             errorMessage={errors.confirmPassword?.message}
           />
 
-          {/* 이름 */}
           <InputField
             label="이름"
             name="name"
@@ -172,17 +176,15 @@ export default function Join() {
             errorMessage={errors.name?.message}
           />
 
-          {/* 생년월일 */}
           <InputField
             label="생년월일"
-            type="birth" // 자동 하이픈 추가
+            type="birth"
             name="birth"
-            placeholder="예: 1993-08-10"
+            placeholder="예: 1993-08-10 (숫자만 입력하세요)"
             register={register}
             errorMessage={errors.birth?.message}
           />
 
-          {/* 성별 */}
           <RadioGroup
             label="성별"
             name="gender"
@@ -194,12 +196,11 @@ export default function Join() {
             errorMessage={errors.gender?.message}
           />
 
-          {/* 전화번호 */}
           <InputField
             label="전화번호"
             type="phone"
             name="phone"
-            placeholder="예: 010-1234-5678"
+            placeholder="예: 010-1234-5678 (숫자만 입력하세요)"
             register={register}
             errorMessage={errors.phone?.message}
           />
@@ -243,7 +244,6 @@ export default function Join() {
             </div>
           </div>
 
-          {/* 회원구분 */}
           <SelectBox
             label="회원구분"
             name="userType"
@@ -256,19 +256,17 @@ export default function Join() {
             errorMessage={errors.userType?.message}
           />
 
-          {/* 점주일 때 사업자등록번호 */}
           {selectedType === "OWNER" && (
             <InputField
               label="사업자등록번호"
               name="businessNumber"
               type="business"
-              placeholder="000-00-00000"
+              placeholder="예 : 000-00-00000 (숫자만 입력하세요)"
               register={register}
               errorMessage={errors.businessNumber?.message}
             />
           )}
 
-          {/* 버튼 */}
           <button
             type="submit"
             className="btn btn-default btn-primary btn-round"
