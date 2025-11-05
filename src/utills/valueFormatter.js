@@ -29,19 +29,22 @@ export const formatPhone = (val = "") => {
   const digits = val.replace(/\D/g, "");
   if (!digits) return "";
 
-  if (digits.startsWith("02")) {
-    if (digits.length <= 2) return digits;
-    if (digits.length <= 5) return `${digits.slice(0, 2)}-${digits.slice(2)}`;
-    if (digits.length <= 9)
-      return `${digits.slice(0, 2)}-${digits.slice(2, 5)}-${digits.slice(5)}`;
-    return `${digits.slice(0, 2)}-${digits.slice(2, 6)}-${digits.slice(6, 10)}`;
+  // 최대 11자리까지만 허용 (그 이상은 잘라냄)
+  const clean = digits.slice(0, 11);
+
+  // 서울 지역번호 (02)
+  if (clean.startsWith("02")) {
+    if (clean.length <= 2) return clean;
+    if (clean.length <= 5) return `${clean.slice(0, 2)}-${clean.slice(2)}`;
+    if (clean.length <= 9)
+      return `${clean.slice(0, 2)}-${clean.slice(2, 5)}-${clean.slice(5)}`;
+    return `${clean.slice(0, 2)}-${clean.slice(2, 6)}-${clean.slice(6, 10)}`;
   }
 
-  if (digits.length <= 3) return digits;
-  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-  if (digits.length <= 11)
-    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
-  return digits;
+  // 일반 휴대폰 / 지역번호
+  if (clean.length <= 3) return clean;
+  if (clean.length <= 7) return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+  return `${clean.slice(0, 3)}-${clean.slice(3, 7)}-${clean.slice(7)}`;
 };
 
 /**
