@@ -5,7 +5,7 @@ import * as yup from "yup";
 import Card from "../MypageCard";
 
 import { useStore } from "@/hooks/useStore";
-import { categoryAPI } from "@/service/categoryAPI";
+import { useCategory } from "@/hooks/useCategory";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 
 import InputField from "@/components/form/InputField";
@@ -109,8 +109,8 @@ const schema = yup.object().shape({
 
 export default function StoreCRUD() {
   const { myStore, create, update, remove } = useStore();
+  const { categories, isLoading: isCatLoading } = useCategory(); // ✅ 변경
   const [isEdit, setIsEdit] = useState(false);
-  const [categories, setCategories] = useState([]);
   const [mainImageUrl, setMainImageUrl] = useState(null);
 
   /* ------------------------------------------------------------
@@ -134,18 +134,6 @@ export default function StoreCRUD() {
     },
     mode: "onChange",
   });
-
-  /* ------------------------------------------------------------
-    카테고리 목록 로드
-    ------------------------------------------------------------ */
-  useEffect(() => {
-    categoryAPI
-      .getCategories()
-      .then((list) =>
-        setCategories(list.map((c) => ({ id: c.caId, name: c.caName })))
-      )
-      .catch((err) => console.error("카테고리 불러오기 실패:", err));
-  }, []);
 
   /* ------------------------------------------------------------
     내 가게 정보 로드 및 폼 초기화
@@ -288,7 +276,7 @@ export default function StoreCRUD() {
         <Checkbox
           label="카테고리 선택"
           name="categoryIds"
-          options={categories}
+          options={categories.map((c) => ({ id: c.id, name: c.name }))}
           register={register}
           watch={watch}
           hint="가게 업종을 선택해주세요. (중복 선택 가능)"
