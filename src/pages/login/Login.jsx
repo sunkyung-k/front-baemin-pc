@@ -28,6 +28,16 @@ export default function Login() {
     try {
       await loginMutate(data);
     } catch (error) {
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "아이디 또는 비밀번호가 일치하지 않습니다.";
+
+      if (import.meta.env.MODE === "development") {
+        console.warn("[Login Error]", backendMessage);
+      }
+
+      // 사용자에게 보여줄 메시지 통일
       setLoginError("아이디 또는 비밀번호가 일치하지 않습니다.");
     }
   };
@@ -42,6 +52,7 @@ export default function Login() {
         <h2 className={styles.title}>로그인</h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.loginForm}>
+          {/* 아이디 */}
           <InputField
             label="아이디"
             name="username"
@@ -52,6 +63,7 @@ export default function Login() {
             onFocus={handleFocus}
           />
 
+          {/* 비밀번호 */}
           <InputField
             label="비밀번호"
             type="password"
@@ -63,6 +75,7 @@ export default function Login() {
             onFocus={handleFocus}
           />
 
+          {/* 통합 로그인 실패 문구 (폼 하단 공통 위치) */}
           {loginError && <p className={styles.error}>{loginError}</p>}
 
           <button

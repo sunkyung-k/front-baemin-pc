@@ -31,9 +31,18 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const { response, config } = error;
+    const requestUrl = config?.url || "";
+
+    // (1) 로그인 요청(/api/v1/login)은 예외 처리 — 세션 만료 alert 금지
+    if (requestUrl.includes("/api/v1/login")) {
+      // 로그인 페이지에서 직접 에러 메시지를 표시해야 하므로 여기서는 아무 alert도 띄우지 않음
+      return Promise.reject(error);
+    }
+
+    // 공통 에러 처리
     handleApiError(error, "Axios Response");
 
-    // 권한 없음
+    // (2) 접근 권한 없음 (403)
     if (response?.status === 403) {
       alert("접근 권한이 없습니다. 로그인 후 이용해주세요.");
       authStore.getState().clearAuth();
@@ -41,7 +50,7 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // 인증 만료
+    // (3) 인증 만료 (401)
     if (response?.status === 401) {
       alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
       authStore.getState().clearAuth();
@@ -49,7 +58,7 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // 토큰 재발급 (406)
+    // (4) 토큰 재발급 (406)
     if (response?.status === 406 && !config._retry) {
       if (!isRefreshing) {
         isRefreshing = true;
@@ -60,6 +69,8 @@ api.interceptors.response.use(
         const res = await axios.get("/api/v1/refresh", {
           withCredentials: true,
         });
+
+        // 토큰 저장
         authStore.getState().setLogin(res.data.response.content);
 
         // 기존 요청 복원
