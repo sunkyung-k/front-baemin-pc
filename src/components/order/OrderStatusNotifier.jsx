@@ -4,7 +4,6 @@ import { authStore } from "../../store/authStore";
 import { eventSourceRef } from "../../utills/eventSourceRef";
 
 export default function OrderStatusNotifier() {
-
   const token = authStore((state) => state.token);
   const userRole = authStore((state) => state.userRole);
 
@@ -20,7 +19,9 @@ export default function OrderStatusNotifier() {
       eventSourceRef.current = null;
     }
 
-    const url = `${baseUrl}/api/v1/sse/subscribe?token=${encodeURIComponent(token)}`;
+    const url = `${baseUrl}/api/v1/sse/subscribe?token=${encodeURIComponent(
+      token
+    )}`;
     const eventSource = new EventSource(url, { withCredentials: true });
 
     eventSource.addEventListener("order-status", (event) => {
@@ -44,7 +45,7 @@ export default function OrderStatusNotifier() {
       } else {
         toast.info(message, {
           position: "bottom-right",
-          autoClose: 8000,
+          autoClose: 10000,
           style: { width: "300px", fontSize: "1.1rem" },
         });
       }
