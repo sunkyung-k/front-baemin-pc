@@ -88,7 +88,7 @@ const schema = yup.object().shape({
   phone: yup
     .string()
     .required("전화번호를 입력해주세요.")
-    .matches(/^[0-9-]{9,13}$/, "전화번호 형식이 올바르지 않습니다."),
+    .matches(/^[0-9-]{8,13}$/, "전화번호 형식이 올바르지 않습니다."),
   addr: yup.string().required("주소를 입력해주세요."),
   minPrice: yup.string().required("최소 주문 금액을 입력해주세요."),
   origin: yup.string().required("원산지 정보를 입력해주세요."),
@@ -299,6 +299,7 @@ export default function StoreCRUD() {
           label="가게명"
           name="storeName"
           register={register}
+          placeholder="예: 홍길동식당"
           errorMessage={errors.storeName?.message}
         />
 
@@ -306,6 +307,7 @@ export default function StoreCRUD() {
           label="지점명 (선택)"
           name="branchName"
           register={register}
+          placeholder="예: 강남점"
         />
 
         <ImageUpload
@@ -323,6 +325,7 @@ export default function StoreCRUD() {
           type="phone"
           register={register}
           value={watch("phone") || ""}
+          placeholder="예: 02-123-4567 또는 010-1234-5678 (숫자만 입력하세요)"
           errorMessage={errors.phone?.message}
         />
 
@@ -330,6 +333,7 @@ export default function StoreCRUD() {
           label="주소"
           name="addr"
           register={register}
+          placeholder="예: 서울특별시 강남구 테헤란로 123"
           errorMessage={errors.addr?.message}
         />
 
@@ -337,6 +341,7 @@ export default function StoreCRUD() {
           label="상세주소 (선택)"
           name="addrDetail"
           register={register}
+          placeholder="예: 3층 302호"
         />
 
         <InputField
@@ -345,6 +350,7 @@ export default function StoreCRUD() {
           type="price"
           register={register}
           value={watch("minPrice") || ""}
+          placeholder="예: 10,000 (숫자만 입력하세요)"
           errorMessage={errors.minPrice?.message}
         />
 
@@ -352,6 +358,7 @@ export default function StoreCRUD() {
           label="원산지 표시"
           name="origin"
           register={register}
+          placeholder="예: 쌀(국내산), 김치(중국산)"
           errorMessage={errors.origin?.message}
         />
 
@@ -359,6 +366,7 @@ export default function StoreCRUD() {
           label="공지사항 (선택)"
           name="notice"
           register={register}
+          placeholder="예: 명절 기간에는 휴무입니다."
         />
 
         <HoursField
