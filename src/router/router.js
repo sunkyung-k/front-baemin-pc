@@ -11,6 +11,7 @@ import MenuLayout from "../pages/menu-register/MenuLayout";
 import StoreList from "../pages/store-list/StoreList";
 import StoreDetailLayout from "../pages/store-detail/StoreDetailLayout";
 import MenuTabContent from "../pages/store-detail/components/menu/MenuTabContent";
+import Join from "../pages/join/Join";
 
 export const router = createBrowserRouter([
   {
@@ -62,6 +63,10 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     Component: Login,
+  },
+  {
+    path: "/join",
+    Component: Join,
   },
   {
     path: "/menuRegister/:storeId",

@@ -1,11 +1,12 @@
 import React from "react";
 
 /**
- * 🌐 전역 공용 InputField
+ * 전역 공용 InputField
  * - RHF register / 수동 제어 모두 지원
  * - type="phone" → 전화번호 자동 하이픈
  * - type="price" → 3자리 콤마 자동 추가
  * - type="number" → 음수 입력 방지
+ * - type="business" → 사업자등록번호 자동 하이픈(000-00-00000)
  * - Yup 등 상위 스키마와 완벽 호환
  */
 export default function InputField({
@@ -46,6 +47,16 @@ export default function InputField({
     return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
   };
 
+  /** 사업자등록번호 포맷 (000-00-00000) */
+  const formatBusiness = (val = "") => {
+    const digits = val.replace(/\D/g, "");
+    if (!digits) return "";
+
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 5) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5, 10)}`;
+  };
+
   /** 금액 포맷 */
   const formatPrice = (val = "") => {
     const digits = val.replace(/\D/g, "");
@@ -59,6 +70,7 @@ export default function InputField({
 
     // type별 포맷팅 처리
     if (type === "phone") val = formatPhone(val);
+    else if (type === "business") val = formatBusiness(val);
     else if (type === "price") val = formatPrice(val);
     else if (type === "number") val = val.replace(/[^0-9]/g, ""); // 음수 방지
 
@@ -80,7 +92,8 @@ export default function InputField({
   };
 
   /** 실제 input type 결정 */
-  const resolvedType = type === "phone" || type === "price" ? "text" : type;
+  const resolvedType =
+    type === "phone" || type === "price" || type === "business" ? "text" : type;
 
   return (
     <div className="input-field">
@@ -103,7 +116,11 @@ export default function InputField({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onFocus={onFocus}
-        inputMode={type === "price" || type === "phone" ? "numeric" : undefined}
+        inputMode={
+          type === "price" || type === "phone" || type === "business"
+            ? "numeric"
+            : undefined
+        }
       />
 
       {errorMessage && <p className="input-error">{errorMessage}</p>}
