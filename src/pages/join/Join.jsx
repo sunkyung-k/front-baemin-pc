@@ -28,7 +28,10 @@ const schema = yup.object().shape({
   password: yup
     .string()
     .required("비밀번호를 입력해주세요.")
-    .matches(PW_REGEX, "비밀번호는 영문과 숫자를 포함해야 합니다."),
+    .matches(
+      PW_REGEX,
+      "비밀번호는 영문과 숫자 포함해 모두 포함해 최소 8자 이상으로 입력해주세요."
+    ),
   confirmPassword: yup
     .string()
     .required("비밀번호를 다시 입력해주세요.")
