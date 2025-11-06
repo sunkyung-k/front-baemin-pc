@@ -13,7 +13,8 @@ import EmptyState from "@/components/menu/EmptyState";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useHandleError } from "@/hooks/common/useHandleError";
 
-const schema = yup.object().shape({
+/** 유효성 검증 스키마 */
+const schema = yup.object({
   categoryName: yup.string().required("카테고리명을 입력해주세요."),
   categoryOrder: yup
     .number()
@@ -32,22 +33,32 @@ export default function CategoryPanel({ storeId }) {
   const [modalOpen, setModalOpen] = useState(false);
 
   const { setActiveCategory, clearActiveCategory } = useMenuCategoryStore();
-  const { categories, createCategory, updateCategory, removeCategory } =
-    useMenuCategory(storeId);
+  const {
+    categories = [],
+    createCategory,
+    updateCategory,
+    removeCategory,
+    isLoading,
+  } = useMenuCategory(storeId);
+
   const handleError = useHandleError();
 
+  /** React Hook Form */
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({ resolver: yupResolver(schema) });
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
-  const visibleCategories = useMemo(
-    () => categories.filter((cat) => cat.delYn === "N"),
-    [categories]
-  );
+  /** delYn = 'N' 인 카테고리만 표시 */
+  const visibleCategories = useMemo(() => {
+    return categories.filter((cat) => cat.delYn === "N");
+  }, [categories]);
 
+  /** 새 카테고리 등록 */
   const onSubmit = (data) => {
     createCategory.mutate(
       {
@@ -65,6 +76,7 @@ export default function CategoryPanel({ storeId }) {
     );
   };
 
+  /** 카테고리 수정 */
   const handleUpdate = (id) => {
     const target = editableValues[id];
     if (!target) return;
@@ -104,6 +116,7 @@ export default function CategoryPanel({ storeId }) {
     }
   };
 
+  /** 카테고리 삭제 */
   const handleRemove = (id) => {
     removeCategory.mutate(id, {
       onSuccess: () => {
@@ -116,10 +129,12 @@ export default function CategoryPanel({ storeId }) {
     });
   };
 
+  /** 카테고리 선택/토글 */
   const handleToggle = (id) => {
     setActiveId((prev) => (prev === id ? null : id));
   };
 
+  /** 선택된 카테고리 전역 상태 동기화 */
   useEffect(() => {
     if (!categories?.length) return;
 
@@ -129,11 +144,12 @@ export default function CategoryPanel({ storeId }) {
     }
 
     const selected = categories.find((c) => c.menuCaId === activeId);
-    if (!selected) return;
+    if (selected) setActiveCategory({ ...selected, storeId });
+  }, [activeId, categories, storeId, setActiveCategory, clearActiveCategory]);
 
-    setActiveCategory({ ...selected, storeId });
-  }, [activeId, categories, storeId]);
+  if (isLoading) return null;
 
+  /** 렌더링 */
   return (
     <section className={styles.categoryPanel}>
       <div className={styles.categoryHeader}>
@@ -247,6 +263,7 @@ export default function CategoryPanel({ storeId }) {
         />
       )}
 
+      {/* 카테고리 등록 모달 */}
       <Modal
         isOpen={modalOpen}
         title="카테고리 등록"

@@ -8,14 +8,17 @@ import { useMenu } from "@/hooks/menu/useMenu";
 import MenuModal from "./MenuModal";
 import OptionGroupPanel from "./OptionGroupPanel";
 import { getAbsoluteImageUrl } from "../../utills/imageUtills";
-import { useHandleError } from "@/hooks/common/useHandleError";
 
+/**
+ * 메뉴 패널 (카테고리별 메뉴 목록 + CRUD)
+ * - React Query + Zustand 완전 동기화 구조
+ * - useMemo 제거 → 즉시 반영 보장
+ */
 export default function MenuPanel() {
   const { activeCategory } = useMenuCategoryStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
-  const [activeMenuId, setActiveMenuId] = useState(null);
-  const handleError = useHandleError();
+  const [activeMenuId, setActiveMenuId] = useState(null); // 옵션 그룹 토글 상태
 
   const hasActiveCategory = !!activeCategory;
   const menuList = activeCategory?.menuList || [];
@@ -43,20 +46,26 @@ export default function MenuPanel() {
     try {
       if (editTarget) {
         await update.mutateAsync(formData);
+        alert("메뉴가 수정되었습니다.");
       } else {
         await create.mutateAsync(formData);
+        alert("메뉴가 등록되었습니다.");
       }
-      setModalOpen(false); // alert 생략 (메뉴관리 전용)
+      setModalOpen(false);
     } catch (err) {
-      handleError(err, "MenuPanel.handleSubmit");
+      console.error("메뉴 등록/수정 실패:", err);
+      alert("등록/수정 중 오류가 발생했습니다.");
     }
   };
 
   const handleRemove = async (menuId) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
     try {
-      await remove.mutateAsync(menuId); // confirm + alert 통합
+      await remove.mutateAsync(menuId);
+      alert("삭제되었습니다.");
     } catch (err) {
-      handleError(err, "MenuPanel.handleRemove");
+      console.error("메뉴 삭제 실패:", err);
+      alert("삭제 중 오류가 발생했습니다.");
     }
   };
 

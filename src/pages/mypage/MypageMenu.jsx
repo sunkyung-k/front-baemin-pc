@@ -7,7 +7,7 @@ import styles from "./MypageMenu.module.scss";
 
 function MypageMenu() {
   const { userId, userName, userRole } = authStore();
-  const { myStore, isLoading } = useStore();
+  const { myStore } = useStore();
 
   const storeName = myStore?.storeName || "등록된 가게 없음";
   const isEdit = !!myStore;
@@ -42,7 +42,7 @@ function MypageMenu() {
         userName={userName}
         userId={userId}
         userRole={userRole}
-        storeName={isLoading ? "로딩 중..." : storeName}
+        storeName={storeName}
       />
 
       <nav className={styles.navMenu}>

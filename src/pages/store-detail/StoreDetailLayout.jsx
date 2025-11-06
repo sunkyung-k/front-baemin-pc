@@ -11,17 +11,14 @@ export default function StoreDetailLayout() {
   const storeId = Number(storeIdParam);
   const handleError = useHandleError();
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isError } = useQuery({
     queryKey: [QUERY_KEYS.STORE_DETAIL, storeId],
     queryFn: () => storeAPI.getStoreDetail(storeId),
     enabled: !!storeId,
     onError: (err) => handleError(err, "StoreDetailLayout.getStoreDetail"),
   });
 
-  if (isLoading)
-    return <LoadingSpinner fullscreen message="가게 정보를 불러오는 중..." />;
-
-  if (isError || !data) return <div>가게 정보를 불러올 수 없습니다.</div>;
+  if (isError || !data) return "";
 
   const storeDetail = data?.response?.vo ?? data;
 

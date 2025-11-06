@@ -19,8 +19,6 @@ export default function BasketBox() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  if (basketQuery?.isLoading) return "";
-
   const handleClear = () => {
     if (!window.confirm("장바구니를 모두 비우시겠습니까?")) return;
     clearAll.mutate();

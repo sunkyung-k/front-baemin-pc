@@ -8,14 +8,12 @@ import { formatPrice } from "@/utills/valueFormatter";
 
 export default function MypageProfile() {
   const { userName, userId, userRole } = authStore();
-  const { myStore, isLoading: isStoreLoading } = useStore();
+  const { myStore } = useStore();
   const { userInfo, isUserInfoLoading } = useAccount();
   const [isChargeOpen, setChargeOpen] = useState(false);
 
   /** 가게명 표시 */
-  const storeName = isStoreLoading
-    ? "로딩 중..."
-    : myStore?.storeName || "등록된 가게 없음";
+  const storeName = myStore?.storeName || "등록된 가게 없음";
 
   /** 보유 포인트 표시 */
   const deposit = isUserInfoLoading
