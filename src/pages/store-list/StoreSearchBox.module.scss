@@ -16,24 +16,21 @@
     opacity: 1;
   }
 
-  input {
-    width: 100%;
-    height: 100%;
-    border: 1px solid fn-color("gray-300");
-    border-radius: radius("md");
-    padding: 0 space("xl");
-    font-size: font("lg");
-
-    &:focus {
-      border-color: fn-color("primary");
-      box-shadow: 0 0 0 fn-rem(4) fn-color("primary-bg");
-    }
+  :global(.input-round) {
+    padding-right: fn-rem(50);
   }
 }
 
-.icon {
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
-  right: space("lg");
+  top: 50%;
+  right: fn-rem(30);
+  width: fn-rem(30);
+  height: fn-rem(30);
   color: fn-color("primary");
   font-size: fn-rem(22);
+  transform: translateY(-50%);
 }

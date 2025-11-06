@@ -37,6 +37,11 @@ export default defineConfig({
         target: "http://localhost:9090",
         changeOrigin: true,
       },
+      // "/kakao": {
+      //   target: "https://dapi.kakao.com",
+      //   changeOrigin: true,
+      //   rewrite: (path) => path.replace(/^\/kakao/, ""),
+      // },
     },
   },
 });

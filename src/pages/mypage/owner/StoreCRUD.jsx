@@ -109,7 +109,7 @@ const schema = yup.object().shape({
 
 export default function StoreCRUD() {
   const { myStore, create, update, remove } = useStore();
-  const { categories, isLoading: isCatLoading } = useCategory(); // ✅ 변경
+  const { categories } = useCategory();
   const [isEdit, setIsEdit] = useState(false);
   const [mainImageUrl, setMainImageUrl] = useState(null);
 

@@ -1,8 +1,9 @@
 @use "@/assets/scss/utils" as *;
 
 .header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  width: 100%;
   padding: 0 space("lg");
   background-color: fn-color("primary");
   z-index: 1;

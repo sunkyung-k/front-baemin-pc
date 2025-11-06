@@ -1,4 +1,5 @@
 import { createBrowserRouter } from "react-router";
+import { redirect } from "react-router-dom";
 import Layout from "../pages/Layout";
 import Home from "../pages/home/Home";
 import Login from "../pages/login/Login";
@@ -24,13 +25,26 @@ export const router = createBrowserRouter([
         Component: Home,
         handle: { layoutClass: "wide" },
       },
+
       {
         path: "store",
         Component: StoreListLayout,
-        children: [
-          { path: "list", Component: StoreList }, // ✅ /store/list
-        ],
         handle: { layoutClass: "wide" },
+        children: [
+          {
+            index: true,
+            Component: StoreList,
+          },
+          {
+            path: "list",
+            loader: () => redirect("/store"),
+          },
+        ],
+      },
+      {
+        path: "store/:storeId",
+        Component: StoreDetailLayout,
+        children: [{ index: true, Component: MenuTabContent }],
       },
       {
         path: "mypage",

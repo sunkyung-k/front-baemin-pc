@@ -1,18 +1,22 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { FaMagnifyingGlass } from "react-icons/fa6";
-import { useCategory } from "@/hooks/useCategory"; // ✅ 요거!
+import { useCategory } from "@/hooks/useCategory";
+import { useAddressStore } from "@/store/useAddressStore";
+import { useCurrentAddress } from "@/hooks/useCurrentAddress";
+import { openKakaoAddressSearch } from "@/utills/kakaoAddressSearch";
 import StoreSearchBox from "./StoreSearchBox";
 import styles from "./StoreTopBar.module.scss";
 
 export default function StoreTopBar({ activeCaId, searchText, setSearchText }) {
   const [showSearch, setShowSearch] = useState(false);
-  const { categories, isLoading } = useCategory(); // ✅ 캐시된 카테고리 목록
+  const { categories } = useCategory();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
 
-  if (isLoading) return <p>카테고리 불러오는 중...</p>;
+  const { address, setAddress } = useAddressStore();
+  const { fetchAddress, loading } = useCurrentAddress();
 
   const handleCategoryClick = (id) => {
     const newParams = new URLSearchParams(searchParams);
@@ -22,6 +26,14 @@ export default function StoreTopBar({ activeCaId, searchText, setSearchText }) {
       pathname: location.pathname,
       search: `?${newParams.toString()}`,
     });
+  };
+
+  const handleGetLocation = async () => {
+    await fetchAddress();
+  };
+
+  const handleSearchAddress = () => {
+    openKakaoAddressSearch((addr) => setAddress(addr));
   };
 
   return (

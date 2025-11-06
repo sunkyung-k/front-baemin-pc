@@ -46,7 +46,7 @@ export default function OrderStatusNotifier() {
         toast.info(message, {
           position: "bottom-right",
           autoClose: 10000,
-          style: { width: "300px", fontSize: "1.1rem" },
+          style: { width: "300px", fontSize: "1.1rem", whiteSpace: "pre-line" },
         });
       }
     });

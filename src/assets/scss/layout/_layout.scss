@@ -5,6 +5,11 @@
   flex-direction: column;
   margin: 0 auto;
   height: 100%;
+  padding-top: $header-height;
+
+  @media (max-width: bp("md")) {
+    padding-top: $header-height + $gnb-height-mobile;
+  }
 }
 
 .container {

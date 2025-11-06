@@ -1,31 +1,34 @@
-import React, { useState } from "react";
-import { Outlet, useSearchParams } from "react-router-dom";
+import React from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { useAddressStore } from "@/store/useAddressStore";
+import { useCurrentAddress } from "@/hooks/useCurrentAddress";
+import { useAddressSearch } from "@/hooks/useAddressSearch";
 import ImportAddress from "@/components/form/ImportAddress";
 import StoreTopBar from "./StoreTopBar";
 import styles from "./StoreListLayout.module.scss";
 
 export default function StoreListLayout() {
-  const [searchParams] = useSearchParams();
-  const [searchText, setSearchText] = useState("");
-  const addr = searchParams.get("addr") || "";
-  const activeCaId = searchParams.get("caId") || "";
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const activeCaId = query.get("caId") || "";
+
+  const { address, setAddress } = useAddressStore();
+  const { fetchAddress, loading } = useCurrentAddress();
+  const { openAddressSearch } = useAddressSearch(setAddress);
 
   return (
     <>
       <section className={styles.addressSection}>
-        <ImportAddress userAddress={addr} readonly />
+        <ImportAddress
+          userAddress={address}
+          onGetLocation={fetchAddress}
+          onSearchAddress={openAddressSearch}
+          loading={loading}
+        />
       </section>
 
-      <StoreTopBar
-        activeCaId={activeCaId}
-        searchText={searchText}
-        setSearchText={setSearchText}
-      />
-
-      {/* 하위 Outlet에서 리스트 or 상세 페이지 렌더링 */}
-
-      {console.log("🔥 StoreListLayout 렌더됨", { searchText, activeCaId })}
-      <Outlet context={{ searchText, activeCaId }} />
+      <StoreTopBar activeCaId={activeCaId} />
+      <Outlet context={{ activeCaId }} />
     </>
   );
 }

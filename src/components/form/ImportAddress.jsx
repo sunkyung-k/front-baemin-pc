@@ -1,30 +1,65 @@
 import React from "react";
-import { FaLocationCrosshairs } from "react-icons/fa6";
+import {
+  FaLocationCrosshairs,
+  FaMagnifyingGlassLocation,
+} from "react-icons/fa6";
 
-/**
- * - 입력창은 읽기 전용 (직접 입력 불가)
- * - onGetLocation 클릭 시 현재 위치 좌표 가져오기
- */
-function ImportAddress({ userAddress, onGetLocation }) {
+export default function ImportAddress({
+  userAddress,
+  onGetLocation,
+  onSearchAddress,
+  loading = false,
+}) {
   return (
-    <div className="input-round">
-      <button
-        type="button"
-        className="btn btn-default btn-round btn-primary-line"
-        onClick={onGetLocation}
-        title="현재 위치 불러오기"
-      >
-        <FaLocationCrosshairs size="16" />
-      </button>
-
+    <div className="input-round address-box">
+      {/* 주소 표시창 */}
       <input
         type="text"
         value={userAddress || ""}
         readOnly
-        placeholder="현재 위치를 불러와주세요."
+        placeholder="내 위치를 불러오거나 주소를 선택해주세요."
       />
+
+      {/* 내 위치 */}
+      <button
+        type="button"
+        onClick={onGetLocation}
+        disabled={loading}
+        title="내 위치 불러오기"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "40px",
+          height: "40px",
+          borderRadius: "50%",
+          border: "1px solid #ddd",
+          background: "#fff",
+          cursor: "pointer",
+        }}
+      >
+        {loading ? "..." : <FaLocationCrosshairs size={16} />}
+      </button>
+
+      {/* 주소 검색 */}
+      <button
+        type="button"
+        onClick={onSearchAddress}
+        title="주소 검색하기"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "40px",
+          height: "40px",
+          borderRadius: "50%",
+          border: "1px solid #ddd",
+          background: "#fff",
+          cursor: "pointer",
+        }}
+      >
+        <FaMagnifyingGlassLocation size={16} />
+      </button>
     </div>
   );
 }
-
-export default ImportAddress;

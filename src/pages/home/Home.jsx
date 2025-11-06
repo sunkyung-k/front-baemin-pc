@@ -1,16 +1,22 @@
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import ImportAddress from "@/components/form/ImportAddress";
-import { getAddressFromCoords } from "@/utills/addressUtils";
+import { useCurrentAddress } from "@/hooks/useCurrentAddress";
 import { useCategory } from "@/hooks/useCategory";
-import api from "@/api/axiosApi";
+import { useAddressStore } from "@/store/useAddressStore";
+import { useAddressSearch } from "@/hooks/useAddressSearch";
 import styles from "./Home.module.scss";
 
 function Home() {
-  const [userAddress, setUserAddress] = useState("");
-  const [searchText, setSearchText] = useState("");
-  const { categories, isLoading, error } = useCategory();
   const navigate = useNavigate();
+  const { categories } = useCategory();
+  const { address, setAddress } = useAddressStore();
+  const { fetchAddress, loading } = useCurrentAddress();
+  const { openAddressSearch } = useAddressSearch(setAddress);
+
+  useEffect(() => {
+    if (address) setAddress(address);
+  }, [address]);
 
   const categoryImages = useMemo(
     () =>
@@ -24,78 +30,17 @@ function Home() {
     []
   );
 
-  /** 📍 현재 위치 → 주소 자동 변환 */
-  const handleGetLocation = () => {
-    if (!navigator.geolocation) {
-      alert("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
+  const handleCategoryClick = (category) => {
+    if (!address) {
+      alert("현재 위치를 먼저 설정해주세요!");
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude } = pos.coords;
-        try {
-          const address = await getAddressFromCoords(longitude, latitude);
-          setUserAddress(address);
-          alert(`현재 위치가 설정되었습니다.\n${address}`);
-        } catch (err) {
-          console.error("주소 변환 실패:", err);
-          alert("주소를 가져오는 중 오류가 발생했습니다.");
-        }
-      },
-      () => alert("위치 정보를 불러올 수 없습니다.")
+    const shortAddr = address.split(" ").slice(0, 2).join(" ");
+    navigate(
+      `/store/list?addr=${encodeURIComponent(shortAddr)}&caId=${category.id}`
     );
   };
-
-  /** 카테고리 클릭 시 음식점 리스트 페이지로 이동 */
-  const handleCategoryClick = async (category) => {
-    if (!userAddress) {
-      alert("현재 위치를 설정해주세요!");
-      return;
-    }
-
-    const shortAddr = userAddress.split(" ").slice(0, 2).join(" ");
-
-    try {
-      // 백엔드 검색 API 호출
-      const res = await api.post("/api/v1/store/search", {
-        searchText: searchText.trim(),
-        caId: category.id,
-      });
-
-      const stores = res.data?.response || [];
-
-      // 검색 결과 페이지로 이동 (stores 데이터 전달)
-      navigate("/store/list", {
-        state: {
-          stores,
-          addr: shortAddr,
-          caName: category.name,
-          searchText,
-        },
-      });
-    } catch (err) {
-      console.error("검색 실패:", err);
-      alert("가게 검색 중 오류가 발생했습니다.");
-    }
-  };
-
-  /** 🧭 로딩 상태 / 에러 처리 */
-  if (isLoading) {
-    return (
-      <div className={styles.loadingWrap}>
-        <p>카테고리를 불러오는 중입니다...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.errorWrap}>
-        <p>카테고리를 불러오는 중 오류가 발생했습니다 😢</p>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.home}>
@@ -104,8 +49,10 @@ function Home() {
         <p>현재 위치를 불러오면 내 주변 맛집을 볼 수 있어요!</p>
 
         <ImportAddress
-          userAddress={userAddress}
-          onGetLocation={handleGetLocation}
+          userAddress={address}
+          onGetLocation={fetchAddress}
+          onSearchAddress={openAddressSearch}
+          loading={loading}
         />
       </section>
 
@@ -113,26 +60,22 @@ function Home() {
         <section>
           <h2 className={styles.homeTit}>카테고리</h2>
           <div className={styles.categoryGrid}>
-            {Array.isArray(categories) && categories.length > 0 ? (
-              categories.map((category, idx) => (
-                <div
-                  key={category.id || idx}
-                  className={styles.categoryCard}
-                  onClick={() => handleCategoryClick(category)}
-                >
-                  <div className={styles.categoryThumb}>
-                    <img
-                      src={categoryImages[idx % categoryImages.length]}
-                      alt={category.name}
-                      loading="lazy"
-                    />
-                  </div>
-                  <p>{category.name}</p>
+            {categories.map((category, idx) => (
+              <div
+                key={category.id || idx}
+                className={styles.categoryCard}
+                onClick={() => handleCategoryClick(category)}
+              >
+                <div className={styles.categoryThumb}>
+                  <img
+                    src={categoryImages[idx % categoryImages.length]}
+                    alt={category.name}
+                    loading="lazy"
+                  />
                 </div>
-              ))
-            ) : (
-              <p>표시할 카테고리가 없습니다.</p>
-            )}
+                <p>{category.name}</p>
+              </div>
+            ))}
           </div>
         </section>
       </main>

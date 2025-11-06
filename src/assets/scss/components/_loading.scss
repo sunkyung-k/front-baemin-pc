@@ -1,6 +1,6 @@
 @use "@/assets/scss/utils" as *;
 
-/* ✅ 로딩 스피너 공용 스타일 */
+/* 로딩 스피너 공용 스타일 */
 
 .loading-wrapper {
   display: flex;
@@ -15,21 +15,21 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: red; // ✅ 테스트용 (나중에 rgba로 변경하면 됨)
+    background: transparent;
     z-index: 9999;
   }
 }
 
 .loading-spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-top: 4px solid #3498db;
+  border: fn-rem(4) solid fn-color("gray-300");
+  border-top: fn-rem(4) solid fn-color("primary");
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 .loading-text {
-  margin-top: 12px;
-  font-size: 14px;
+  margin-top: fn-rem(12);
+  font-size: font("sm");
   color: #333;
 }
 

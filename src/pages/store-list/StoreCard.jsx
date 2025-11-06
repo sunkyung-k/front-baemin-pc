@@ -1,10 +1,12 @@
+// /store-list/StoreCard.jsx
 import React from "react";
+import { Link } from "react-router-dom";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 import styles from "./StoreCard.module.scss";
 
 export default function StoreCard({ store }) {
   return (
-    <div className={styles.storeCard}>
+    <Link to={`/store/${store.storeId}`} className={styles.storeCard}>
       <div className={styles.thumb}>
         <img src={getAbsoluteImageUrl(store)} alt={store.storeName} />
       </div>
@@ -13,6 +15,6 @@ export default function StoreCard({ store }) {
         <p>{store.addr}</p>
         <p className={styles.rating}>⭐ {store.ratingAvg?.toFixed(1) ?? 0}</p>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -3,6 +3,10 @@ import { useOutletContext } from "react-router-dom";
 import MenuItem from "./MenuItem";
 import styles from "./MenuList.module.scss";
 
+// EmptyState 임포트
+import EmptyState from "@/components/menu/EmptyState";
+import { FaUtensils } from "react-icons/fa6";
+
 /**
  * MenuList
  * ------------------------------------------------------
@@ -47,6 +51,17 @@ export default function MenuList() {
         : allMenus.filter((m) => m.categoryName === active),
     [active, allMenus]
   );
+
+  /** 메뉴 카테고리조차 없으면 → 탭 + 리스트 전부 숨기고 EmptyState만 표시 */
+  if (categories.length === 0) {
+    return (
+      <EmptyState
+        icon={<FaUtensils />}
+        title="등록된 메뉴가 없습니다."
+        description="사장님이 메뉴를 준비 중이에요."
+      />
+    );
+  }
 
   return (
     <div className={styles.menuListWrap}>
