@@ -1,5 +1,4 @@
 import React from "react";
-import styles from "./LoadingSpinner.module.scss";
 
 /**
  * 💫 공용 로딩 스피너 컴포넌트
@@ -15,12 +14,12 @@ function LoadingSpinner({
   fullscreen = false,
 }) {
   return (
-    <div className={`${styles.wrapper} ${fullscreen ? styles.fullscreen : ""}`}>
+    <div className={`loading-wrapper ${fullscreen ? "fullscreen" : ""}`}>
       <div
-        className={styles.spinner}
+        className="loading-spinner"
         style={{ width: size, height: size }}
       ></div>
-      {message && <p className={styles.text}>{message}</p>}
+      {message && <p className="loading-text">{message}</p>}
     </div>
   );
 }
