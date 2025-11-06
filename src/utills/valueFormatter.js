@@ -55,7 +55,9 @@ export const formatPhone = (val = "") => {
  * formatPrice("1000000") // "1,000,000"
  */
 export const formatPrice = (val = "") => {
-  const digits = val.replace(/\D/g, "");
+  if (val == null) return "";
+  const strVal = String(val);
+  const digits = strVal.replace(/\D/g, "");
   if (!digits) return "";
   return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
@@ -104,11 +106,3 @@ export const formatBirth = (val = "") => {
   if (digits.length <= 6) return `${digits.slice(0, 4)}-${digits.slice(4)}`;
   return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
 };
-
-/**
- * 생년월일 정제: YYYY-MM-DD → YYYYMMDD
- *
- * @example
- * cleanBirth("1993-08-10") // "19930810"
- */
-export const cleanBirth = (val = "") => val.replace(/\D/g, "");

@@ -33,6 +33,11 @@
       border-color: fn-color("primary");
     }
 
+    &:disabled {
+      opacity: 0.6;
+      background-color: #f5f5f5;
+    }
+
     &.error {
       border-color: fn-color("danger");
       background: fn-color("danger-bg");

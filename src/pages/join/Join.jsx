@@ -8,7 +8,7 @@ import RadioGroup from "@/components/form/RadioGroup";
 import SelectBox from "@/components/form/SelectBox";
 import { Link, useNavigate } from "react-router-dom";
 import authAPI from "@/service/authAPI";
-import { cleanNumber, cleanBirth } from "@/utills/valueFormatter";
+import { cleanNumber } from "@/utills/valueFormatter";
 import { useHandleError } from "@/hooks/common/useHandleError";
 
 /* ============================================================
@@ -114,7 +114,7 @@ export default function Join() {
       passwd: data.password,
       userName: data.name,
       userRole: data.userType,
-      birth: cleanBirth(data.birth),
+      birth: cleanNumber(data.birth),
       gender: data.gender === "M" ? "남자" : "여자",
       phone: cleanNumber(data.phone),
       email: fullEmail,
@@ -211,16 +211,16 @@ export default function Join() {
           {/* 이메일 */}
           <div className="input-field">
             <label className="input-label">이메일</label>
-            <div className={styles.emailField}>
+            <div className="email-field">
               <InputField
                 name="emailId"
                 placeholder="이메일 아이디"
                 register={register}
                 errorMessage={errors.emailId?.message}
               />
-              <span className={styles.at}>@</span>
+              <span>@</span>
 
-              <div className={styles.emailBox}>
+              <div className="emailBox">
                 <SelectBox
                   name="emailDomain"
                   register={register}
@@ -273,9 +273,8 @@ export default function Join() {
           <button
             type="submit"
             className="btn btn-default btn-primary btn-round"
-            disabled={loading}
           >
-            {loading ? "가입 중..." : "회원가입"}
+            회원가입
           </button>
         </form>
 

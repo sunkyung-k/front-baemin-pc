@@ -1,16 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import { authStore } from "@/store/authStore";
 import { useStore } from "@/hooks/useStore";
+import useAccount from "@/hooks/useAccount";
+import PointChargeModal from "../../components/common/PointChargeModal";
 import styles from "./MypageProfile.module.scss";
+import { formatPrice } from "@/utills/valueFormatter";
 
 export default function MypageProfile() {
   const { userName, userId, userRole } = authStore();
-  const { myStore, isLoading } = useStore();
+  const { myStore, isLoading: isStoreLoading } = useStore();
+  const { userInfo, isUserInfoLoading } = useAccount();
+  const [isChargeOpen, setChargeOpen] = useState(false);
 
-  // React Query에서 가져온 가게명 (로딩/미등록 상태 구분)
-  const storeName = isLoading
+  /** 가게명 표시 */
+  const storeName = isStoreLoading
     ? "로딩 중..."
     : myStore?.storeName || "등록된 가게 없음";
+
+  /** 보유 포인트 표시 */
+  const deposit = isUserInfoLoading
+    ? "로딩 중..."
+    : userInfo?.deposit
+    ? `₩${formatPrice(userInfo.deposit)}`
+    : "₩0";
 
   const roleInfo = {
     ROLE_OWNER: {
@@ -28,16 +40,19 @@ export default function MypageProfile() {
       labelTxt: "ID:",
       label: userId,
       subText: "보유 포인트",
-      value: "₩1,203,000",
+      value: deposit,
       button: (
-        <button type="button" className="btn btn-round btn-primary">
+        <button
+          type="button"
+          className="btn btn-round btn-primary"
+          onClick={() => setChargeOpen(true)}
+        >
           포인트 충전
         </button>
       ),
     },
   };
 
-  // 현재 로그인된 역할에 맞는 표시 정보 선택
   const info = roleInfo[userRole] || {};
 
   return (
@@ -53,6 +68,16 @@ export default function MypageProfile() {
         {info.subText} : {info.value}
       </div>
       <div>{info.button}</div>
+
+      {/* 💰 포인트 충전 모달 */}
+      <PointChargeModal
+        isOpen={isChargeOpen}
+        onClose={() => setChargeOpen(false)}
+        onSuccess={() => {
+          // ✅ 충전 완료 후 React Query 자동 invalidate
+          // (useAccount 내부 afterMutation 에서 처리됨)
+        }}
+      />
     </div>
   );
 }

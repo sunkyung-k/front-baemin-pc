@@ -1,4 +1,5 @@
 @use "@/assets/scss/utils" as *;
+
 .radio-group {
   display: flex;
   flex-direction: column;
@@ -42,7 +43,9 @@
     align-items: center;
     gap: space("xs");
     cursor: pointer;
-    // width: 100%;
+    &:has(input:disabled) {
+      cursor: unset;
+    }
 
     input[type="radio"] {
       width: fn-rem(18);
@@ -74,6 +77,19 @@
       &:hover {
         border-color: fn-color("primary");
       }
+
+      &:disabled {
+        border-color: fn-color("gray-300");
+        background-color: fn-color("gray-100");
+
+        &:hover {
+          cursor: unset;
+        }
+
+        &::after {
+          background-color: fn-color("gray-300");
+        }
+      }
     }
 
     .radio-label {
@@ -84,6 +100,13 @@
       align-items: center;
       justify-content: space-between;
       width: 100%;
+
+      // input[type="radio"]:disabled + &,
+      // .radio-option:has(input:disabled) {
+      //   span {
+      //     color: fn-color("gray-500");
+      //   }
+      // }
     }
   }
 

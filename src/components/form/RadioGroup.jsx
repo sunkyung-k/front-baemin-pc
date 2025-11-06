@@ -16,6 +16,7 @@ export default function RadioGroup({
   onChange,
   errorMessage,
   direction = "row", // row | column
+  disabled = false,
 }) {
   const isRHF = typeof register === "function";
   const registerProps = isRHF ? register(name) : {};
@@ -38,8 +39,8 @@ export default function RadioGroup({
               {...registerProps}
               checked={isRHF ? undefined : value === opt.value}
               onChange={isRHF ? undefined : onChange || (() => {})}
+              disabled={disabled}
             />
-            {/* ✅ 문자열/노드 둘 다 지원 */}
             <span className="radio-label">
               {typeof opt.label === "string" ? opt.label : opt.label}
             </span>

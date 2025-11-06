@@ -41,4 +41,9 @@ export const QUERY_KEYS = {
   /** 유틸성 (캐시 전체 초기화 등) */
   ALL_MENUS: ["allMenus"],
   ALL_OPTIONS: ["allOptions"],
+
+  /** 사용자(User / Account) */
+  USER_INFO: (userId) => ["userInfo", userId], // 내 정보
+  USER_DEPOSIT: (userId) => ["userDeposit", userId], // 보유금
+  USER_LIST: ["userList"], // 관리자용 전체 조회 (선택)
 };

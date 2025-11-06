@@ -36,7 +36,10 @@ export const useConfirmDelete = () => {
 
       return { success: true, data };
     } catch (err) {
-      handleError(err, context || "useConfirmDelete.handleDelete");
+      const msg = handleError(err, context || "useConfirmDelete.handleDelete");
+      if (msg && typeof window !== "undefined") {
+        alert(msg);
+      }
       return { success: false, data: null, error: err };
     }
   };
