@@ -11,7 +11,7 @@ import MypageAccount from "../pages/mypage/MypageAccount";
 import MenuLayout from "../pages/menu-register/MenuLayout";
 import StoreListLayout from "../pages/store-list/StoreListLayout";
 import StoreDetailLayout from "../pages/store-detail/StoreDetailLayout";
-import MenuTabContent from "../pages/store-detail/components/menu/MenuTabContent";
+import MenuTabContent from "../pages/store-detail/menu/MenuTabContent";
 import Join from "../pages/join/Join";
 import StoreList from "../pages/store-list/StoreList";
 

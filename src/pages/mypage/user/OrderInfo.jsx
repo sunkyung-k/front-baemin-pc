@@ -1,5 +1,5 @@
 import React from "react";
-import Card from "../MypageCard";
+import Card from "@/components/mypage/Card";
 
 function OrderInfo(props) {
   return (

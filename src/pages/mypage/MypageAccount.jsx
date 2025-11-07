@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import Card from "./MypageCard";
+import Card from "@/components/mypage/Card";
 import stylesLayout from "./MypageLayout.module.scss";
 import InputField from "@/components/form/InputField";
 import RadioGroup from "@/components/form/RadioGroup";
