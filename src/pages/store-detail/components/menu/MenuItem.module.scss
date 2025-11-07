@@ -51,6 +51,7 @@
   justify-content: space-between;
   align-items: center;
   width: calc(100% - (fn-rem(80) + space("md")));
+  gap: space("xl");
 }
 
 .name {
@@ -62,13 +63,15 @@
 .desc {
   font-size: font("sm");
   color: fn-color("gray-500");
-  margin-top: space("xs");
+  margin-top: space("sm");
 }
 
 .price {
   font-size: font("lg");
   font-weight: 600;
   color: fn-color("gray-800");
+  min-width: fn-rem(105);
+  text-align: right;
 }
 
 .optionBox {
