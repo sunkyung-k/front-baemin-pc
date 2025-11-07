@@ -67,14 +67,10 @@ export default function MypageProfile() {
       </div>
       <div>{info.button}</div>
 
-      {/* 💰 포인트 충전 모달 */}
+      {/* 포인트 충전 모달 */}
       <PointChargeModal
         isOpen={isChargeOpen}
         onClose={() => setChargeOpen(false)}
-        onSuccess={() => {
-          // ✅ 충전 완료 후 React Query 자동 invalidate
-          // (useAccount 내부 afterMutation 에서 처리됨)
-        }}
       />
     </div>
   );

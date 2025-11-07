@@ -37,7 +37,7 @@ export function useAccount() {
   /** 보유금 충전 */
   const deposit = useMutation({
     mutationFn: accountAPI.increaseDeposit,
-    onSettled: () => afterMutation(QUERY_KEYS.USER_DEPOSIT(userId)),
+    onSettled: () => afterMutation(QUERY_KEYS.USER_INFO(userId)),
     onError: (err) => handleApiError(err, "useAccount.deposit"),
   });
 
