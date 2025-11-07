@@ -8,7 +8,7 @@ import InputField from "@/components/form/InputField";
 import { useHandleError } from "@/hooks/common/useHandleError";
 import { parseNumber } from "@/utills/valueFormatter";
 import { authStore } from "@/store/authStore";
-import useAccount from "@/hooks/useAccount"; // ✅ 추가
+import useAccount from "@/hooks/useAccount";
 
 /**
  * PointChargeModal (공통 포인트 충전 모달)

@@ -43,7 +43,7 @@ export default function OptionPanel({ menuId, group }) {
     e?.stopPropagation?.();
     e?.nativeEvent?.stopImmediatePropagation?.();
     try {
-      // ✅ handleDelete 제거 — remove 내부에서 이미 confirm/alert 수행
+      // handleDelete 제거 — remove 내부에서 이미 confirm/alert 수행
       await remove.mutateAsync(menuOptId);
       await refreshMenu();
     } catch (err) {

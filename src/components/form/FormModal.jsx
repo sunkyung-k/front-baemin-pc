@@ -19,7 +19,7 @@ export default function FormModal({
   return (
     <Modal isOpen={isOpen} title={title} onClose={onClose}>
       <form
-        onSubmit={onSubmit} // ✅ RHF handleSubmit 직접 연결
+        onSubmit={onSubmit} // RHF handleSubmit 직접 연결
         className={`form-modal ${className}`}
         noValidate
       >

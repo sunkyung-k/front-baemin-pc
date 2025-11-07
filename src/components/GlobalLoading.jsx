@@ -3,7 +3,7 @@ import { useIsFetching } from "@tanstack/react-query";
 import LoadingSpinner from "./LoadingSpinner";
 
 /**
- * 🌐 React Query 전역 로딩 감시
+ * React Query 전역 로딩 감시
  * - 모든 useQuery / useMutation 요청 중일 때 스피너 표시
  */
 export default function GlobalLoading() {

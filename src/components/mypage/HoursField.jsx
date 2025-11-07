@@ -11,7 +11,7 @@ export default function HoursField({
   openError,
   closeError,
   register,
-  watch, // 추가 (RHF 값 추적)
+  watch,
   hint = "",
 }) {
   // 00:00 ~ 23:00까지 시간 옵션 생성

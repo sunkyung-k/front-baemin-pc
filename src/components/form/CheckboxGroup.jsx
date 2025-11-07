@@ -19,7 +19,7 @@ export default function CheckboxGroup({
   const isRHF = typeof register === "function";
   const registerProps = isRHF ? register(name) : {};
 
-  /** ✅ 특정 옵션 클릭 시 상태 업데이트 */
+  /** 특정 옵션 클릭 시 상태 업데이트 */
   const handleToggle = (value) => {
     let updated = [...values];
     if (updated.includes(value)) {
@@ -47,7 +47,7 @@ export default function CheckboxGroup({
               value={opt.value}
               {...registerProps}
               checked={isRHF ? undefined : values.includes(opt.value)}
-              onChange={isRHF ? undefined : () => handleToggle(opt.value)} // ✅ 각 체크박스 고유 핸들러
+              onChange={isRHF ? undefined : () => handleToggle(opt.value)} // 각 체크박스 고유 핸들러
             />
             <span className="chk-label">
               {typeof opt.label === "string" ? opt.label : opt.label}
