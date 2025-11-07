@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import Card from "../MypageCard";
 
 import { useStore } from "@/hooks/useStore";
 import { useCategory } from "@/hooks/useCategory";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 
+import Card from "@/components/mypage/Card";
 import InputField from "@/components/form/InputField";
 import TextareaField from "@/components/form/TextareaField";
 import Checkbox from "@/components/mypage/Checkbox";

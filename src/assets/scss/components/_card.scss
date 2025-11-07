@@ -1,3 +1,5 @@
+@use "@/assets/scss/utils" as *;
+
 .card {
   background-color: fn-color("white");
   padding: space("xxl");
