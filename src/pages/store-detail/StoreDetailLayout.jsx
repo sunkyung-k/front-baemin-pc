@@ -3,7 +3,6 @@ import { Outlet, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import storeAPI from "@/service/storeAPI";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import { useHandleError } from "@/hooks/common/useHandleError";
 
 export default function StoreDetailLayout() {
