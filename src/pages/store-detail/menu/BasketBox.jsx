@@ -4,6 +4,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import useBasket from "@/hooks/useBasket";
 import BasketItem from "./BasketItem";
 import { useNavigate } from "react-router-dom";
+import { formatPrice } from "@/utills/valueFormatter";
 
 /**
  * BasketBox
@@ -12,8 +13,7 @@ import { useNavigate } from "react-router-dom";
  * - clearAll / orderAll confirm 1회만 표시
  */
 export default function BasketBox() {
-  const { basketQuery, increase, decrease, removeItem, clearAll, orderAll } =
-    useBasket();
+  const { basketQuery, increase, decrease, removeItem, clearAll } = useBasket();
   const basket = basketQuery?.data;
   const isEmpty = !basket || !basket.itemList || basket.itemList.length === 0;
   const [isOpen, setIsOpen] = useState(false);
@@ -28,6 +28,11 @@ export default function BasketBox() {
     if (!window.confirm("주문을 진행하시겠습니까?")) return;
     navigate("/order");
   };
+
+  /** 💰 총합계 계산 */
+  const totalPrice = !isEmpty
+    ? basket.itemList.reduce((acc, cur) => acc + (cur.totalPrice || 0), 0)
+    : 0;
 
   return (
     <>
@@ -74,6 +79,18 @@ export default function BasketBox() {
             )}
           </ul>
         </div>
+
+        {/* 합계 표시 섹션 */}
+        {!isEmpty && (
+          <div>
+            <div className={styles.totalBox}>
+              <span className={styles.totalLabel}>총 합계</span>
+              <strong className={styles.totalPrice}>
+                ₩{formatPrice(totalPrice)}
+              </strong>
+            </div>
+          </div>
+        )}
 
         <button
           className="btn btn-default btn-primary"
