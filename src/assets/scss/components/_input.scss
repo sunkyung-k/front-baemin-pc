@@ -61,27 +61,183 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
-/* input round (메인, 가게리스트) */
+/* input (주소 찾기 / 메뉴명, 가게명) */
+/* input (주소 찾기 / 메뉴명, 가게명) */
 .input-round {
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: space("sm");
   max-width: fn-rem(600);
   width: 100%;
   margin: 0 auto;
+  border-radius: radius(full);
+  transition: all 0.25s ease;
 
   input {
     flex: 1;
-    height: fn-rem(44);
+    height: fn-rem(36);
     padding: 0 space("md");
-    font-size: font("lg");
-    border-radius: fn-rem(40);
-    border: 1px solid fn-color("gray-200");
-    background-color: fn-color("gray-50");
+    font-size: font("md");
+    border: none;
+    outline: none;
+    background: transparent;
+    color: fn-color("gray-800");
 
     &::placeholder {
       color: fn-color("gray-400");
+    }
+
+    &:read-only {
+      cursor: default;
+      color: fn-color("gray-700");
+    }
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fn-rem(38);
+    height: fn-rem(38);
+    border-radius: radius(full);
+    border: 1px solid transparent;
+    background: none;
+    color: fn-color("gray-600");
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      color: fn-color("primary");
+      background-color: fn-color("gray-50");
+    }
+
+    &:disabled {
+      color: fn-color("gray-400");
+      cursor: not-allowed;
+    }
+  }
+
+  /* -------------------------------------------------
+     📍 address 모드 — 읽기전용 / 카드형 / 안정감 있는 느낌
+  -------------------------------------------------- */
+  &.address {
+    background-color: fn-color("gray-100"); // 밝은 gray tone 배경
+    border: 1px solid fn-color("gray-300"); // 명확한 경계선
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03); // 자연스러운 음영
+    padding: fn-rem(8) fn-rem(16);
+    min-height: fn-rem(54);
+    border-radius: radius("lg");
+    align-items: center;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background-color: fn-color("gray-50");
+      border-color: fn-color("gray-400");
+    }
+
+    &:focus-within {
+      border-color: fn-color("primary");
+      box-shadow: 0 0 0 2px rgba(fn-color("primary"), 0.1);
+    }
+
+    .address-display {
+      flex: 1;
+      padding: 0 space("md");
+      font-size: font("lg");
+      font-weight: 600;
+      color: fn-color("gray-800");
+      line-height: fn-rem(36);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: default;
+
+      &:empty::after {
+        content: "배달받을 주소를 입력해주세요";
+        color: fn-color("gray-400");
+        font-weight: 400;
+      }
+    }
+
+    /* 주소 input은 숨김 */
+    input {
+      display: none;
+    }
+
+    /* 좌측 GPS 버튼 */
+    .btn-location {
+      background-color: fn-color("primary-bg");
+      color: fn-color("primary");
+      border: none;
+
+      &:hover {
+        background-color: rgba(fn-color("primary"), 0.15);
+      }
+    }
+
+    /* 우측 검색버튼 */
+    .btn-search {
+      background: none;
+      border: none;
+      color: fn-color("gray-600");
+      font-size: fn-rem(18);
+
+      &:hover {
+        color: fn-color("primary");
+      }
+    }
+  }
+
+  /* -------------------------------------------------
+     🔍 search 모드 — 기본 검색 입력창
+  -------------------------------------------------- */
+  &.search {
+    background-color: fn-color("gray-50");
+    border: 1px solid fn-color("gray-300");
+    padding: fn-rem(4) fn-rem(12);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+
+    input {
+      font-size: font("sm");
+      color: fn-color("gray-800");
+    }
+
+    .btn-search {
+      border: none;
+      background: none;
+      color: fn-color("gray-500");
+      font-size: fn-rem(18);
+
+      &:hover {
+        color: fn-color("primary");
+      }
+    }
+
+    /* -------------------------------------------------
+       🪶 sub variant — 리스트 중간용 얇은 검색창
+    -------------------------------------------------- */
+    &.sub {
+      max-width: fn-rem(500);
+      background-color: fn-color("white");
+      border: 1px solid fn-color("gray-200");
+      border-radius: fn-rem(18);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      padding: fn-rem(3) fn-rem(10);
+      min-height: fn-rem(44);
+
+      input {
+        font-size: font("sm");
+        padding: 0 fn-rem(6);
+      }
+
+      .btn-search {
+        font-size: fn-rem(16);
+        color: fn-color("gray-500");
+
+        &:hover {
+          color: fn-color("primary");
+        }
+      }
     }
   }
 }

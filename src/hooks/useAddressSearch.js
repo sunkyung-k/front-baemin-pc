@@ -1,15 +1,18 @@
-import { openKakaoAddressSearch } from "@/utills/kakaoAddressSearch";
+import { openDaumPostcode } from "@/config/kakao/postcode";
 
 /**
- * useAddressSearch 훅
- * @param {Function} onComplete 주소 선택 시 실행되는 콜백
+ * 주소 검색 훅 (Daum Postcode API)
+ * --------------------------------------------------
+ * - 다음(카카오) 주소검색 팝업을 열어 주소 선택
+ * - 선택된 주소를 Zustand 전역 상태(setAddress)에 저장
+ * - onComplete 콜백으로 결과 반환
  */
-export function useAddressSearch(onComplete) {
+export function useAddressSearch(setAddress) {
   const openAddressSearch = () => {
-    openKakaoAddressSearch((address) => {
-      if (onComplete) onComplete(address);
+    openDaumPostcode((addr) => {
+      setAddress(addr);
+      console.log("주소 선택:", addr);
     });
   };
-
   return { openAddressSearch };
 }

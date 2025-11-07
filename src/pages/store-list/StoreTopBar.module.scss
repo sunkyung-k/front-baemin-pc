@@ -18,7 +18,6 @@
     top: $header-height + $gnb-height-mobile;
   }
 
-  /* 🔹 미묘한 그림자 추가 (스크롤 있을 때만 표시) */
   &.scrolled {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }

@@ -1,7 +1,7 @@
-import { loadKakaoSDK } from "@/config/kakao";
+import { loadKakaoSDK } from "./index";
 
 /**
- * 좌표 → 주소 변환 (지도 없이 사용)
+ * 좌표 → 주소 변환 (Kakao Geocoder)
  */
 export async function getAddressFromCoords(longitude, latitude) {
   await loadKakaoSDK();
@@ -13,7 +13,6 @@ export async function getAddressFromCoords(longitude, latitude) {
     }
 
     const geocoder = new window.kakao.maps.services.Geocoder();
-
     geocoder.coord2Address(longitude, latitude, (result, status) => {
       if (status === window.kakao.maps.services.Status.OK) {
         const address =

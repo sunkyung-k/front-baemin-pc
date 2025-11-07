@@ -25,7 +25,7 @@
     color: fn-color("gray-600");
   }
 
-  :global(.searchBox) {
+  :global(.address-box) {
     margin-top: space("md");
   }
 }
@@ -33,7 +33,6 @@
 .main {
   display: flex;
   flex-direction: column;
-  gap: fn-rem(70);
   max-width: fn-rem(1200);
   margin: space("xxl") auto 0;
   padding: 0 space("lg");
