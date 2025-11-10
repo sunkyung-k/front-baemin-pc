@@ -158,10 +158,10 @@ export default function CategoryPanel({ storeId }) {
 
       <button
         type="button"
-        className="btn btn-default btn-primary"
+        className="btn btn-default btn-primary-line btn-sm"
         onClick={() => setModalOpen(true)}
       >
-        <TiPlus size={18} /> 새 카테고리 등록
+        <TiPlus size={18} /> 새 카테고리
       </button>
 
       {visibleCategories.length > 0 ? (

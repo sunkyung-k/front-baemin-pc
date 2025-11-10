@@ -117,7 +117,7 @@ export default function OptionGroupPanel({ menuId }) {
         className={styles.addGroupButton}
         onClick={(e) => handleOpenGroupModal(null, e)}
       >
-        <TiPlus size={18} /> 새 옵션 그룹 등록
+        <TiPlus size={18} /> 새 옵션 그룹
       </button>
 
       {groupList.length === 0 ? (

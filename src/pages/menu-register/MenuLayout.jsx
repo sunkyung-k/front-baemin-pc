@@ -59,8 +59,12 @@ export default function MenuLayout() {
   return (
     <div className={styles.wrap}>
       <main className={styles.main}>
-        <button type="button" className={styles.close} onClick={handleClose}>
-          <IoClose />
+        <button
+          type="button"
+          className={`${styles.close} btn btn-default btn-sm btn-primary`}
+          onClick={handleClose}
+        >
+          등록
         </button>
         <div className={styles.panelWrapper}>
           <CategoryPanel storeId={storeId} />

@@ -99,8 +99,11 @@ export default function MenuPanel() {
         <h2 className={styles.categoryTitle}>
           <span>{activeCategory.menuCaName}</span>
         </h2>
-        <button className="btn btn-primary btn-default" onClick={handleCreate}>
-          <TiPlus size={18} /> 메뉴 등록
+        <button
+          className="btn btn-primary-line btn-default btn-sm"
+          onClick={handleCreate}
+        >
+          <TiPlus size={18} /> 메뉴
         </button>
       </div>
 

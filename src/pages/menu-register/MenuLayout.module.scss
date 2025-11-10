@@ -77,7 +77,7 @@
 
 .close {
   position: absolute;
-  top: fn-rem(20);
+  top: fn-rem(15);
   right: fn-rem(20);
   background: transparent;
   border: none;
@@ -86,10 +86,12 @@
   cursor: pointer;
   transition: color 0.2s ease;
   z-index: 10;
+  width: fn-rem(60);
+  height: fn-rem(30) !important;
 
-  &:hover {
-    color: fn-color("gray-600");
-  }
+  // &:hover {
+  //   color: fn-color("primary");
+  // }
 
   @media (max-width: bp("lg")) {
     top: fn-rem(10);
