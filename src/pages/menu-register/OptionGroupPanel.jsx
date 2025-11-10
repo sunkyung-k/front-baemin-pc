@@ -80,10 +80,12 @@ export default function OptionGroupPanel({ menuId }) {
     setOptionModalOpen(true);
   }, []);
   const handleCloseOptionModal = useCallback(async () => {
-    setOptionGroupTarget(null);
+    const targetId = optionGroupTarget?.menuOptGrpId;
     setOptionModalOpen(false);
     await refreshMenu();
-  }, [refreshMenu]);
+    if (targetId) setOpenGroupId(targetId);
+    setOptionGroupTarget(null);
+  }, [refreshMenu, optionGroupTarget]);
 
   /** 그룹 삭제 */
   const handleRemoveGroup = useCallback(

@@ -6,12 +6,15 @@ import { useMenuOption } from "@/hooks/menu/useMenuOption";
 import { useHandleError } from "@/hooks/common/useHandleError";
 import { useConfirmDelete } from "@/hooks/common/useConfirmDelete";
 import EmptyState from "@/components/menu/EmptyState";
+import { formatPrice } from "@/utills/valueFormatter";
 
 /**
- * 옵션 패널 (v2 alert 구조)
- * --------------------------------
+ * OptionPanel
+ * ------------------------------------------------------
+ * - 옵션 목록 + 수정/삭제/등록 관리
  * - 삭제: useConfirmDelete
  * - 에러: useHandleError
+ * - 가격 표시: formatPrice() 적용 (3자리 콤마)
  */
 export default function OptionPanel({ menuId, group }) {
   const { remove, refreshMenu } = useMenuOption(menuId);
@@ -24,6 +27,7 @@ export default function OptionPanel({ menuId, group }) {
 
   const optionList = group?.menuOptionList ?? [];
 
+  /** 옵션 모달 열기 */
   const handleOpenModal = (option = null, e) => {
     e?.stopPropagation?.();
     e?.nativeEvent?.stopImmediatePropagation?.();
@@ -32,6 +36,7 @@ export default function OptionPanel({ menuId, group }) {
     setModalOpen(true);
   };
 
+  /** 옵션 모달 닫기 */
   const handleCloseModal = () => {
     setEditTarget(null);
     setMode("create");
@@ -43,7 +48,6 @@ export default function OptionPanel({ menuId, group }) {
     e?.stopPropagation?.();
     e?.nativeEvent?.stopImmediatePropagation?.();
     try {
-      // handleDelete 제거 — remove 내부에서 이미 confirm/alert 수행
       await remove.mutateAsync(menuOptId);
       await refreshMenu();
     } catch (err) {
@@ -63,6 +67,7 @@ export default function OptionPanel({ menuId, group }) {
         ) : (
           optionList.map((opt, index) => (
             <div key={opt.menuOptId || index} className={styles.optionItem}>
+              {/* 옵션 이름 + 선택 여부 */}
               <div className={styles.optionInfo}>
                 <span className={styles.optName}>{opt.menuOptName}</span>
                 <span
@@ -74,9 +79,10 @@ export default function OptionPanel({ menuId, group }) {
                 </span>
               </div>
 
+              {/* 가격 + 수정/삭제 버튼 */}
               <div className={styles.optionActions}>
                 <span className={styles.optPrice}>
-                  + {opt.price?.toLocaleString() ?? 0}원
+                  + {formatPrice(opt.price ?? 0)}원
                 </span>
                 <button
                   className="btn btn-sm btn-secondary-line"
@@ -98,6 +104,7 @@ export default function OptionPanel({ menuId, group }) {
         )}
       </div>
 
+      {/* 옵션 등록/수정 모달 */}
       <OptionModal
         menuId={menuId}
         groupId={group.menuOptGrpId}

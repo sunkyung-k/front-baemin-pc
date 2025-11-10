@@ -7,18 +7,20 @@ import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useMenu } from "@/hooks/menu/useMenu";
 import MenuModal from "./MenuModal";
 import OptionGroupPanel from "./OptionGroupPanel";
-import { getAbsoluteImageUrl } from "../../utills/imageUtills";
+import { getAbsoluteImageUrl } from "@/utills/imageUtills";
+import { formatPrice } from "@/utills/valueFormatter";
 
 /**
  * 메뉴 패널 (카테고리별 메뉴 목록 + CRUD)
+ * --------------------------------------------------
  * - React Query + Zustand 완전 동기화 구조
- * - useMemo 제거 → 즉시 반영 보장
+ * - formatPrice 적용 (가격 + "원" 단위 통일)
  */
 export default function MenuPanel() {
   const { activeCategory } = useMenuCategoryStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
-  const [activeMenuId, setActiveMenuId] = useState(null); // 옵션 그룹 토글 상태
+  const [activeMenuId, setActiveMenuId] = useState(null);
 
   const hasActiveCategory = !!activeCategory;
   const menuList = activeCategory?.menuList || [];
@@ -32,16 +34,19 @@ export default function MenuPanel() {
 
   const { create, update, remove } = useMenu(storeId);
 
+  /** 메뉴 등록 모달 열기 */
   const handleCreate = () => {
     setEditTarget(null);
     setModalOpen(true);
   };
 
+  /** 메뉴 수정 모달 열기 */
   const handleEdit = (menu) => {
     setEditTarget(menu);
     setModalOpen(true);
   };
 
+  /** 메뉴 등록/수정 */
   const handleSubmit = async (formData) => {
     try {
       if (editTarget) {
@@ -58,6 +63,7 @@ export default function MenuPanel() {
     }
   };
 
+  /** 메뉴 삭제 */
   const handleRemove = async (menuId) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
     try {
@@ -69,10 +75,12 @@ export default function MenuPanel() {
     }
   };
 
+  /** 옵션 그룹 토글 */
   const handleToggle = (menuId) => {
     setActiveMenuId((prev) => (prev === menuId ? null : menuId));
   };
 
+  /** 카테고리 선택 안 된 경우 */
   if (!hasActiveCategory) {
     return (
       <section className={styles.detailPanel}>
@@ -126,6 +134,7 @@ export default function MenuPanel() {
                         <span className={styles.soldoutBadge}>품절</span>
                       )}
                     </div>
+
                     <div className={styles.menuInfo}>
                       <h4>{menu.menuName}</h4>
                       <p>{menu.description || "메뉴 설명이 없습니다."}</p>
@@ -134,7 +143,7 @@ export default function MenuPanel() {
 
                   <div className={styles.menuRight}>
                     <div className={styles.menuPrice}>
-                      {menu.price?.toLocaleString()}원
+                      {`${formatPrice(menu.price ?? 0)}원`}
                     </div>
                     <div className={styles.menuButtons}>
                       <button
@@ -178,6 +187,7 @@ export default function MenuPanel() {
         />
       )}
 
+      {/* 메뉴 등록/수정 모달 */}
       <MenuModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

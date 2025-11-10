@@ -8,14 +8,16 @@ import InputField from "@/components/form/InputField";
 import RadioGroup from "@/components/form/RadioGroup";
 import useMenuOption from "@/hooks/menu/useMenuOption";
 import { useHandleError } from "@/hooks/common/useHandleError";
+import { formatPrice, parseNumber } from "@/utills/valueFormatter";
 
-/* 유효성 스키마 */
+/*  유효성 스키마 */
 const schema = yup.object().shape({
   menuOptName: yup.string().required("옵션명을 입력해주세요."),
   price: yup
-    .number()
-    .typeError("숫자만 입력 가능합니다.")
-    .min(0, "0원 이상 입력해주세요.")
+    .string()
+    .test("is-valid-price", "숫자만 입력 가능합니다.", (val) =>
+      /^[\d,]+$/.test(val || "")
+    )
     .required("가격을 입력해주세요."),
   availableYn: yup.string().required("선택 가능 여부를 선택해주세요."),
 });
@@ -36,6 +38,8 @@ export default function OptionModal({
     handleSubmit,
     control,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -46,21 +50,31 @@ export default function OptionModal({
     },
   });
 
+  /**  가격 입력 감시 & 자동 포맷 */
+  const priceValue = watch("price");
+  useEffect(() => {
+    if (priceValue === undefined || priceValue === null) return;
+    const formatted = formatPrice(priceValue);
+    if (formatted !== priceValue) setValue("price", formatted);
+  }, [priceValue, setValue]);
+
+  /**  모달 열릴 때 기본값 세팅 */
   useEffect(() => {
     if (isOpen) {
       reset({
         menuOptName: defaultValues?.menuOptName ?? "",
-        price: defaultValues?.price ?? "",
+        price: formatPrice(defaultValues?.price ?? ""),
         availableYn: defaultValues?.availableYn ?? "Y",
       });
     }
   }, [isOpen, defaultValues, reset]);
 
+  /**  제출 핸들러 */
   const handleFormSubmit = async (data) => {
     const payload = {
       menuOptGrpId: groupId,
       menuOptName: data.menuOptName,
-      price: Number(data.price ?? 0),
+      price: parseNumber(data.price ?? "0"), // 문자열 → 숫자 변환
       availableYn: data.availableYn ?? "Y",
       delYn: "N",
       maxSelect: 0,
@@ -100,11 +114,11 @@ export default function OptionModal({
         errorMessage={errors.menuOptName?.message}
       />
 
+      {/*  금액 입력 */}
       <InputField
         label="가격"
         name="price"
-        type="number"
-        placeholder="예: 2000"
+        placeholder="예: 2,000"
         register={register}
         errorMessage={errors.price?.message}
       />

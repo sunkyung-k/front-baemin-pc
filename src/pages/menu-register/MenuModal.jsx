@@ -10,12 +10,16 @@ import ImageUpload from "@/components/form/ImageUpload";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 import { useHandleError } from "@/hooks/common/useHandleError";
+import { formatPrice, parseNumber } from "@/utills/valueFormatter";
 
+/* 유효성 스키마 */
 const schema = yup.object().shape({
   menuName: yup.string().required("메뉴명을 입력해주세요."),
   price: yup
-    .number()
-    .typeError("가격은 숫자만 입력 가능합니다.")
+    .string()
+    .test("is-valid-price", "가격은 숫자만 입력 가능합니다.", (val) =>
+      /^[\d,]+$/.test(val || "")
+    )
     .required("가격을 입력해주세요."),
   description: yup
     .string()
@@ -39,6 +43,7 @@ export default function MenuModal({
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -51,12 +56,28 @@ export default function MenuModal({
     },
   });
 
+  /** 실시간 가격 포맷 */
+  const priceValue = watch("price");
+  useEffect(() => {
+    if (priceValue === undefined || priceValue === null) return;
+    const formatted = formatPrice(priceValue);
+    if (formatted !== priceValue) setValue("price", formatted);
+  }, [priceValue, setValue]);
+
+  /** 모달 열릴 때 기본값 초기화 */
   useEffect(() => {
     if (isOpen) {
-      reset(defaultValues || { soldoutYn: "N" });
+      reset({
+        menuName: defaultValues?.menuName ?? "",
+        price: formatPrice(defaultValues?.price ?? ""),
+        description: defaultValues?.description ?? "",
+        soldoutYn: defaultValues?.soldoutYn ?? "N",
+        menuImage: defaultValues?.menuImage ?? "",
+      });
     }
   }, [isOpen, defaultValues, reset]);
 
+  /** 폼 제출 */
   const handleFormSubmit = (data) => {
     try {
       const formData = new FormData();
@@ -66,7 +87,7 @@ export default function MenuModal({
       );
       formData.append("menuName", data.menuName);
       formData.append("description", data.description);
-      formData.append("price", data.price);
+      formData.append("price", parseNumber(data.price)); // 콤마 제거 후 숫자 변환
       formData.append("soldoutYn", data.soldoutYn);
 
       const fileField = data.menuImage;
@@ -107,11 +128,11 @@ export default function MenuModal({
         errorMessage={errors.menuName?.message}
       />
 
+      {/* 금액 입력 필드 (자동 포맷 적용) */}
       <InputField
         label="가격"
         name="price"
-        type="number"
-        placeholder="예: 8500"
+        placeholder="예: 8,500"
         register={register}
         errorMessage={errors.price?.message}
       />
