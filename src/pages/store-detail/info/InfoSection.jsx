@@ -19,8 +19,6 @@ export default function InfoSection({ store }) {
       label: "최소주문금액",
       value: `${store.minPrice.toLocaleString()}원`,
     },
-    store.hourComment && { label: "영업 상태", value: store.hourComment },
-    store.notice && { label: "안내사항", value: store.notice },
   ].filter(Boolean);
 
   const hasBusinessInfo = infoList.length > 0;
@@ -54,15 +52,15 @@ export default function InfoSection({ store }) {
                 <strong>상호명 :</strong> {store.storeName}
               </li>
             )}
-            {owner.userName && (
-              <li>
-                <strong>대표자명 :</strong> {owner.userName}
-              </li>
-            )}
             {owner.businessNo && (
               <li>
                 <strong>사업자등록번호 :</strong>{" "}
                 {formatBusinessNo(owner.businessNo)}
+              </li>
+            )}
+            {owner.userName && (
+              <li>
+                <strong>대표자명 :</strong> {owner.userName}
               </li>
             )}
           </ul>
