@@ -40,7 +40,7 @@ export default function OrderCartItem({ item, onRemove }) {
         <div className={styles.cartInfo}>
           <p className={styles.name}>{menu?.menuName}</p>
           <p className={styles.desc}>{menu?.description}</p>
-          <p className={styles.unitPrice}>₩{menu?.price?.toLocaleString()}</p>
+          <p className={styles.unitPrice}>{menu?.price?.toLocaleString()}원</p>
         </div>
       </div>
 
@@ -53,7 +53,7 @@ export default function OrderCartItem({ item, onRemove }) {
           size="md"
         />
 
-        <div className={styles.price}>₩{formatPrice(totalPrice)}</div>
+        <div className={styles.price}>{formatPrice(totalPrice)}원</div>
 
         <button
           className={styles.removeBtn}
