@@ -1,0 +1,64 @@
+.infoTabContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: space("xxl");
+}
+
+/* 사장님 한마디 */
+.ownerMessage {
+  .sectionTitle {
+    padding-bottom: space("sm");
+    margin-bottom: space("md");
+    border-bottom: 2px solid fn-color("primary");
+    font-size: font("xl");
+    color: fn-color("gray-900");
+  }
+
+  .messageBox {
+    padding: space("lg");
+    background-color: fn-color("gray-50");
+    border: 1px solid fn-color("gray-200");
+    border-radius: radius("sm");
+    font-size: font("md");
+    line-height: 1.7;
+    color: fn-color("gray-800");
+  }
+}
+
+/* 각 정보 섹션 */
+.section {
+  .sectionSubTitle {
+    font-size: font("lg");
+    font-weight: 700;
+    color: fn-color("gray-900");
+    border-bottom: 1px solid fn-color("gray-200");
+    padding-bottom: space("sm");
+    margin-bottom: space("sm");
+  }
+
+  .infoList {
+    display: flex;
+    flex-direction: column;
+    gap: space("xs");
+    padding: 0 space("xs");
+    font-size: font("md");
+    color: fn-color("gray-600");
+
+    li {
+      line-height: 1.8;
+    }
+
+    strong {
+      color: fn-color("gray-900");
+    }
+  }
+
+  .infoText {
+    font-size: font("sm");
+    color: fn-color("gray-600");
+    line-height: 1.7;
+    white-space: pre-line;
+  }
+}
