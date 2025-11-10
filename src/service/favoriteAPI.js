@@ -26,10 +26,10 @@ const favoriteAPI = {
   },
 
   /** 내 찜 목록 조회 */
-  async list() {
-    const res = await api.get(`/api/v1/favorite`);
+  async list(page = 0) {
+    const res = await api.get(`/api/v1/favorite`, { params: { page } });
     if (res.data.resultCode !== "200") throw new Error("찜 목록 조회 실패");
-    return res.data.response?.content ?? [];
+    return res.data.response;
   },
 };
 

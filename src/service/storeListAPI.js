@@ -8,9 +8,9 @@ const storeListAPI = {
 
     // 주소 없으면 호출 막기
     if (!address) {
-      console.warn("⚠️ 주소 정보가 없어 가게 목록 요청이 취소되었습니다.");
+      console.warn("주소 정보가 없어 가게 목록 요청이 취소되었습니다.");
       alert("현재 위치를 먼저 설정해주세요!");
-      return [];
+      return { content: [], pageInfo: null };
     }
 
     // 구 까지 추출
@@ -21,16 +21,10 @@ const storeListAPI = {
         params: { ...params, addr: shortAddr },
       });
 
-      const data = res.data?.response?.content ?? [];
-
-      if (import.meta.env.MODE === "development") {
-        console.log("[storeListAPI] getStores 응답:", data);
-      }
-
-      return data;
+      return res.data.response;
     } catch (err) {
       console.error("가게 리스트 호출 실패:", err);
-      return [];
+      return { content: [], pageInfo: null };
     }
   },
 

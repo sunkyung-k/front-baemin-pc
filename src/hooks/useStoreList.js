@@ -22,6 +22,7 @@ export function useStoreList(filters = {}) {
 
   /** 서버 요청 파라미터 */
   const params = {
+    ...filters,
     addr: address,
     caId: normalizedCaId,
     searchText: filters.searchText?.trim() || null,
@@ -50,7 +51,7 @@ export function useStoreList(filters = {}) {
   };
 
   /** React Query 설정 */
-  const { data: stores, refetch } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey,
     queryFn: fetchStoreList,
     enabled: !!address,
@@ -58,7 +59,10 @@ export function useStoreList(filters = {}) {
     retry: 1,
   });
 
-  return { stores, refetch, afterMutationList };
+  const stores = data?.content ?? [];
+  const pageInfo = data?.pageInfo ?? null;
+
+  return { stores, pageInfo, refetch };
 }
 
 export default useStoreList;

@@ -1,7 +1,9 @@
+import React, { useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useStoreList } from "@/hooks/useStoreList";
 import StoreCard from "@/components/store/StoreCard";
 import EmptyState from "@/components/menu/EmptyState";
+import Pagination from "@/components/common/Pagination";
 import { FaStore } from "react-icons/fa6";
 import styles from "./StoreList.module.scss";
 
@@ -12,9 +14,15 @@ import styles from "./StoreList.module.scss";
  */
 export default function StoreList() {
   const { searchText, activeCaId } = useOutletContext();
-  const { stores } = useStoreList({
+
+  // 현재 페이지 번호 관리
+  const [page, setPage] = useState(0);
+
+  // useStoreList 훅에 page 전달
+  const { stores, pageInfo } = useStoreList({
     caId: activeCaId || null,
     searchText: searchText || null,
+    page,
   });
 
   // 데이터 준비 전엔 아무것도 렌더하지 않음
@@ -33,6 +41,10 @@ export default function StoreList() {
     );
   }
 
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
   return (
     <main className={styles.main}>
       <div className={styles.storeGrid}>
@@ -40,6 +52,11 @@ export default function StoreList() {
           <StoreCard key={s.storeId} store={s} showStatus />
         ))}
       </div>
+
+      {/* Pagination 컴포넌트 추가 */}
+      {pageInfo && (
+        <Pagination pageInfo={pageInfo} onPageChange={handlePageChange} />
+      )}
     </main>
   );
 }
