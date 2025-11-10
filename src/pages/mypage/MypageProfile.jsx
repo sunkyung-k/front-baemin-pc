@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { authStore } from "@/store/authStore";
+import { useNavigate } from "react-router-dom";
 import { useStore } from "@/hooks/useStore";
 import useAccount from "@/hooks/useAccount";
 import PointChargeModal from "../../components/common/PointChargeModal";
@@ -7,6 +8,7 @@ import styles from "./MypageProfile.module.scss";
 import { formatPrice } from "@/utills/valueFormatter";
 
 export default function MypageProfile() {
+  const navigate = useNavigate();
   const { userName, userId, userRole } = authStore();
   const { myStore } = useStore();
   const { userInfo, isUserInfoLoading } = useAccount();
@@ -14,6 +16,15 @@ export default function MypageProfile() {
 
   /** 가게명 표시 */
   const storeName = myStore?.storeName || "등록된 가게 없음";
+
+  /**  내 가게로 이동 */
+  const handleGoMyStore = () => {
+    if (!myStore || !myStore.storeId) {
+      alert("등록된 가게가 없습니다.");
+      return;
+    }
+    navigate(`/store/${myStore.storeId}`);
+  };
 
   /** 보유 포인트 표시 */
   const deposit = isUserInfoLoading
@@ -29,7 +40,11 @@ export default function MypageProfile() {
       subText: "총 수입",
       value: "₩1,203,000",
       button: (
-        <button type="button" className="btn btn-round btn-primary">
+        <button
+          type="button"
+          className="btn btn-round btn-primary"
+          onClick={handleGoMyStore}
+        >
           내 가게 보기
         </button>
       ),

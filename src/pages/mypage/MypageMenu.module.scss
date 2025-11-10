@@ -1,4 +1,6 @@
 .sidebar {
+  position: sticky;
+  top: $header-height + fn-rem(50);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -7,6 +9,10 @@
   background-color: fn-color("gray-bg");
   border-radius: radius("md");
   width: fn-rem(260);
+
+  @media (max-width: bp("md")) {
+    position: static;
+  }
 }
 
 .navMenu {
