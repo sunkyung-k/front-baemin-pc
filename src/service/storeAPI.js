@@ -75,14 +75,26 @@ const storeAPI = {
     return res.data;
   },
 
-  /** 유저용 가게 상세 조회 (로그인 불필요) */
+  /** 유저용 가게 상세 조회 (로그인 불필요, ownerInfo 병합 포함) */
   async getStoreDetail(storeId) {
     if (import.meta.env.MODE === "development") {
       console.log(`[storeAPI] getStoreDetail 호출 (storeId=${storeId})`);
     }
 
     const res = await api.get(`/api/v1/store/${storeId}`);
-    return res.data;
+
+    // ✅ 백엔드 구조: response.vo + response.ownerInfo
+    const vo = res.data?.response?.vo ?? null;
+    const ownerInfo = res.data?.response?.ownerInfo ?? null;
+
+    // ✅ 병합해서 반환 (storeDetail.ownerInfo 접근 가능)
+    const merged = { ...vo, ownerInfo };
+
+    if (import.meta.env.MODE === "development") {
+      console.log("[storeAPI] getStoreDetail merged:", merged);
+    }
+
+    return merged;
   },
 };
 

@@ -22,7 +22,7 @@ export default function StoreDetailLayout() {
 
   if (!data) return null;
 
-  const storeDetail = data?.response?.vo ?? data;
+  const storeDetail = data;
 
   return (
     <div className={styles.detailLayout}>

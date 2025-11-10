@@ -7,11 +7,6 @@ import Pagination from "@/components/common/Pagination";
 import { FaStore } from "react-icons/fa6";
 import styles from "./StoreList.module.scss";
 
-/**
- * StoreList — 가게 목록 렌더링
- * - 로딩 중엔 전역 GlobalLoading이 대신 처리
- * - 데이터 undefined일 땐 렌더 차단 (깜빡임 방지)
- */
 export default function StoreList() {
   const { searchText, activeCaId } = useOutletContext();
 
@@ -53,7 +48,7 @@ export default function StoreList() {
         ))}
       </div>
 
-      {/* Pagination 컴포넌트 추가 */}
+      {/* Pagination */}
       {pageInfo && (
         <Pagination pageInfo={pageInfo} onPageChange={handlePageChange} />
       )}

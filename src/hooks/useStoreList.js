@@ -31,14 +31,9 @@ export function useStoreList(filters = {}) {
   /** 쿼리 키 정의 */
   const queryKey = QUERY_KEYS.STORE_LIST(params);
 
-  /** 목록 갱신 후처리 훅 */
-  const afterMutationList = useAfterMutation(AFTER_TYPES.LIST, null, {
-    scrollTop: false,
-  });
-
   /** API 호출 */
   const fetchStoreList = async () => {
-    if (!address) return []; // 주소 없으면 스킵
+    if (!address) return [];
     try {
       const data = await storeListAPI.getStores(params);
       if (import.meta.env.DEV)
