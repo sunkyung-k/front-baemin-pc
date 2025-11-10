@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useHandleError } from "@/hooks/common/useHandleError";
@@ -8,7 +8,8 @@ import { FaUtensils } from "react-icons/fa";
 
 import Card from "@/components/mypage/Card";
 import EmptyState from "@/components/menu/EmptyState";
-import OrderList from "../../../components/mypage/OrderList";
+import OrderList from "@/components/mypage/OrderList";
+import Pagination from "@/components/common/Pagination";
 
 export default function OrderInfo() {
   const handleError = useHandleError();
@@ -18,22 +19,23 @@ export default function OrderInfo() {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   /** 주문 리스트 조회 */
-  const { data, refetch } = useQuery({
+  const { data, refetch, isLoading } = useQuery({
     queryKey: [QUERY_KEYS.MY_ORDER_LIST, page],
     queryFn: () => orderAPI.getMyOrders(page),
     onError: handleError,
   });
 
-  // 백엔드 pageHTML (대문자 H 주의)
-  const orders = data?.response?.content || [];
-  const pageHtml = data?.response?.pageHTML || "";
+  if (isLoading) return <div>로딩 중...</div>;
 
-  /** 주문 상태 변경  */
+  const orders = data?.content || [];
+  const pageInfo = data?.pageInfo;
+
+  /** 주문 상태 변경 */
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      await orderAPI.updateStatus(orderId, newStatus); // 상태 변경 API 호출
-      await afterMutation([QUERY_KEYS.MY_ORDER_LIST, page]); // 캐시 무효화 (page 포함)
-      refetch(); // 즉시 재요청 (보장)
+      await orderAPI.updateStatus(orderId, newStatus);
+      await afterMutation([QUERY_KEYS.MY_ORDER_LIST, page]);
+      refetch();
     } catch (err) {
       handleError(err);
     }
@@ -47,24 +49,15 @@ export default function OrderInfo() {
 
   /** 리뷰 작성 완료 후 목록 새로고침 */
   const handleReviewComplete = async () => {
-    await afterMutation([QUERY_KEYS.MY_ORDER_LIST, page]); // 동일 invalidate
+    await afterMutation([QUERY_KEYS.MY_ORDER_LIST, page]);
     setReviewOpen(false);
     setSelectedOrder(null);
   };
 
-  /** 백엔드 onclick용 movePage 함수 정의 */
-  useEffect(() => {
-    window.movePage = function (newPage) {
-      const safePage = Math.max(Number(newPage), 0);
-      console.log("👉 movePage 호출됨:", safePage);
-      setPage(safePage);
-    };
-
-    // cleanup: 메모리 누수 방지
-    return () => {
-      delete window.movePage;
-    };
-  }, []);
+  /** 페이지 이동 */
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
   return (
     <Card title="주문 정보">
@@ -76,21 +69,17 @@ export default function OrderInfo() {
         />
       ) : (
         <>
-          {/* 주문 리스트 */}
           <OrderList
-            key="user-order-list"
+            key={`user-order-list-${page}`}
             data={orders}
             type="user"
-            refreshTrigger={page} // 페이지 이동 시만 닫기
+            refreshTrigger={page}
             onReviewClick={handleReviewClick}
             onStatusChange={handleStatusChange}
           />
 
-          {pageHtml && (
-            <ul
-              className="pagination-box"
-              dangerouslySetInnerHTML={{ __html: pageHtml }}
-            ></ul>
+          {pageInfo && (
+            <Pagination pageInfo={pageInfo} onPageChange={handlePageChange} />
           )}
         </>
       )}

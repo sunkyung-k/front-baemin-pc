@@ -1,97 +1,48 @@
-// @use "@/assets/scss/utils" as *;
-
-// .pagination {
-//   display: flex;
-//   justify-content: center;
-//   gap: fn-rem(8);
-//   margin-top: space("lg");
-
-//   button {
-//     background: none;
-//     border: none;
-//     cursor: pointer;
-//     color: fn-color("gray-700");
-//     font-size: font("sm");
-//     transition: color 0.2s ease;
-
-//     &:hover:not(:disabled) {
-//       color: fn-color("primary");
-//     }
-
-//     &.active {
-//       color: fn-color("primary");
-//       font-weight: 600;
-//       text-decoration: underline;
-//     }
-
-//     &:disabled {
-//       opacity: 0.4;
-//       cursor: not-allowed;
-//     }
-//   }
-// }
 @use "@/assets/scss/utils" as *;
-
-/* =========================================================
-📄 Pagination (백엔드 pageHTML 호환)
-------------------------------------------------------------
-> HTML 구조 (백엔드 PageVO.java 기준)
-<ul>
-  <li class="page-item active"><a class="page-link">1</a></li>
-  <li class="page-item"><a class="page-link">2</a></li>
-</ul>
-========================================================= */
 
 .pagination-box {
   display: flex;
   justify-content: center;
-  margin-top: space("lg");
-  align-items: baseline;
+  align-items: center;
   gap: space("md");
-
-  ul {
-    display: flex;
-    align-items: center;
-    gap: fn-rem(10);
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+  margin-top: space("lg");
+  list-style: none;
+  padding: 0;
 
   .page-item {
-    &.disabled {
-      opacity: 0.4;
-      pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    font-size: font("sm");
+    color: fn-color("gray-700");
+    cursor: pointer;
+    user-select: none;
+    padding: fn-rem(4) fn-rem(8);
+    border-radius: radius("sm");
+    transition: all 0.2s ease;
+    height: fn-rem(30);
+
+    &:hover {
+      color: fn-color("primary");
     }
 
-    &.active .page-link {
+    &.active {
       color: fn-color("primary");
       font-weight: 600;
       position: relative;
-      display: flex;
-      flex-direction: column;
-      height: fn-rem(20);
 
       &::after {
         content: "";
-
         width: 100%;
         height: fn-rem(2);
         background-color: fn-color("primary");
       }
     }
-  }
 
-  .page-link {
-    display: inline-block;
-    font-size: font("sm");
-    color: fn-color("gray-800");
-    text-decoration: none;
-    padding: 0 fn-rem(4);
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: fn-color("primary");
+    &.disabled {
+      opacity: 0.4;
+      pointer-events: none;
     }
   }
 }

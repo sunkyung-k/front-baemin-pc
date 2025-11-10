@@ -79,10 +79,10 @@
       font-weight: 600;
     }
     .badge-progress {
-      color: fn-color("primary");
+      color: fn-color("gray-500");
     }
     .badge-done {
-      color: fn-color("gray-500");
+      color: fn-color("primary");
     }
     .badge-cancel {
       color: fn-color("danger");
