@@ -27,18 +27,6 @@ const storeListAPI = {
       return { content: [], pageInfo: null };
     }
   },
-
-  /** 단일 가게 상세 조회 */
-  async getStoreDetail(storeId) {
-    const res = await api.get(`/api/v1/store/${storeId}`);
-    const data = res.data?.response?.vo ?? res.data?.response ?? null;
-
-    if (import.meta.env.MODE === "development") {
-      console.log(`[storeListAPI] getStoreDetail(${storeId}) 응답:`, data);
-    }
-
-    return data;
-  },
 };
 
 export default storeListAPI;
