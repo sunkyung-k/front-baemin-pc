@@ -1,0 +1,113 @@
+@use "@/assets/scss/utils" as *;
+
+.address-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: fn-rem(600);
+  margin: 0 auto;
+  padding: space("sm");
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("full");
+  background: fn-color("white");
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+
+  &:hover {
+    border-color: fn-color("gray-300");
+  }
+
+  &:focus-within {
+    border-color: fn-color("primary");
+    box-shadow: 0 0 0 3px rgba(fn-color("primary"), 0.1);
+  }
+
+  /* 📍 버튼 */
+  .address-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fn-rem(34);
+    height: fn-rem(34);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--location {
+      background: fn-color("primary-bg");
+      color: fn-color("primary");
+      border: 1px solid rgba(fn-color("primary"), 0.3);
+
+      &:hover {
+        background: lighten(fn-color("primary-bg"), 3%);
+      }
+    }
+
+    &--search {
+      background: fn-color("gray-100");
+      color: fn-color("gray-700");
+      border: 1px solid fn-color("gray-200");
+
+      &:hover {
+        background: fn-color("primary-bg");
+        color: fn-color("primary");
+        border-color: fn-color("primary");
+      }
+    }
+
+    &:hover:not(:disabled) {
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  /* 🏠 주소 텍스트 */
+  .address-display {
+    flex: 1;
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 0 space("sm");
+    font-size: font("md");
+    font-weight: 500;
+    color: fn-color("gray-900");
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: fn-color("primary");
+    }
+  }
+
+  /* compact 버전 */
+  &--compact {
+    max-width: fn-rem(400);
+    padding: space("xs");
+    background: fn-color("gray-50");
+    border-color: fn-color("gray-300");
+    box-shadow: none;
+
+    .address-display {
+      font-size: font("sm");
+      font-weight: 400;
+      color: fn-color("gray-700");
+    }
+
+    .address-btn {
+      width: fn-rem(28);
+      height: fn-rem(28);
+    }
+  }
+}

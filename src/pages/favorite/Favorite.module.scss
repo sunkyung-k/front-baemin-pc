@@ -1,0 +1,15 @@
+.favoriteWrap {
+  .storeList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space("xl");
+    margin-top: space("lg");
+  }
+
+  .pageTitle {
+    font-size: font("xxl");
+    font-weight: 800;
+    margin-bottom: space("xl");
+    text-align: center;
+  }
+}

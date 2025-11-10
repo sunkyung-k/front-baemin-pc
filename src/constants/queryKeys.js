@@ -46,4 +46,8 @@ export const QUERY_KEYS = {
   USER_INFO: (userId) => ["userInfo", userId], // 내 정보
   USER_DEPOSIT: (userId) => ["userDeposit", userId], // 보유금
   USER_LIST: ["userList"], // 관리자용 전체 조회 (선택)
+
+  /** 찜(Favorite) */
+  FAVORITE_LIST: ["favoriteList"], // 전체 찜 목록
+  FAVORITE_DETAIL: (storeId) => ["favoriteDetail", storeId], // 특정 가게 찜 여부
 };
