@@ -7,6 +7,10 @@
   border-radius: radius("md");
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
 
+  & + .card {
+    margin-top: space("xxl");
+  }
+
   &Tit {
     font-size: font("xxl");
     font-weight: 800;

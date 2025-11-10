@@ -1,25 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { formatPrice } from "@/utills/valueFormatter";
-import { FaAngleDown } from "react-icons/fa";
+import { FaAngleDown, FaUtensils } from "react-icons/fa";
+import EmptyState from "@/components/menu/EmptyState";
 
-/**
- * OrderList (공용 주문 리스트 컴포넌트)
- * --------------------------------------------------
- * - order-title: 가게명 고정
- * - 헤더는 항상 동일한 요약(총금액 / 주문일자 / 토글아이콘)
- * - 모든 주문(1개든 n개든)에서 토글 가능
- * - UI / 클래스 / SCSS 절대 변경 없음
- * - 페이지네이션은 부모에서 처리 (OrderInfo)
- */
 export default function OrderList({
   data = [],
   type = "user",
   onReviewClick,
   onStatusChange,
+  refreshTrigger, // 페이지 이동 등 외부 트리거로 초기화
 }) {
   const [openIds, setOpenIds] = useState([]);
 
-  /** ✅ 아코디언 토글 */
+  /** 외부 트리거(page 등) 발생 시 자동 닫기 */
+  useEffect(() => {
+    setOpenIds([]);
+  }, [refreshTrigger]);
+
+  /** 데이터 변경 시 기존 open 상태 유지 */
+  useEffect(() => {
+    setOpenIds((prev) =>
+      prev.filter((id) => data.some((o) => o.orderId === id))
+    );
+  }, [data]);
+
+  /** 아코디언 토글 */
   const toggleAccordion = (orderId) => {
     setOpenIds((prev) =>
       prev.includes(orderId)
@@ -28,7 +33,7 @@ export default function OrderList({
     );
   };
 
-  /** ✅ 상태 텍스트 변환 */
+  /** 상태 텍스트 변환 */
   const getStatusLabel = (status) => {
     const mapUser = {
       주문완료: "주문 확인중",
@@ -43,8 +48,15 @@ export default function OrderList({
     return type === "user" ? mapUser[status] : mapOwner[status];
   };
 
+  /** 데이터 없을 때 EmptyState 출력 */
   if (!data?.length) {
-    return <p className="txt-center txt-gray">주문 내역이 없습니다.</p>;
+    return (
+      <EmptyState
+        icon={<FaUtensils />}
+        title="주문 내역이 없습니다."
+        description="최근 주문하신 내역이 여기에 표시됩니다."
+      />
+    );
   }
 
   return (
@@ -59,7 +71,6 @@ export default function OrderList({
 
         return (
           <div key={orderId} className={`order-card ${isOpen ? "open" : ""}`}>
-            {/* ===== 헤더 영역 ===== */}
             <div
               className="order-card-header"
               onClick={() => toggleAccordion(orderId)}
@@ -67,11 +78,11 @@ export default function OrderList({
               <div className="order-info">
                 <h4 className="order-title">{storeName || "가게명 미표시"}</h4>
 
-                <p className="order-detail">
-                  <span>{formatPrice(totalPrice)}원</span> /{" "}
+                <div className="order-detail">
+                  <p>{formatPrice(totalPrice)}원</p> /{" "}
                   <span>{formattedDate}</span>
                   <FaAngleDown className="toggle-arrow" />
-                </p>
+                </div>
               </div>
 
               <div className="order-actions">
@@ -87,13 +98,16 @@ export default function OrderList({
                   {getStatusLabel(status)}
                 </span>
 
-                {type === "user" && (
+                {type === "user" && status !== "주문취소" && (
                   <button
                     className={`btn btn-round btn-sm ${
                       isReviewable ? "btn-primary" : "btn-disabled"
                     }`}
                     disabled={!isReviewable}
-                    onClick={() => isReviewable && onReviewClick(order)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // 부모 토글 차단
+                      isReviewable && onReviewClick(order);
+                    }}
                   >
                     리뷰 쓰기
                   </button>
@@ -102,14 +116,20 @@ export default function OrderList({
                 {type === "owner" && status === "주문완료" && (
                   <>
                     <button
-                      className="btn btn-outline"
-                      onClick={() => onStatusChange(orderId, "주문취소", order)}
+                      className="btn btn-outline btn-round btn-sm btn-danger"
+                      onClick={(e) => {
+                        e.stopPropagation(); // 부모 토글 이벤트 차단
+                        onStatusChange(orderId, "주문취소", order);
+                      }}
                     >
                       주문 취소
                     </button>
                     <button
-                      className="btn btn-primary"
-                      onClick={() => onStatusChange(orderId, "배달완료", order)}
+                      className="btn btn-primary btn-round btn-sm"
+                      onClick={(e) => {
+                        e.stopPropagation(); // 부모 토글 이벤트 차단
+                        onStatusChange(orderId, "배달완료", order);
+                      }}
                     >
                       배달 완료
                     </button>
@@ -118,7 +138,6 @@ export default function OrderList({
               </div>
             </div>
 
-            {/* ===== 상세(항목 리스트) ===== */}
             <div
               className="order-items"
               style={{ display: isOpen ? "block" : "none" }}

@@ -16,45 +16,6 @@
   margin-bottom: space("lg");
   line-height: 1.3;
 }
-
-/* 리스트와 페이지네이션 간 간격 */
-.pagination-box {
-  margin-top: space("lg");
-  text-align: center;
-
-  .pagination {
-    display: inline-flex;
-    align-items: center;
-    gap: space("xs");
-
-    .page-btn {
-      border: 1px solid fn-color("gray-300");
-      border-radius: radius("sm");
-      background: fn-color("white");
-      color: fn-color("gray-700");
-      padding: space("xs") space("sm");
-      font-size: font("sm");
-      cursor: pointer;
-      transition: 0.2s ease;
-
-      &:hover:not(:disabled) {
-        background: fn-color("primary-bg");
-      }
-
-      &.active {
-        background: fn-color("primary");
-        color: fn-color("white");
-        border-color: fn-color("primary");
-      }
-
-      &:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-      }
-    }
-  }
-}
-
 /* 빈 상태 (주문 없을 때) */
 .emptyState {
   text-align: center;
@@ -72,14 +33,5 @@
 
   .mypageSection {
     gap: space("lg");
-  }
-
-  .pagination-box {
-    margin-top: space("md");
-
-    .page-btn {
-      font-size: font("xs");
-      padding: space("xs") space("sm");
-    }
   }
 }

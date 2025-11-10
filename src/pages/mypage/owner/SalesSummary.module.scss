@@ -1,0 +1,27 @@
+.salesBox {
+  display: flex;
+  justify-content: space-between;
+  gap: space("lg");
+  padding: space("md") 0;
+}
+
+.salesItem {
+  flex: 1;
+  background-color: fn-color("primary-bg");
+  border-radius: radius("lg");
+  text-align: center;
+  padding: space("lg") 0;
+
+  .label {
+    font-size: font("lg");
+    font-weight: 600;
+    color: fn-color("gray-600");
+    margin-bottom: space("xs");
+  }
+
+  .value {
+    font-size: font("xxl");
+    font-weight: 700;
+    color: fn-color("primary");
+  }
+}

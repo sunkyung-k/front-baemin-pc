@@ -50,4 +50,9 @@ export const QUERY_KEYS = {
   /** 찜(Favorite) */
   FAVORITE_LIST: ["favoriteList"], // 전체 찜 목록
   FAVORITE_DETAIL: (storeId) => ["favoriteDetail", storeId], // 특정 가게 찜 여부
+
+  /** 주문(Order) */
+  MY_ORDER_LIST: ["myOrderList"], // 유저 주문 내역
+  MY_STORE_ORDER_LIST: ["myStoreOrderList"], // 점주 주문 내역
+  ORDER_DETAIL: (orderId) => ["orderDetail", orderId],
 };

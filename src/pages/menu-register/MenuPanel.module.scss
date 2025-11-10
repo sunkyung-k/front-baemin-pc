@@ -8,6 +8,10 @@
   @media (max-width: bp("lg")) {
     padding: fn-rem(20);
   }
+
+  :global(.empty-state) {
+    margin-top: fn-rem(20);
+  }
 }
 
 .detailHeader {
@@ -145,10 +149,6 @@
 .menuButtons {
   display: flex;
   gap: fn-rem(8);
-}
-
-:global(.empty-state) {
-  margin-top: fn-rem(20);
 }
 
 .active {
