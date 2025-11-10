@@ -9,6 +9,10 @@
     border-right: 0;
   }
 
+  :global(.empty-state) {
+    margin-top: fn-rem(20);
+  }
+
   .categoryHeader {
     margin-bottom: fn-rem(20);
     display: flex;
