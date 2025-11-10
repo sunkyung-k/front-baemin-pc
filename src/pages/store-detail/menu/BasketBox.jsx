@@ -86,7 +86,7 @@ export default function BasketBox() {
             <div className={styles.totalBox}>
               <span className={styles.totalLabel}>총 합계</span>
               <strong className={styles.totalPrice}>
-                ₩{formatPrice(totalPrice)}
+                {formatPrice(totalPrice)}원
               </strong>
             </div>
           </div>

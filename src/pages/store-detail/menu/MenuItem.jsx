@@ -166,7 +166,7 @@ export default function MenuItem({ menuId }) {
             <h4 className={styles.name}>{menu.menuName}</h4>
             <p className={styles.desc}>{menu.description}</p>
           </div>
-          <p className={styles.price}>₩{menu.price?.toLocaleString()}</p>
+          <p className={styles.price}>{menu.price?.toLocaleString()}원</p>
         </div>
       </div>
 
@@ -202,7 +202,7 @@ export default function MenuItem({ menuId }) {
                   <>
                     <span>{opt.menuOptName}</span>
                     {opt.price > 0 && (
-                      <span>+₩{opt.price.toLocaleString()}</span>
+                      <span>+{opt.price.toLocaleString()} 원</span>
                     )}
                   </>
                 ),

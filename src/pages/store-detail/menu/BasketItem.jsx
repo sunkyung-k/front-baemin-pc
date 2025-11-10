@@ -14,7 +14,7 @@ export default function BasketItem({ item, onIncrease, onDecrease, onRemove }) {
             const name = o.menuOption.menuOptName;
             const totalOptPrice = o.totalPrice || 0;
             return totalOptPrice > 0
-              ? `${name} (+₩${totalOptPrice.toLocaleString()})`
+              ? `${name} (+${totalOptPrice.toLocaleString()}원)`
               : name;
           })
           .join(", ")
@@ -62,7 +62,7 @@ export default function BasketItem({ item, onIncrease, onDecrease, onRemove }) {
           />
         </div>
         <div className={styles.price}>
-          ₩{(totalPrice || 0).toLocaleString()}
+          {(totalPrice || 0).toLocaleString()}원
         </div>
       </div>
     </li>
