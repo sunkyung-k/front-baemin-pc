@@ -61,7 +61,7 @@ export default function MenuItem({ menuId }) {
   };
 
   /** 담기 버튼 */
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.stopPropagation();
 
     const requiredGroups = optionGroups.filter(
@@ -84,6 +84,7 @@ export default function MenuItem({ menuId }) {
       return;
     }
 
+    // 옵션 구성
     const optionList = Object.values(selectedValues)
       .flat()
       .map((optId) => ({
@@ -91,6 +92,46 @@ export default function MenuItem({ menuId }) {
         quantity: 1,
       }));
 
+    // ✅ 최신 장바구니 불러오기 (react-query 캐시 기준)
+    let currentBasket = null;
+    try {
+      currentBasket = await addMenu.queryClient.fetchQuery({
+        queryKey: QUERY_KEYS.BASKET,
+        queryFn: () => menuAPI.getMyBasket(),
+      });
+    } catch (e) {
+      currentBasket = null;
+    }
+
+    const basketItems = currentBasket?.menuList || [];
+
+    // ✅ 동일 메뉴 + 동일 옵션 조합 찾기
+    const existingItem = basketItems.find((item) => {
+      if (item.menuId !== menu.menuId) return false;
+      const existingOpts = item.optionList.map((opt) => opt.menuOptId).sort();
+      const newOpts = optionList.map((opt) => opt.menuOptId).sort();
+      return JSON.stringify(existingOpts) === JSON.stringify(newOpts);
+    });
+
+    if (existingItem) {
+      // ✅ 수량 +1 업데이트 payload
+      const updatedPayload = {
+        userId,
+        menu: {
+          ...existingItem,
+          quantity: existingItem.quantity + 1,
+          storeId: currentStoreId,
+        },
+      };
+
+      addMenu.mutate(updatedPayload, {
+        onSuccess: () => setIsOpen(false),
+        onError: (err) => handleError(err, "MenuItem.updateQuantity"),
+      });
+      return;
+    }
+
+    // ✅ 새 항목 추가
     const payload = {
       userId,
       menu: {
@@ -194,9 +235,21 @@ export default function MenuItem({ menuId }) {
             );
           })}
 
+          {/* 담기 버튼 (영업시간 체크 / :disabled 적용) */}
           {isUser && (
-            <button className="btn btn-default btn-primary" onClick={handleAdd}>
-              담기
+            <button
+              className="btn btn-default btn-primary"
+              onClick={handleAdd}
+              disabled={!storeDetail?.open || !!storeDetail?.hourComment}
+              title={
+                storeDetail?.hourComment
+                  ? storeDetail.hourComment
+                  : "지금 주문 가능합니다."
+              }
+            >
+              {storeDetail?.open && !storeDetail?.hourComment
+                ? "담기"
+                : storeDetail?.hourComment || "주문 불가"}
             </button>
           )}
         </div>
