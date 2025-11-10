@@ -6,6 +6,7 @@ import * as yup from "yup";
 import { useStore } from "@/hooks/useStore";
 import { useCategory } from "@/hooks/useCategory";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
+import { useAddressSearch } from "@/hooks/useAddressSearch";
 
 import Card from "@/components/mypage/Card";
 import InputField from "@/components/form/InputField";
@@ -14,6 +15,7 @@ import Checkbox from "@/components/mypage/Checkbox";
 import HoursField from "@/components/mypage/HoursField";
 import ImageUpload from "@/components/form/ImageUpload";
 import stylesLayout from "../MypageLayout.module.scss";
+import stylesCrud from "./StoreCRUD.module.scss";
 
 // 공통 포맷 유틸 (전화번호·금액 포맷 / 숫자 정제)
 import {
@@ -270,6 +272,13 @@ export default function StoreCRUD() {
     }
   };
 
+  /* ------------------------------------------------------------
+    주소 검색
+    ------------------------------------------------------------ */
+  const { openAddressSearch } = useAddressSearch((addr) => {
+    setValue("addr", addr, { shouldValidate: true }); // 주소 필드값 업데이트
+  });
+
   return (
     <Card title={isEdit ? "가게 관리" : "가게 등록"}>
       <form onSubmit={handleSubmit(onSubmit)} className={stylesLayout.form}>
@@ -317,13 +326,24 @@ export default function StoreCRUD() {
           errorMessage={errors.phone?.message}
         />
 
-        <InputField
-          label="주소"
-          name="addr"
-          register={register}
-          placeholder="예: 서울특별시 강남구 테헤란로 123"
-          errorMessage={errors.addr?.message}
-        />
+        <div className={stylesCrud.addrRow}>
+          <InputField
+            label="주소"
+            name="addr"
+            register={register}
+            placeholder="예: 서울특별시 강남구 테헤란로 123"
+            errorMessage={errors.addr?.message}
+            readOnly
+          />
+
+          <button
+            type="button"
+            onClick={openAddressSearch}
+            className="btn btn-default btn-primary"
+          >
+            주소 찾기
+          </button>
+        </div>
 
         <InputField
           label="상세주소 (선택)"
