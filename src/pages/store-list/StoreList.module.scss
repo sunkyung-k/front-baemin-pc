@@ -3,10 +3,10 @@
   margin: 0 auto;
   width: 100%;
   padding: 0 space("lg");
-}
 
-:global(.empty-state) {
-  margin-top: fn-rem(50);
+  :global(.empty-state) {
+    margin-top: fn-rem(50);
+  }
 }
 
 .storeGrid {

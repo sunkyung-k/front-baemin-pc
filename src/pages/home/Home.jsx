@@ -51,9 +51,12 @@ export default function Home() {
         return;
       }
 
-      sessionStorage.setItem("lastCategoryId", caId);
-      const params = new URLSearchParams({ addr: address, caId });
-      navigate(`/store/list?${params.toString()}`);
+      const params = new URLSearchParams({
+        addr: encodeURIComponent(address),
+        caId,
+      });
+
+      navigate(`/store?${params.toString()}`, { replace: false });
     },
     [address, navigate]
   );
@@ -63,7 +66,9 @@ export default function Home() {
       {/* Hero Section */}
       <section className={styles.hero}>
         <p className={styles.tit}>“어디로 배달해 드릴까요?”</p>
-        <p>현재 위치를 불러오면 내 주변 맛집을 볼 수 있어요!</p>
+        <div className={styles.txtBox}>
+          <p>현재 위치를 불러오면 내 주변 4km 이내의 가게를 볼 수 있어요!</p>
+        </div>
 
         <AddressInput
           value={address}
