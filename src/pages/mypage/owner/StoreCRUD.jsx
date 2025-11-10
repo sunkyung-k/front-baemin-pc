@@ -276,7 +276,7 @@ export default function StoreCRUD() {
     주소 검색
     ------------------------------------------------------------ */
   const { openAddressSearch } = useAddressSearch((addr) => {
-    setValue("addr", addr, { shouldValidate: true }); // 주소 필드값 업데이트
+    setValue("addr", addr, { shouldValidate: true, shouldDirty: true });
   });
 
   return (

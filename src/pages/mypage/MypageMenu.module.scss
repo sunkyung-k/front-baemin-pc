@@ -1,6 +1,6 @@
 .sidebar {
   position: sticky;
-  top: $header-height + fn-rem(50);
+  top: $sticky-top;
   display: flex;
   flex-direction: column;
   gap: 16px;
