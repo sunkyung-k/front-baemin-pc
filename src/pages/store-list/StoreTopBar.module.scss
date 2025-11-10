@@ -1,101 +1,146 @@
+/* 상단 전체 영역 */
 .topBar {
   position: sticky;
   top: $header-height;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: space("md");
   padding: space("md") 0;
-  border-bottom: 1px solid fn-color("gray-200");
   background: fn-color("white");
+  border-bottom: 1px solid fn-color("gray-200");
   z-index: 10;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  white-space: nowrap;
-  scroll-behavior: smooth;
+  transition: box-shadow 0.25s ease;
+
+  &.scrolled {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
 
   @media (max-width: bp("md")) {
     top: $header-height + $gnb-height-mobile;
   }
-
-  &.scrolled {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
 }
 
-.tabWrap {
+/* 검색 영역 */
+.innerBox {
+  width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: space("md");
-  padding-left: space("md");
 }
 
-.searchToggleBtn {
-  font-size: fn-rem(20);
-  color: fn-color("gray-700");
-  width: fn-rem(40);
-  height: fn-rem(40);
-  border-radius: radius(full);
+.searchForm {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: fn-color("gray-100");
+  width: 100%;
+  max-width: fn-rem(600);
+  padding: 0 space("sm");
+  background: fn-color("gray-50");
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("full");
+  height: fn-rem(44);
   transition: all 0.2s ease;
 
-  &:hover {
-    transform: translateY(-2px);
-    background: fn-color("primary");
-    color: fn-color("white");
-    box-shadow: 0 4px 10px rgba($color: fn-color("primary"), $alpha: 0.3);
+  &:focus-within {
+    border-color: fn-color("primary");
+    background: fn-color("white");
+    box-shadow: 0 0 0 3px rgba(fn-color("primary"), 0.08);
   }
 
-  &:active {
-    transform: translateY(0) scale(0.96);
-    box-shadow: inset 0 2px 3px rgba($color: fn-color("primary"), $alpha: 0.4);
+  .searchIcon {
+    flex-shrink: 0;
+    color: fn-color("gray-500");
+    font-size: fn-rem(16);
+    margin-left: space("sm");
+  }
+
+  :global(.input-field) {
+    flex: 1;
+    height: 100%;
+  }
+
+  :global(.input-field .input-txt) {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: font("md");
+    color: fn-color("gray-900");
+
+    &::placeholder {
+      color: fn-color("gray-400");
+    }
+
+    &::-webkit-search-decoration,
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-results-button,
+    &::-webkit-search-results-decoration {
+      display: none !important;
+      -webkit-appearance: none;
+    }
+
+    &::-ms-clear {
+      display: none !important;
+    }
+
+    &::-ms-reveal {
+      display: none !important;
+    }
+  }
+
+  .btnClear {
+    background: none;
+    border: none;
+    color: fn-color("gray-400");
+    font-size: fn-rem(20);
+    cursor: pointer;
+    padding: space("xs");
+    margin-inline-end: space("sm");
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: fn-color("gray-600");
+    }
   }
 }
 
+/* 카테고리 탭 */
 .categoryTabs {
   display: flex;
-  gap: space("sm");
+  gap: space("xs");
+  padding: 0 space("md");
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
   scroll-behavior: smooth;
-  padding-right: space("md");
 
   &::-webkit-scrollbar {
     display: none;
   }
-
-  @media (max-width: bp("md")) {
-    width: calc(100% - fn-rem(40) - space("sm"));
-    flex-wrap: nowrap;
-  }
 }
 
 .tab {
+  flex-shrink: 0;
   border-radius: radius("lg");
   padding: space("xs") space("md");
   font-size: font("md");
   color: fn-color("gray-700");
   background: fn-color("gray-50");
   border: 1px solid transparent;
-  white-space: nowrap;
   cursor: pointer;
   transition: all 0.25s ease;
 
   &:hover:not(.active) {
     color: fn-color("primary");
-    background-color: fn-color("primary-bg");
+    background: fn-color("primary-bg");
     border-color: fn-color("primary");
   }
 
   &.active {
     background: fn-color("primary");
     border-color: fn-color("primary");
-    color: #fff;
+    color: fn-color("white");
     font-weight: 700;
-    box-shadow: 0 2px 6px rgba($color: fn-color("primary"), $alpha: 0.3);
+    box-shadow: 0 2px 6px rgba(fn-color("primary"), 0.3);
   }
 }

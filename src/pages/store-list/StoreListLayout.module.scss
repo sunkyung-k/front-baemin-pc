@@ -1,10 +1,5 @@
 .addressSection {
-  padding: space("xl") space("md");
+  padding: space("md") space("md");
   border-bottom: 1px solid fn-color("gray-200");
   background: fn-color("gray-bg");
-
-  @media (max-width: bp("md")) {
-    padding-top: space("md");
-    padding-bottom: space("md");
-  }
 }

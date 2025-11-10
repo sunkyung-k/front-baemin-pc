@@ -1,0 +1,48 @@
+.tabs {
+  display: flex;
+  justify-content: center;
+  background-color: fn-color("white");
+  border-bottom: 1px solid fn-color("gray-200");
+  position: sticky; // 스크롤 따라오게 하고 싶다면 이거 유지
+  top: fn-rem(60); // 헤더 높이에 맞춰 조정
+  z-index: 10;
+}
+
+.tabBtn {
+  flex: 1;
+  text-align: center;
+  padding: space("md") 0;
+  font-size: font("lg");
+  font-weight: 700;
+  color: fn-color("dark");
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  transition: all 0.25s ease;
+
+  &:hover {
+    color: fn-color("primary");
+    background-color: fn-color("primary-bg");
+  }
+
+  &.active {
+    color: fn-color("primary");
+    border-color: fn-color("primary");
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+@media (max-width: bp("md")) {
+  .tabBtn {
+    font-size: font("md");
+    padding: space("sm") 0;
+  }
+
+  .tabs {
+    top: fn-rem(46);
+  }
+}

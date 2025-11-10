@@ -1,0 +1,50 @@
+.heroWrap {
+  .storeHero {
+    position: relative;
+    width: 100%;
+    height: fn-rem(260);
+    background: fn-color("gray-200") center / cover no-repeat;
+  }
+
+  .storeInfo {
+    display: flex;
+    flex-direction: column;
+    gap: space("sm");
+    padding: space("lg");
+    border-bottom: 1px solid fn-color("gray-200");
+    color: fn-color("gray-600");
+
+    .storeName {
+      font-size: font("xxl");
+      font-weight: 700;
+      color: fn-color("gray-900");
+    }
+
+    /* 별점 + 최소주문금액 */
+    .storeMeta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: space("xs");
+      font-size: font("sm");
+
+      svg {
+        color: #ffb800;
+        font-size: font("md");
+      }
+    }
+
+    /* 영업 상태 */
+    .storeHour {
+      display: flex;
+      align-items: center;
+      gap: space("xs");
+      font-size: font("sm");
+
+      svg {
+        font-size: font("md");
+        color: fn-color("primary");
+      }
+    }
+  }
+}

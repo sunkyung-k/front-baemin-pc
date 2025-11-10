@@ -1,4 +1,3 @@
-// src/hooks/useStoreList.js
 import { useQuery } from "@tanstack/react-query";
 import { useAfterMutation, AFTER_TYPES } from "@/hooks/common/useAfterMutation";
 import { QUERY_KEYS } from "@/constants/queryKeys";
@@ -7,60 +6,59 @@ import { handleApiError } from "@/utills/handleApiError";
 import { useAddressStore } from "@/store/useAddressStore";
 
 /**
- * 🏪 useStoreList 훅 (React Query 기반 가게 목록 조회)
- * ---------------------------------------------------------
- * ✔ 변경 사항:
- * - addr(주소) 반드시 필요
- * - 주소 없으면 호출 안 함
+ * useStoreList 훅
+ * ------------------------------------------------------
+ * - 가게 목록 조회 전용
+ * - 주소 기반 필터링 + 카테고리, 검색어 옵션 지원
+ * - useAfterMutation으로 목록 캐시 자동 갱신
+ * - 로딩/에러는 전역(GlobalLoading + handleApiError) 처리
  */
 export function useStoreList(filters = {}) {
   const { address } = useAddressStore();
 
-  // 캐시 키 (주소 포함해서 고유화)
-  const queryKey = QUERY_KEYS.STORE_LIST({ ...filters, addr: address });
+  /** 필터 정규화 */
+  const normalizedCaId =
+    !filters.caId || filters.caId === "all" ? null : filters.caId;
 
-  // 공통 후처리 훅
+  /** 서버 요청 파라미터 */
+  const params = {
+    addr: address,
+    caId: normalizedCaId,
+    searchText: filters.searchText?.trim() || null,
+  };
+
+  /** 쿼리 키 정의 */
+  const queryKey = QUERY_KEYS.STORE_LIST(params);
+
+  /** 목록 갱신 후처리 훅 */
   const afterMutationList = useAfterMutation(AFTER_TYPES.LIST, null, {
     scrollTop: false,
   });
 
-  // API 요청 함수
+  /** API 호출 */
   const fetchStoreList = async () => {
-    if (!address) {
-      console.warn("⚠️ 주소가 없어 가게 목록 요청이 취소됨");
-      alert("현재 위치를 먼저 설정해주세요!");
+    if (!address) return []; // 주소 없으면 스킵
+    try {
+      const data = await storeListAPI.getStores(params);
+      if (import.meta.env.DEV)
+        console.log("[useStoreList] fetched stores:", data);
+      return data;
+    } catch (err) {
+      handleApiError(err, "useStoreList.getStores");
       return [];
     }
-    return await storeListAPI.getStores(filters);
   };
 
-  // React Query
-  const {
-    data: stores = [],
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
+  /** React Query 설정 */
+  const { data: stores, refetch } = useQuery({
     queryKey,
     queryFn: fetchStoreList,
-    enabled: !!address, // 주소가 있을 때만 실행
+    enabled: !!address,
     staleTime: 1000 * 60,
     retry: 1,
-    onError: (err) => handleApiError(err, "useStoreList.getStores"),
   });
 
-  // 개발 환경 로그
-  if (import.meta.env.MODE === "development" && stores?.length) {
-    console.log("[useStoreList] fetched stores:", stores);
-  }
-
-  return {
-    stores,
-    isLoading,
-    isError,
-    refetch,
-    afterMutationList,
-  };
+  return { stores, refetch, afterMutationList };
 }
 
 export default useStoreList;

@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import SearchInput from "@/components/form/SearchInput";
+import AddressInput from "@/components/store/AddressInput";
 import { useCurrentAddress } from "@/hooks/useCurrentAddress";
 import { useCategory } from "@/hooks/useCategory";
 import { useAddressStore } from "@/store/useAddressStore";
@@ -14,7 +14,7 @@ export default function Home() {
   const { fetchAddress, loading } = useCurrentAddress();
   const { openAddressSearch } = useAddressSearch(setAddress);
 
-  // 최초 진입 시 주소 없으면 자동으로 현재 위치 불러오기
+  /** 주소 초기 자동 설정 */
   useEffect(() => {
     if (!address) {
       (async () => {
@@ -24,63 +24,78 @@ export default function Home() {
     }
   }, [address, fetchAddress, setAddress]);
 
+  /** 카테고리 이미지 (정적 경로) */
   const categoryImages = useMemo(
     () =>
       Array.from(
-        { length: 9 },
+        { length: 10 },
         (_, i) =>
           `${import.meta.env.BASE_URL}images/category/category_${String(
-            i + 1
+            i
           ).padStart(2, "0")}.png`
       ),
     []
   );
 
-  const handleCategoryClick = (category) => {
-    if (!address) {
-      alert("현재 위치를 먼저 설정해주세요!");
-      return;
-    }
-    const encodedAddr = encodeURIComponent(address);
-    navigate(`/store/list?addr=${encodedAddr}&caId=${category.id}`);
-  };
+  /** 전체보기 포함한 카테고리 */
+  const categoryList = useMemo(
+    () => [{ id: "all", name: "전체보기" }, ...(categories || [])],
+    [categories]
+  );
+
+  /** 카테고리 클릭 시 이동 */
+  const handleCategoryClick = useCallback(
+    (caId) => {
+      if (!address) {
+        alert("현재 위치를 먼저 설정해주세요!");
+        return;
+      }
+
+      sessionStorage.setItem("lastCategoryId", caId);
+      const params = new URLSearchParams({ addr: address, caId });
+      navigate(`/store/list?${params.toString()}`);
+    },
+    [address, navigate]
+  );
 
   return (
     <div className={styles.home}>
+      {/* Hero Section */}
       <section className={styles.hero}>
         <p className={styles.tit}>“어디로 배달해 드릴까요?”</p>
         <p>현재 위치를 불러오면 내 주변 맛집을 볼 수 있어요!</p>
 
-        {/* Kakao + Daum 주소 입력 통합 */}
-        <SearchInput
-          mode="address"
+        <AddressInput
           value={address}
           setValue={setAddress}
           onGetLocation={fetchAddress}
           onSearchAddress={openAddressSearch}
+          variant="default"
           loading={loading}
         />
       </section>
 
+      {/* Category Section */}
       <main className={styles.main}>
         <h2 className={styles.homeTit}>카테고리</h2>
         <div className={styles.categoryGrid}>
-          {categories.map((category, idx) => (
-            <div
-              key={category.id || idx}
-              className={styles.categoryCard}
-              onClick={() => handleCategoryClick(category)}
-            >
-              <div className={styles.categoryThumb}>
-                <img
-                  src={categoryImages[idx % categoryImages.length]}
-                  alt={category.name}
-                  loading="lazy"
-                />
-              </div>
-              <p>{category.name}</p>
-            </div>
-          ))}
+          {categoryList.map((cat, idx) => {
+            const imgSrc = categoryImages[idx % categoryImages.length];
+            const caId = String(cat.id || "all");
+
+            return (
+              <button
+                key={cat.id || idx}
+                onClick={() => handleCategoryClick(caId)}
+                className={styles.categoryCard}
+              >
+                <div className={styles.categoryThumb}>
+                  <img src={imgSrc} alt={`${cat.name} 이미지`} loading="lazy" />
+                </div>
+                <p className={styles.categoryName}>{cat.name}</p>
+              </button>
+            );
+          })}
         </div>
       </main>
     </div>

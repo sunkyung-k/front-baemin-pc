@@ -31,6 +31,7 @@ export default function InputField({
   onFocus,
   autoComplete = "off",
   disabled = false,
+  readOnly = false,
 }) {
   // RHF register 지원
   const registered = typeof register === "function" ? register(name) : {};
@@ -86,6 +87,7 @@ export default function InputField({
         placeholder={placeholder}
         autoComplete={autoComplete}
         disabled={disabled}
+        readOnly={readOnly}
         className={`input-txt ${errorMessage ? "error" : ""}`}
         {...registered}
         value={value}

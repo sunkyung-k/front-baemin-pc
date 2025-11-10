@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAfterMutation, AFTER_TYPES } from "@/hooks/common/useAfterMutation";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import storeAPI from "@/service/storeAPI";
@@ -20,8 +20,9 @@ import { authStore } from "@/store/authStore";
  */
 export function useStore() {
   // 식별자 및 쿼리 키 정의
-  const userId = authStore((s) => s.userId); // 다른 훅에서는 product/order ID 등을 사용할 수 있습니다.
-  const queryKey = [QUERY_KEYS.MY_STORE, userId]; // 상세 데이터 쿼리 키
+  const queryClient = useQueryClient();
+  const userId = authStore((s) => s.userId);
+  const queryKey = [QUERY_KEYS.MY_STORE, userId];
 
   /** 공통 후처리 훅: 상세 데이터 갱신 (등록·수정 후 캐시 refetch 또는 업데이트) */
   const afterMutationDetail = useAfterMutation(AFTER_TYPES.DETAIL, null, {
@@ -31,21 +32,13 @@ export function useStore() {
   /** 삭제 후처리 훅: 상세 캐시 제거 및 목록/Zustand 동기화 */
   const afterMutationDelete = useAfterMutation(
     AFTER_TYPES.DELETE,
-    () => {
-      // Zustand 상태도 같이 정리 (선택 사항: 필요한 경우에만 추가)
-      authStore.getState().clearStoreId();
-    },
-    { scrollTop: true } // 스크롤top 있을 시에만 추가
+    () => authStore.getState().clearStoreId(),
+    { scrollTop: true }
   );
 
   // 상세 조회 (Read)
   /** 내 가게 조회 (myStore 상세 데이터) */
-  const {
-    data: myStore,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
+  const { data: myStore, refetch } = useQuery({
     queryKey,
     queryFn: storeAPI.getMyStore,
     enabled: !!userId,
@@ -57,7 +50,6 @@ export function useStore() {
   /** 가게 등록 (Create) */
   const create = useMutation({
     mutationFn: storeAPI.create,
-    // 등록 후 상세 쿼리를 갱신하여 UI에 최신 데이터를 반영
     onSettled: () => afterMutationDetail(queryKey),
     onError: (err) => handleApiError(err, "useStore.create"),
   });
@@ -65,17 +57,20 @@ export function useStore() {
   /** 가게 수정 (Update) */
   const update = useMutation({
     mutationFn: storeAPI.update,
-    // 수정 후 상세 쿼리를 갱신하여 UI에 최신 데이터를 반영
-    onSettled: () => afterMutationDetail(queryKey),
+    onSettled: (data, error, variables) => {
+      afterMutationDetail(queryKey);
+      const storeId = variables?.get?.("storeId");
+      if (storeId) {
+        queryClient.invalidateQueries([QUERY_KEYS.STORE_DETAIL, storeId]);
+      }
+    },
     onError: (err) => handleApiError(err, "useStore.update"),
   });
 
   /** 가게 삭제 (Delete) */
   const remove = useMutation({
     mutationFn: storeAPI.remove,
-    onSettled: async (data, error) => {
-      // 삭제 후 상세 쿼리 캐시를 완전히 제거하고(useAfterMutation.DELETE),
-      // 필요한 경우 목록 쿼리 키(listQueryKey)를 인자로 추가하여 목록 갱신을 지시할 수 있습니다.
+    onSettled: async () => {
       await afterMutationDelete(queryKey);
       console.log("[useStore] 가게 삭제 후처리 완료 → 캐시 및 상태 초기화");
     },
@@ -84,8 +79,6 @@ export function useStore() {
 
   return {
     myStore,
-    isLoading,
-    isError,
     refetch,
     create,
     update,

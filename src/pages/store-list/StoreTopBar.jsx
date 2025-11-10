@@ -1,84 +1,82 @@
-// src/pages/store-list/StoreTopBar.jsx
-import React, { useState } from "react";
-import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { useCategory } from "@/hooks/useCategory";
-import { useAddressStore } from "@/store/useAddressStore";
-import { useCurrentAddress } from "@/hooks/useCurrentAddress";
-import { useAddressSearch } from "@/hooks/useAddressSearch";
-import SearchInput from "../../components/form/SearchInput";
+import InputField from "@/components/form/InputField";
 import styles from "./StoreTopBar.module.scss";
 
-export default function StoreTopBar({ activeCaId, searchText, setSearchText }) {
-  const [showSearch, setShowSearch] = useState(false);
+export default function StoreTopBar({
+  activeCaId,
+  searchText,
+  onCategoryChange,
+  onSearchChange,
+}) {
   const { categories } = useCategory();
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [localValue, setLocalValue] = useState(searchText);
+  const inputRef = useRef(null);
 
-  const { address, setAddress } = useAddressStore();
-  const { fetchAddress, loading } = useCurrentAddress();
-  const { openAddressSearch } = useAddressSearch(setAddress);
+  /** 외부 searchText 변경 시 내부 input 반영 */
+  useEffect(() => setLocalValue(searchText), [searchText]);
 
-  /** 카테고리 탭 클릭 핸들러 */
-  const handleCategoryClick = (id) => {
-    const newParams = new URLSearchParams(searchParams);
-
-    if (id) newParams.set("caId", id);
-    else newParams.delete("caId");
-
-    const { address } = useAddressStore.getState();
-    if (address) newParams.set("addr", address);
-
-    if (searchText) newParams.set("searchText", searchText);
-    else newParams.delete("searchText");
-
-    navigate({
-      pathname: location.pathname,
-      search: `?${newParams.toString()}`,
-    });
+  /** 검색 실행 */
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSearchChange(localValue.trim());
   };
+
+  /** 검색어 초기화 */
+  const handleClear = () => {
+    setLocalValue("");
+    onSearchChange("");
+    inputRef.current?.focus();
+  };
+
+  /** 카테고리 데이터 */
+  const allCategories = [{ id: "all", name: "전체보기" }, ...categories];
+  const isActive = (catId) =>
+    String(activeCaId || "all") === String(catId || "all");
 
   return (
     <section className={styles.topBar}>
-      <div className={styles.tabWrap}>
-        {/* 🔍 검색창 토글 버튼 */}
-        <button
-          className={styles.searchToggleBtn}
-          onClick={() => setShowSearch((prev) => !prev)}
-        >
-          <FaMagnifyingGlass />
-        </button>
+      <div className={styles.innerBox}>
+        {/* 검색창 */}
+        <form className={styles.searchForm} onSubmit={handleSubmit}>
+          <FaMagnifyingGlass className={styles.searchIcon} />
+          <InputField
+            ref={inputRef}
+            name="storeSearch"
+            type="search"
+            placeholder="메뉴명 또는 가게명을 입력하세요"
+            value={localValue}
+            onChange={(e) => setLocalValue(e.target.value)}
+            className={styles.searchInput}
+          />
+          {localValue && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className={styles.btnClear}
+              title="검색어 지우기"
+            >
+              ×
+            </button>
+          )}
+        </form>
 
-        {/* 🏷 카테고리 탭 */}
+        {/* 카테고리 탭 */}
         <div className={styles.categoryTabs}>
-          {[{ id: "", name: "전체보기" }, ...categories].map((cat) => (
+          {allCategories.map((cat) => (
             <button
               key={cat.id}
+              onClick={() => onCategoryChange(cat.id)}
               className={`${styles.tab} ${
-                String(activeCaId) === String(cat.id) ? styles.active : ""
+                isActive(cat.id) ? styles.active : ""
               }`}
-              onClick={() => handleCategoryClick(cat.id)}
             >
               {cat.name}
             </button>
           ))}
         </div>
       </div>
-
-      {/* 📍 검색창 (Daum + Kakao 주소 검색 통합) */}
-      {showSearch && (
-        <div className={styles.menuSearch}>
-          <SearchInput
-            mode="search"
-            variant="sub"
-            value={searchText}
-            setValue={setSearchText}
-            placeholder="메뉴명 또는 가게명을 입력하세요"
-            onSearch={() => console.log("검색 실행:", searchText)}
-          />
-        </div>
-      )}
     </section>
   );
 }
