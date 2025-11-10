@@ -1,7 +1,8 @@
 import React from "react";
 import OrderCartItem from "./OrderCartItem";
+import { FaTrashAlt } from "react-icons/fa";
 import InputField from "@/components/form/InputField";
-import { useOrder } from "@/hooks/useOrder";
+import { useBasketOrder } from "@/hooks/useBasketOrder";
 import styles from "./OrderCartBox.module.scss";
 import stylesLayout from "./OrderLayout.module.scss";
 
@@ -10,7 +11,7 @@ import stylesLayout from "./OrderLayout.module.scss";
  * ------------------------------------------------------
  * - 결제 페이지 왼쪽 영역
  * - 장바구니 목록 + 배송 정보 + 전체삭제 기능
- * - Mutation 로직은 useOrder 훅으로 통합
+ * - Mutation 로직은 useBasketOrder 훅으로 통합
  */
 export default function OrderCartBox({
   basket,
@@ -19,18 +20,18 @@ export default function OrderCartBox({
   addrDetail,
   setAddrDetail,
 }) {
-  const { removeItem, clearAll } = useOrder();
+  const { removeItem, clearAll } = useBasketOrder();
 
   /** 단일 항목 삭제 */
   const handleRemove = (basketItemId) => {
     if (!window.confirm("이 항목을 삭제하시겠습니까?")) return;
-    removeItem.mutate(basketItemId);
+    removeItem(basketItemId);
   };
 
   /** 전체 삭제 */
   const handleClearAll = () => {
     if (!window.confirm("장바구니를 모두 비우시겠습니까?")) return;
-    clearAll.mutate();
+    clearAll();
   };
 
   return (
@@ -40,11 +41,12 @@ export default function OrderCartBox({
         <h2 className={styles.pageTitle}>결제하기</h2>
         <button
           type="button"
-          className={styles.clearAllBtn}
-          onClick={handleClearAll}
+          className="btn btn-sm btn-secondary-line"
           disabled={clearAll.isPending}
+          onClick={handleClearAll}
+          aria-label="전체삭제"
         >
-          전체삭제
+          <FaTrashAlt />
         </button>
       </div>
 

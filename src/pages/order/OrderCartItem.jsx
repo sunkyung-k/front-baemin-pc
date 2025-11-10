@@ -1,13 +1,13 @@
 import React from "react";
 import { formatPrice } from "@/utills/valueFormatter";
 import QuantityControl from "@/components/form/QuantityControl";
-import { FaTimes } from "react-icons/fa";
+import { MdClose } from "react-icons/md";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 import useBasket from "@/hooks/useBasket";
 import styles from "./OrderCartItem.module.scss";
 
 export default function OrderCartItem({ item, onRemove }) {
-  const { basketItemId, menu, quantity, totalPrice } = item;
+  const { basketItemId, menu, quantity, totalPrice, options } = item;
   const imageUrl = getAbsoluteImageUrl(menu);
   const { increase, decrease } = useBasket();
 
@@ -26,6 +26,9 @@ export default function OrderCartItem({ item, onRemove }) {
     onRemove?.(basketItemId);
   };
 
+  /** 옵션 가져오기 */
+  const optionNames = options?.map((opt) => opt.menuOption?.menuOptName) || [];
+
   return (
     <div className={styles.cartItem}>
       <div className={styles.left}>
@@ -39,12 +42,23 @@ export default function OrderCartItem({ item, onRemove }) {
 
         <div className={styles.cartInfo}>
           <p className={styles.name}>{menu?.menuName}</p>
-          <p className={styles.desc}>{menu?.description}</p>
-          <p className={styles.unitPrice}>{menu?.price?.toLocaleString()}원</p>
+          {optionNames.length > 0 && (
+            <p className={styles.desc}>{optionNames.join(", ")}</p>
+          )}
+          <p className={styles.unitPrice}>{formatPrice(totalPrice)}원</p>
         </div>
       </div>
 
       <div className={styles.right}>
+        <button
+          type="button"
+          className={styles.btnRemove}
+          onClick={handleRemoveClick}
+          aria-label="삭제"
+        >
+          <MdClose />
+        </button>
+
         <QuantityControl
           value={quantity}
           min={1}
@@ -54,14 +68,6 @@ export default function OrderCartItem({ item, onRemove }) {
         />
 
         <div className={styles.price}>{formatPrice(totalPrice)}원</div>
-
-        <button
-          className={styles.removeBtn}
-          onClick={handleRemoveClick}
-          title="삭제"
-        >
-          <FaTimes />
-        </button>
       </div>
     </div>
   );

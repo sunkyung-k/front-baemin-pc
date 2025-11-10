@@ -3,7 +3,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: space("md");
+  padding-bottom: space("md");
+  border-bottom: 1px solid fn-color("gray-200");
 
   .clearAllBtn {
     font-size: font("sm");
@@ -22,7 +23,11 @@
     font-size: font("xxl");
     font-weight: 800;
     color: fn-color("dark");
-    margin-bottom: space("xl");
+  }
+
+  :global(.btn-sm) {
+    padding: space("sm");
+    color: fn-color("dark");
   }
 }
 

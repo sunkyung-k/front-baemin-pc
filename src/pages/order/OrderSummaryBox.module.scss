@@ -2,10 +2,14 @@
 
 .summaryArea {
   position: sticky;
-  top: fn-rem(100);
+  top: $sticky-top;
   display: flex;
   flex-direction: column;
   gap: space("md");
+
+  @media (max-width: bp("md")) {
+    position: static;
+  }
 }
 
 .summaryRow {
