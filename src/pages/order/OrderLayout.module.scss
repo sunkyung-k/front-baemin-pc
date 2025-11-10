@@ -1,0 +1,24 @@
+@use "@/assets/scss/utils" as *;
+
+.orderWrap {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: space("xl");
+
+  @media (max-width: bp("md")) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cartArea {
+  background: fn-color("white");
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("md");
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  padding: space("xl");
+
+  h3 {
+    font-size: font("xl");
+    margin-bottom: space("lg");
+  }
+}

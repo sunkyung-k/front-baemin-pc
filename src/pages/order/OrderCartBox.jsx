@@ -1,0 +1,83 @@
+import React from "react";
+import OrderCartItem from "./OrderCartItem";
+import InputField from "@/components/form/InputField";
+import { useOrder } from "@/hooks/useOrder";
+import styles from "./OrderCartBox.module.scss";
+import stylesLayout from "./OrderLayout.module.scss";
+
+/**
+ * OrderCartBox
+ * ------------------------------------------------------
+ * - 결제 페이지 왼쪽 영역
+ * - 장바구니 목록 + 배송 정보 + 전체삭제 기능
+ * - Mutation 로직은 useOrder 훅으로 통합
+ */
+export default function OrderCartBox({
+  basket,
+  addr,
+  setAddr,
+  addrDetail,
+  setAddrDetail,
+}) {
+  const { removeItem, clearAll } = useOrder();
+
+  /** 단일 항목 삭제 */
+  const handleRemove = (basketItemId) => {
+    if (!window.confirm("이 항목을 삭제하시겠습니까?")) return;
+    removeItem.mutate(basketItemId);
+  };
+
+  /** 전체 삭제 */
+  const handleClearAll = () => {
+    if (!window.confirm("장바구니를 모두 비우시겠습니까?")) return;
+    clearAll.mutate();
+  };
+
+  return (
+    <div className={stylesLayout.cartArea}>
+      {/* 헤더 */}
+      <div className={styles.headerRow}>
+        <h2 className={styles.pageTitle}>결제하기</h2>
+        <button
+          type="button"
+          className={styles.clearAllBtn}
+          onClick={handleClearAll}
+          disabled={clearAll.isPending}
+        >
+          전체삭제
+        </button>
+      </div>
+
+      {/* 장바구니 아이템 리스트 */}
+      {basket.itemList.map((item) => (
+        <OrderCartItem
+          key={item.basketItemId}
+          item={item}
+          onRemove={handleRemove}
+        />
+      ))}
+
+      {/* 배송정보 */}
+      <div className={styles.formSection}>
+        <h3>배송 정보</h3>
+
+        <InputField
+          label="주소"
+          name="addr"
+          type="text"
+          value={addr}
+          onChange={(e) => setAddr(e.target.value)}
+          readOnly
+        />
+
+        <InputField
+          label="상세 주소"
+          name="addrDetail"
+          placeholder="예: 101동 505호"
+          value={addrDetail}
+          onChange={(e) => setAddrDetail(e.target.value)}
+        />
+      </div>
+    </div>
+  );
+}

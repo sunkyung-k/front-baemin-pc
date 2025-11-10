@@ -1,0 +1,36 @@
+.completeWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: space("xl");
+  align-items: center;
+  text-align: center;
+  height: 100%;
+}
+
+.icon {
+  font-size: fn-rem(80);
+  color: fn-color("primary");
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
+}
+
+.title {
+  font-size: font("3xl");
+  font-weight: 800;
+  color: fn-color("gray-900");
+  letter-spacing: -0.3px;
+}
+
+.descBox {
+  .desc {
+    font-size: font("lg");
+    color: fn-color("gray-700");
+    line-height: 1.8;
+  }
+
+  .sub {
+    font-size: font("md");
+    color: fn-color("gray-500");
+    margin-top: space("lg");
+  }
+}

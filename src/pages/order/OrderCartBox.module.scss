@@ -1,0 +1,52 @@
+// header
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: space("md");
+
+  .clearAllBtn {
+    font-size: font("sm");
+    color: fn-color("gray-500");
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+      color: fn-color("danger");
+    }
+  }
+
+  .pageTitle {
+    font-size: font("xxl");
+    font-weight: 800;
+    color: fn-color("dark");
+    margin-bottom: space("xl");
+  }
+}
+
+// 배송 정보
+.formSection {
+  margin-top: space("xl");
+
+  label {
+    display: block;
+    margin-bottom: space("xs");
+    font-weight: 600;
+  }
+
+  input {
+    width: 100%;
+    border: 1px solid fn-color("gray-200");
+    border-radius: radius("sm");
+    padding: space("md");
+    font-size: font("md");
+    margin-bottom: space("md");
+
+    &:focus {
+      border-color: fn-color("primary");
+      outline: none;
+    }
+  }
+}

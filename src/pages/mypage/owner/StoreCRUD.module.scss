@@ -1,0 +1,15 @@
+.addrRow {
+  display: flex;
+  align-items: flex-end;
+  gap: space("sm");
+
+  :global(.input-field) {
+    width: calc(100% - fn-rem(100));
+  }
+
+  :global(.btn) {
+    padding-left: space("sm");
+    padding-right: space("sm");
+    width: fn-rem(100);
+  }
+}

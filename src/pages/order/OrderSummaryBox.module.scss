@@ -1,0 +1,109 @@
+@use "@/assets/scss/utils" as *;
+
+.summaryArea {
+  position: sticky;
+  top: fn-rem(100);
+  display: flex;
+  flex-direction: column;
+  gap: space("md");
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: font("md");
+  color: fn-color("gray-700");
+
+  &.total {
+    border-top: 1px dashed fn-color("gray-200");
+    padding-top: space("md");
+    color: fn-color("primary");
+    font-weight: 700;
+    font-size: font("lg");
+  }
+}
+
+.summaryFooter {
+  display: flex;
+  flex-direction: column;
+  gap: space("md");
+  padding-top: space("lg");
+  border-top: 1px solid fn-color("gray-100");
+}
+
+.myPoint {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: space("md") space("lg");
+  background: linear-gradient(90deg, #f6fbfa 0%, #ecfbf8 100%);
+  border-radius: radius("xl");
+  font-size: font("sm");
+  font-weight: 600;
+  color: fn-color("gray-800");
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+
+  strong {
+    color: fn-color("primary");
+    font-size: font("md");
+    font-weight: 700;
+  }
+}
+
+.btn {
+  height: fn-rem(48);
+  border-radius: radius("full");
+  font-weight: 700;
+  font-size: font("md");
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* 경고 알림 */
+.warning {
+  padding: space("md") space("lg");
+  border: 1px solid rgba(fn-color("danger"), 0.15);
+  font-size: font("sm");
+  color: fn-color("danger");
+  text-align: center;
+  line-height: 1.5;
+  background: rgba($color: fn-color("danger"), $alpha: 0.05);
+  border-radius: radius("lg");
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.05);
+
+  .warningTop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: space("xs");
+    font-weight: 700;
+    font-size: font("sm");
+
+    &::before {
+      content: "⚠️";
+      font-size: fn-rem(14);
+      flex-shrink: 0;
+    }
+  }
+
+  .warningDesc {
+    color: fn-color("danger");
+    opacity: 0.8;
+  }
+}
+
+.actionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: space("sm");
+}
