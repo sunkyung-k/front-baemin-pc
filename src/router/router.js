@@ -1,3 +1,4 @@
+import React from "react";
 import { createBrowserRouter } from "react-router";
 import { redirect } from "react-router-dom";
 import Layout from "../pages/Layout";
@@ -12,8 +13,12 @@ import MenuLayout from "../pages/menu-register/MenuLayout";
 import StoreListLayout from "../pages/store-list/StoreListLayout";
 import StoreDetailLayout from "../pages/store-detail/StoreDetailLayout";
 import MenuTabContent from "../pages/store-detail/menu/MenuTabContent";
+import InfoTabContent from "../pages/store-detail/info/InfoTabContent";
 import Join from "../pages/join/Join";
 import StoreList from "../pages/store-list/StoreList";
+import Favorite from "../pages/favorite/Favorite";
+import OrderLayout from "../pages/order/OrderLayout";
+import OrderComplete from "../pages/order/OrderComplete";
 
 export const router = createBrowserRouter([
   {
@@ -25,7 +30,6 @@ export const router = createBrowserRouter([
         Component: Home,
         handle: { layoutClass: "wide" },
       },
-
       {
         path: "store",
         Component: StoreListLayout,
@@ -44,7 +48,26 @@ export const router = createBrowserRouter([
       {
         path: "store/:storeId",
         Component: StoreDetailLayout,
-        children: [{ index: true, Component: MenuTabContent }],
+        children: [
+          { index: true, Component: MenuTabContent },
+          { path: "info", Component: InfoTabContent },
+          {
+            path: "review",
+            Component: () => React.createElement("div", null, "리뷰 탭 "),
+          },
+        ],
+      },
+      {
+        path: "order",
+        Component: OrderLayout,
+      },
+      {
+        path: "/order/complete",
+        Component: OrderComplete,
+      },
+      {
+        path: "favorite",
+        Component: Favorite,
       },
       {
         path: "mypage",
