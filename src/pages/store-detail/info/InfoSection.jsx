@@ -65,11 +65,6 @@ export default function InfoSection({ store }) {
                 {formatBusinessNo(owner.businessNo)}
               </li>
             )}
-            {owner.phone && (
-              <li>
-                <strong>점주 연락처 :</strong> {formatPhone(owner.phone)}
-              </li>
-            )}
           </ul>
         </section>
       )}
