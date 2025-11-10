@@ -1,3 +1,4 @@
+import { formatPhone, formatBusinessNo } from "@/utills/valueFormatter";
 import styles from "./InfoTabContent.module.scss";
 
 export default function InfoSection({ store }) {
@@ -5,7 +6,7 @@ export default function InfoSection({ store }) {
 
   const infoList = [
     store.businessHour && { label: "영업시간", value: store.businessHour },
-    store.phone && { label: "전화번호", value: store.phone },
+    store.phone && { label: "전화번호", value: formatPhone(store.phone) },
     (store.addr || store.addrDetail) && {
       label: "주소",
       value: `${store.addr ?? ""} ${store.addrDetail ?? ""}`.trim(),
@@ -15,7 +16,7 @@ export default function InfoSection({ store }) {
       value: `${store.minPrice.toLocaleString()}원`,
     },
     store.hourComment && { label: "영업 상태", value: store.hourComment },
-  ].filter(Boolean); // falsy 제거 (빈 값 안 보이게)
+  ].filter(Boolean);
 
   const hasBusinessInfo = infoList.length > 0;
   const hasOwnerInfo = store.storeName || store.ownerName || store.bizNumber;
