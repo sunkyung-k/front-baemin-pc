@@ -48,7 +48,7 @@ function Header() {
           <NavLink to="/admin">관리자 페이지</NavLink>
         ) : (
           <>
-            <NavLink to="/order">
+            <NavLink to="/order/status">
               <RiEBike2Fill /> 주문 현황
             </NavLink>
             <NavLink to="/favorite">

@@ -1,0 +1,109 @@
+.orders {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space("xl");
+  justify-content: space-between;
+}
+
+/* 카드 공통 */
+.orderCard {
+  flex: 0 0 calc((100% - 1 * space("xl")) / 2);
+  background: fn-color("white");
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("md");
+  padding: space("lg");
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  // transition: 0.25s;
+
+  @media (max-width: bp("md")) {
+    flex: 0 0 100%;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.07);
+  }
+
+  &.done {
+    opacity: 0.8;
+    background: fn-color("gray-100");
+  }
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: space("sm");
+
+  h4 {
+    font-size: font("lg");
+    margin: 0;
+  }
+}
+
+.badge {
+  font-size: font("sm");
+  padding: 4px 10px;
+  border-radius: radius("full");
+  font-weight: 700;
+
+  &.pending {
+    background: fn-color("gray-100");
+    color: fn-color("gray-600");
+  }
+
+  &.cooking {
+    background: fn-color("primary-bg");
+    color: fn-color("primary");
+  }
+
+  &.done {
+    background: fn-color("gray-200");
+    color: fn-color("gray-600");
+  }
+}
+
+.orderDetail {
+  font-size: font("md");
+  color: fn-color("gray-600");
+  margin-bottom: space("lg");
+  line-height: 1.6;
+
+  strong {
+    color: fn-color("primary");
+  }
+}
+
+.steps {
+  display: flex;
+  justify-content: space-between;
+  font-size: font("sm");
+  color: fn-color("gray-400");
+  margin-bottom: space("xs");
+
+  .active {
+    color: fn-color("primary");
+    font-weight: 700;
+  }
+}
+
+/* progress */
+.progressContainer {
+  position: relative;
+  height: 6px;
+  background: fn-color("gray-200");
+  border-radius: radius("full");
+  margin-bottom: space("sm");
+}
+
+.progressFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  border-radius: radius("full");
+  background: fn-color("primary");
+  width: 0%;
+  transition: width 0.5s ease;
+}
