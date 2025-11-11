@@ -9,23 +9,27 @@ export default function OrderList({
   onReviewClick,
   onStatusChange,
   refreshTrigger, // 페이지 이동 등 외부 트리거로 초기화
+  readOnly = false,
 }) {
   const [openIds, setOpenIds] = useState([]);
 
   /** 외부 트리거(page 등) 발생 시 자동 닫기 */
   useEffect(() => {
-    setOpenIds([]);
-  }, [refreshTrigger]);
+    if (!readOnly) setOpenIds([]);
+  }, [refreshTrigger, readOnly]);
 
   /** 데이터 변경 시 기존 open 상태 유지 */
   useEffect(() => {
-    setOpenIds((prev) =>
-      prev.filter((id) => data.some((o) => o.orderId === id))
-    );
-  }, [data]);
+    if (!readOnly) {
+      setOpenIds((prev) =>
+        prev.filter((id) => data.some((o) => o.orderId === id))
+      );
+    }
+  }, [data, readOnly]);
 
   /** 아코디언 토글 */
   const toggleAccordion = (orderId) => {
+    if (readOnly) return;
     setOpenIds((prev) =>
       prev.includes(orderId)
         ? prev.filter((id) => id !== orderId)
@@ -35,6 +39,8 @@ export default function OrderList({
 
   /** 상태 텍스트 변환 */
   const getStatusLabel = (status) => {
+    if (readOnly && status === "주문완료") return "";
+
     const mapUser = {
       주문완료: "주문 확인중",
       배달완료: "배달 완료",
@@ -60,12 +66,12 @@ export default function OrderList({
   }
 
   return (
-    <div className="order-list">
+    <div className={`order-list ${readOnly ? "read-only" : ""}`}>
       {data.map((order) => {
         const { orderId, orderDate, totalPrice, status, itemList, storeName } =
           order;
 
-        const isOpen = openIds.includes(orderId);
+        const isOpen = readOnly ? true : openIds.includes(orderId);
         const isReviewable = type === "user" && status === "배달완료";
         const formattedDate = orderDate?.split(" ")[0] ?? "";
 
@@ -81,7 +87,7 @@ export default function OrderList({
                 <div className="order-detail">
                   <p>{formatPrice(totalPrice)}원</p> /{" "}
                   <span>{formattedDate}</span>
-                  <FaAngleDown className="toggle-arrow" />
+                  {!readOnly && <FaAngleDown className="toggle-arrow" />}
                 </div>
               </div>
 
@@ -98,7 +104,7 @@ export default function OrderList({
                   {getStatusLabel(status)}
                 </span>
 
-                {type === "user" && status !== "주문취소" && (
+                {!readOnly && type === "user" && status !== "주문취소" && (
                   <button
                     className={`btn btn-round btn-sm ${
                       isReviewable ? "btn-primary" : "btn-disabled"
