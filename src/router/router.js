@@ -19,6 +19,7 @@ import StoreList from "../pages/store-list/StoreList";
 import Favorite from "../pages/favorite/Favorite";
 import OrderLayout from "../pages/order/OrderLayout";
 import OrderComplete from "../pages/order/OrderComplete";
+import OrderStatus from "../pages/order/OrderStatus";
 
 export const router = createBrowserRouter([
   {
@@ -46,8 +47,9 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "store/:storeId",
+        path: "/store/:storeId",
         Component: StoreDetailLayout,
+        handle: { layoutClass: "wide" },
         children: [
           { index: true, Component: MenuTabContent },
           { path: "info", Component: InfoTabContent },
@@ -60,6 +62,10 @@ export const router = createBrowserRouter([
       {
         path: "order",
         Component: OrderLayout,
+      },
+      {
+        path: "/order/status",
+        Component: OrderStatus,
       },
       {
         path: "/order/complete",
