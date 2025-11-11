@@ -36,8 +36,8 @@ export default function Favorite() {
   };
 
   return (
-    <main className={styles.favoriteWrap}>
-      <h1 className={styles.pageTitle}>내가 찜한 가게</h1>
+    <main className="page-wrap">
+      <h2 className="page-title">내가 찜한 가게</h2>
 
       <div className={styles.storeList}>
         {likedStores.map((store) => (

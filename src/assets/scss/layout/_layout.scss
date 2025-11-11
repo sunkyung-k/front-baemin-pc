@@ -37,3 +37,12 @@
 #root {
   height: 100%;
 }
+
+.page {
+  &-title {
+    font-size: font("xxl");
+    font-weight: 800;
+    margin-bottom: space("xl");
+    text-align: center;
+  }
+}
