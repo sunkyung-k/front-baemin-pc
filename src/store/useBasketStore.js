@@ -2,33 +2,36 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 /**
- * useBasketStore (Zustand)
+ * useBasketStore (정식 구조)
  * ------------------------------------------------------
- * - 장바구니 전역 상태 (React Query + Zustand 병행 관리)
- * - React Query: 서버 데이터(fetch)
- * - Zustand: 로컬 UI/렌더링용 상태 보관
+ * - React Query와 병행되는 로컬 장바구니 상태 관리
+ * - clearBasket()은 명시적 Lock + unlock 구조로 전환
  */
 export const useBasketStore = create(
   devtools(
     (set, get) => ({
-      /** 장바구니 데이터 (서버 응답 vo) */
       basket: null,
-
-      /** 현재 장바구니의 가게 ID */
       currentStoreId: null,
+      isLocked: false, // refetch 중 동기화 방지용 Lock 플래그
 
-      /**
-       * 장바구니 데이터 세팅
-       * - React Query(useBasket)에서 getMyBasket 성공 시 호출
-       * - storeId가 없으면 itemList의 첫 메뉴에서 추출
-       */
+      /** 장바구니 데이터 세팅 */
       setBasket: (data) => {
-        if (!data) {
+        const { isLocked } = get();
+
+        // refetch 중에는 서버 데이터 무시
+        if (isLocked) return;
+
+        // 빈 데이터 처리
+        if (
+          !data ||
+          (!data.storeId && (!data.itemList || data.itemList.length === 0))
+        ) {
           set({ basket: null, currentStoreId: null });
           return;
         }
 
-        let storeId = data?.storeId ?? null;
+        // storeId 추출
+        let storeId = data.storeId ?? null;
         if (
           !storeId &&
           Array.isArray(data.itemList) &&
@@ -44,9 +47,19 @@ export const useBasketStore = create(
         });
       },
 
-      /** 장바구니 전체 비우기 */
+      /** 장바구니 전체 비우기 (Lock 활성화) */
       clearBasket: () => {
-        set({ basket: null, currentStoreId: null });
+        set({
+          basket: null,
+          currentStoreId: null,
+          isLocked: true, // refetch 동안 상태 변경 방지
+        });
+      },
+
+      /** Lock 해제 (React Query refetch 완료 후 호출) */
+      releaseLock: () => {
+        const { isLocked } = get();
+        if (isLocked) set({ isLocked: false });
       },
 
       /** 현재 장바구니 데이터 반환 */

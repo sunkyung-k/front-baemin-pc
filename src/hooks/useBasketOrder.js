@@ -8,7 +8,7 @@ import basketAPI from "@/service/basketAPI";
 export const useBasketOrder = () => {
   const queryClient = useQueryClient();
   const handleError = useHandleError();
-  const { clearBasket, setBasket } = useBasketStore();
+  const { clearBasket, releaseLock } = useBasketStore();
 
   const afterMutationBasket = useAfterMutation(AFTER_TYPES.DETAIL, null, {
     scrollTop: false,
@@ -19,15 +19,16 @@ export const useBasketOrder = () => {
     try {
       await basketAPI.removeItem(basketItemId);
 
-      // React Query 캐시 새로고침
+      // 캐시 무효화 + 서버 동기화
       await queryClient.invalidateQueries([QUERY_KEYS.BASKET]);
 
-      // Zustand 전역상태도 새로 불러오기
-      const updated = await basketAPI.getMyBasket();
-      setBasket(updated);
+      // refetch 완료 후 Lock 해제
+      releaseLock();
 
+      // React Query 후처리
       afterMutationBasket([QUERY_KEYS.BASKET]);
     } catch (err) {
+      releaseLock(); // 에러 시에도 Lock 해제
       handleError(err, "useBasketOrder.removeItem");
     }
   };
@@ -35,27 +36,41 @@ export const useBasketOrder = () => {
   /** 전체 삭제 */
   const clearAll = async () => {
     try {
+      // 서버 요청
       await basketAPI.clearAll();
 
-      // 전역 스토어 비우기
+      // Zustand 비움 + Lock 설정
       clearBasket();
 
-      // 캐시 갱신
+      // 캐시 무효화 → 서버 동기화
       await queryClient.invalidateQueries([QUERY_KEYS.BASKET]);
 
-      // 후처리
+      // 후처리 및 Lock 해제
       afterMutationBasket([QUERY_KEYS.BASKET]);
+      releaseLock();
     } catch (err) {
+      releaseLock();
       handleError(err, "useBasketOrder.clearAll");
     }
   };
 
   /** 전체 주문 */
-  const orderAll = async () => {
+  const orderAll = async (payload) => {
     try {
-      await basketAPI.orderAll();
+      // 장바구니 즉시 비움 + Lock 설정
+      clearBasket();
+
+      // 주문 요청
+      await basketAPI.orderAll(payload);
+
+      // 서버 재조회
+      await queryClient.invalidateQueries([QUERY_KEYS.BASKET]);
+
+      // 후처리 + Lock 해제
       afterMutationBasket([QUERY_KEYS.BASKET]);
+      releaseLock();
     } catch (err) {
+      releaseLock();
       handleError(err, "useBasketOrder.orderAll");
     }
   };

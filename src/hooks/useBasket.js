@@ -6,13 +6,14 @@ import { useBasketStore } from "@/store/useBasketStore";
 import { authStore } from "@/store/authStore";
 
 /**
- * useBasket 훅
+ * useBasket 훅 (정식 Lock 동기화 반영)
  * ------------------------------------------------------
  * - React Query + Zustand 병행 관리 구조
- * - 장바구니 / 결제 페이지 모두 재사용 가능
+ * - clearBasket() 시 Lock 활성화 → invalidate 후 releaseLock()
+ * - 장바구니 / 결제 페이지 공용 훅
  */
 export const useBasket = () => {
-  const { setBasket, clearBasket } = useBasketStore();
+  const { setBasket, clearBasket, releaseLock } = useBasketStore(); // releaseLock 추가
   const { userRole } = authStore.getState();
   const isUser = userRole?.includes("USER");
 
@@ -29,8 +30,15 @@ export const useBasket = () => {
     queryKey: QUERY_KEYS.BASKET,
     queryFn: basketAPI.getMyBasket,
     enabled: isUser,
-    onSuccess: (data) => setBasket(data),
-    onError: clearBasket,
+    onSuccess: (data) => {
+      setBasket(data);
+      releaseLock(); // refetch 완료 → Lock 해제
+    },
+    onError: (err) => {
+      console.error("❌ useBasket.getMyBasket Error:", err);
+      clearBasket();
+      releaseLock(); // 에러 시에도 Lock 해제
+    },
   });
 
   /** 메뉴 추가 (다른 가게일 경우 confirm 처리) */
@@ -45,9 +53,15 @@ export const useBasket = () => {
         );
         if (!confirmChange)
           throw new Error("사용자가 메뉴 담기를 취소했습니다.");
+
+        // 서버 비우기
         await basketAPI.clearAll();
+
+        // React Query 캐시 강제 무효화 (중요!)
+        await basketQuery.refetch();
       }
 
+      // 최신 basketQuery 데이터 기준으로 다시 추가
       return basketAPI.addMenu(payload);
     },
     onSettled: () => isUser && afterMutation(QUERY_KEYS.BASKET),
@@ -56,34 +70,49 @@ export const useBasket = () => {
   /** 항목 삭제 */
   const removeItem = useMutation({
     mutationFn: basketAPI.removeItem,
-    onSettled: () => isUser && afterMutation(QUERY_KEYS.BASKET),
+    onMutate: () => clearBasket(),
+    onSettled: async () => {
+      if (isUser) {
+        await afterMutation(QUERY_KEYS.BASKET);
+        releaseLock();
+      }
+    },
   });
 
   /** 수량 증가 */
   const increase = useMutation({
     mutationFn: basketAPI.increaseItem,
-    onSettled: () => isUser && afterMutation(QUERY_KEYS.BASKET),
+    onSettled: async () => {
+      if (isUser) {
+        await afterMutation(QUERY_KEYS.BASKET);
+        releaseLock();
+      }
+    },
   });
 
   /** 수량 감소 */
   const decrease = useMutation({
     mutationFn: basketAPI.decreaseItem,
-    onSettled: () => isUser && afterMutation(QUERY_KEYS.BASKET),
+    onSettled: async () => {
+      if (isUser) {
+        await afterMutation(QUERY_KEYS.BASKET);
+        releaseLock();
+      }
+    },
   });
 
   /** 전체 비우기 */
   const clearAll = useMutation({
     mutationFn: basketAPI.clearAll,
-    onSettled: async () => {
-      clearBasket();
-      if (isUser) await afterMutation(QUERY_KEYS.BASKET);
+    onMutate: () => {
+      clearBasket(); // Lock 자동 설정됨
     },
-  });
-
-  /** 전체 주문 */
-  const orderAll = useMutation({
-    mutationFn: basketAPI.orderAll,
-    onSettled: () => isUser && afterMutation(QUERY_KEYS.BASKET),
+    onSettled: async () => {
+      if (isUser) {
+        await afterMutation(QUERY_KEYS.BASKET);
+        releaseLock();
+      }
+    },
   });
 
   return {
@@ -93,7 +122,6 @@ export const useBasket = () => {
     increase,
     decrease,
     clearAll,
-    orderAll,
   };
 };
 
