@@ -18,8 +18,7 @@
   gap: space("md");
 
   :global(.btn-sm) {
-    padding: space("sm");
-    color: fn-color("dark");
+    padding: 0;
   }
 }
 

@@ -42,7 +42,7 @@ export default function OrderCartBox({ basket, addrDetail, setAddrDetail }) {
           onClick={handleClearAll}
           aria-label="전체삭제"
         >
-          <FaTrashAlt />
+          전체 삭제
         </button>
       </div>
 

@@ -43,7 +43,7 @@ export default function BasketItem({ item, onIncrease, onDecrease, onRemove }) {
 
         <button
           type="button"
-          className="btn btn-sm btn-secondary-line"
+          className="btn btn-sm "
           onClick={onRemove}
           aria-label="삭제"
         >
