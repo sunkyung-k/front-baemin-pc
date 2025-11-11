@@ -25,7 +25,7 @@ export default function StoreDetailLayout() {
   const storeDetail = data;
 
   return (
-    <div className={styles.detailLayout}>
+    <>
       {/* 상단 히어로 */}
       <StoreHero storeDetail={storeDetail} />
 
@@ -36,6 +36,6 @@ export default function StoreDetailLayout() {
       <div className={styles.tabContent}>
         <Outlet context={{ storeDetail, storeId: Number(storeId) }} />
       </div>
-    </div>
+    </>
   );
 }
