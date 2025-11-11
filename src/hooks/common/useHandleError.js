@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { handleApiError } from "@/utills/handleApiError";
 
 export const useHandleError = () => {
@@ -16,7 +17,8 @@ export const useHandleError = () => {
         console.groupEnd();
       }
 
-      if (typeof window !== "undefined" && message) alert(message);
+      // 토스트 팝업
+      if (message) toast.error(message);
     } catch (err) {
       console.error("[useHandleError 내부 오류]", err);
     }
