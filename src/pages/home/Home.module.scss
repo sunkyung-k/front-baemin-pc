@@ -41,11 +41,10 @@
 .categoryGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: space("lg");
+  gap: space("md");
 
   @media (max-width: bp("md")) {
     grid-template-columns: repeat(2, 1fr);
-    gap: space("md");
   }
 }
 

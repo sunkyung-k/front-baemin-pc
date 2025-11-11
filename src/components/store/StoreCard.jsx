@@ -17,6 +17,16 @@ export default function StoreCard({
 
   const cardInner = (
     <>
+      {/* 찜 버튼 */}
+      <LikeButton
+        isActive={isLiked}
+        onToggle={toggleLike}
+        size={20}
+        round
+        animated
+        className="btn-like"
+      />
+
       <div className="card-thumb">
         <img src={getAbsoluteImageUrl(store)} alt={storeName} />
 
@@ -24,16 +34,6 @@ export default function StoreCard({
         {showStatus && open === false && (
           <span className="closedBadge">{hourComment || "휴무"}</span>
         )}
-
-        {/* 찜 버튼 */}
-        <LikeButton
-          isActive={isLiked}
-          onToggle={toggleLike}
-          size={20}
-          round
-          animated
-          className="btn-like"
-        />
       </div>
 
       <div className="card-info">
