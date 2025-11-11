@@ -1,6 +1,8 @@
 /* 탭 콘텐츠 영역 */
 .tabContent {
   padding: space("xl") space("xl") space("xxl");
+  max-width: fn-rem(1200);
+  margin: 0 auto;
   background-color: fn-color("white");
 
   @media (max-width: bp("md")) {
