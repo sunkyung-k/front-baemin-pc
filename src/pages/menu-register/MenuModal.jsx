@@ -163,6 +163,7 @@ export default function MenuModal({
         register={register}
         errorMessage={errors.menuImage?.message}
         currentImageUrl={currentImageUrl}
+        hint="JPG, PNG 형식 / 최대 50MB까지 업로드 가능합니다."
       />
     </FormModal>
   );

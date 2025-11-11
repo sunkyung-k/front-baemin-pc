@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useHandleError } from "@/hooks/common/useHandleError";
-import { useAfterMutation, AFTER_TYPES } from "@/hooks/common/useAfterMutation";
 import orderAPI from "@/service/orderAPI";
 import { FaUtensils } from "react-icons/fa";
 
@@ -10,53 +9,48 @@ import Card from "@/components/mypage/Card";
 import EmptyState from "@/components/menu/EmptyState";
 import OrderList from "@/components/mypage/OrderList";
 import Pagination from "@/components/common/Pagination";
+import ReviewModal from "@/components/review/ReviewModal";
+import { useOrderStatus } from "@/hooks/useOrderStatus";
 
 export default function OrderInfo() {
   const handleError = useHandleError();
-  const afterMutation = useAfterMutation(AFTER_TYPES.LIST);
   const [page, setPage] = useState(0);
   const [isReviewOpen, setReviewOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const { updateStatus } = useOrderStatus(page);
 
-  /** 주문 리스트 조회 */
-  const { data, refetch, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEYS.MY_ORDER_LIST, page],
     queryFn: () => orderAPI.getMyOrders(page),
     onError: handleError,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading) return <div>로딩 중...</div>;
 
   const orders = data?.content || [];
   const pageInfo = data?.pageInfo;
+  const handlePageChange = (newPage) => setPage(newPage);
 
-  /** 주문 상태 변경 */
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      await orderAPI.updateStatus(orderId, newStatus);
-      await afterMutation([QUERY_KEYS.MY_ORDER_LIST, page]);
-      refetch();
+      await updateStatus(orderId, newStatus);
     } catch (err) {
       handleError(err);
     }
   };
 
-  /** 리뷰쓰기 버튼 클릭 */
   const handleReviewClick = (order) => {
     setSelectedOrder(order);
     setReviewOpen(true);
   };
 
-  /** 리뷰 작성 완료 후 목록 새로고침 */
   const handleReviewComplete = async () => {
-    await afterMutation([QUERY_KEYS.MY_ORDER_LIST, page]);
+    await updateStatus(); // 자동 invalidate 반영
     setReviewOpen(false);
     setSelectedOrder(null);
-  };
-
-  /** 페이지 이동 */
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
   };
 
   return (
@@ -70,18 +64,30 @@ export default function OrderInfo() {
       ) : (
         <>
           <OrderList
-            key={`user-order-list-${page}`}
+            key={`user-order-list-${page}-${orders[0]?.status ?? ""}`}
             data={orders}
             type="user"
             refreshTrigger={page}
             onReviewClick={handleReviewClick}
             onStatusChange={handleStatusChange}
           />
-
           {pageInfo && (
             <Pagination pageInfo={pageInfo} onPageChange={handlePageChange} />
           )}
         </>
+      )}
+
+      {isReviewOpen && selectedOrder && (
+        <ReviewModal
+          isOpen={isReviewOpen}
+          onClose={() => setReviewOpen(false)}
+          mode="create"
+          order={selectedOrder}
+          onSubmit={(formData) => {
+            console.log("리뷰 작성 데이터", [...formData.entries()]);
+            handleReviewComplete();
+          }}
+        />
       )}
     </Card>
   );

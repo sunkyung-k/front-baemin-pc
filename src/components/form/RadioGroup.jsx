@@ -5,7 +5,7 @@ import React from "react";
  * - RHF(register) 또는 수동 onChange 둘 다 호환
  * - 동일 name을 가진 여러 옵션을 묶어서 사용
  * - 라벨/정렬/에러메시지 포함
- * - label: string 또는 ReactNode 모두 지원 (ex. <><span>곱빼기</span><span>(+₩1,000)</span></>)
+ * - label: string 또는 ReactNode 모두 지원 (ex. <><span>곱빼기</span><span>(+1,000)</span></>)
  */
 export default function RadioGroup({
   label,

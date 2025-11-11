@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useHandleError } from "@/hooks/common/useHandleError";
-import { useAfterMutation, AFTER_TYPES } from "@/hooks/common/useAfterMutation";
 import orderAPI from "@/service/orderAPI";
 import { FaUtensils } from "react-icons/fa";
 
@@ -11,36 +10,30 @@ import EmptyState from "@/components/menu/EmptyState";
 import OrderList from "@/components/mypage/OrderList";
 import SalesSummary from "./SalesSummary";
 import Pagination from "@/components/common/Pagination";
+import { useOrderStatus } from "@/hooks/useOrderStatus";
 
 export default function OrderManage() {
   const handleError = useHandleError();
-  const afterMutation = useAfterMutation(AFTER_TYPES.LIST);
   const [page, setPage] = useState(0);
+  const { updateStatus } = useOrderStatus(page);
 
-  const { data, refetch, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEYS.MY_STORE_ORDER_LIST, page],
     queryFn: () => orderAPI.getMyStoreOrders(page),
     onError: handleError,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading) return <div>로딩 중...</div>;
 
   const orders = data?.content || [];
   const pageInfo = data?.pageInfo;
+  const handlePageChange = (newPage) => setPage(newPage);
 
-  const handleStatusChange = async (orderId, newStatus) => {
-    try {
-      await orderAPI.updateStatus(orderId, newStatus);
-      await afterMutation([QUERY_KEYS.MY_STORE_ORDER_LIST, page]);
-      await afterMutation([QUERY_KEYS.MY_ORDER_LIST]);
-      refetch();
-    } catch (err) {
-      handleError(err);
-    }
-  };
-
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
+  const handleStatusChange = async (orderId, newStatus, order) => {
+    await updateStatus(orderId, newStatus, order);
   };
 
   return (
@@ -57,7 +50,7 @@ export default function OrderManage() {
         ) : (
           <>
             <OrderList
-              key={`order-list-${page}`}
+              key={`order-list-${page}-${orders[0]?.status ?? ""}`}
               data={orders}
               type="owner"
               refreshTrigger={page}

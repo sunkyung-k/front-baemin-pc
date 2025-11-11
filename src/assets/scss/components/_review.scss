@@ -1,0 +1,240 @@
+@use "@/assets/scss/utils" as *;
+
+.review-modal {
+  display: flex;
+  flex-direction: column;
+  gap: fn-rem(20);
+
+  .review-order-info {
+    border: 1px solid fn-color("border");
+    border-radius: radius("md");
+    padding: fn-rem(12);
+    background-color: fn-color("gray-bg");
+
+    .order-card {
+      margin: 0;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+
+      .order-card-header {
+        cursor: default;
+      }
+
+      .order-actions {
+        display: none !important;
+      }
+    }
+  }
+
+  .review-rating {
+    display: flex;
+    gap: fn-rem(8);
+    justify-content: center;
+    align-items: center;
+    margin-top: fn-rem(8);
+
+    .star {
+      color: fn-color("gray-400");
+      cursor: pointer;
+      transition: color 0.2s ease, transform 0.15s ease;
+
+      &.active {
+        color: #ffb800; // 배민 민트 기준
+      }
+
+      &:hover {
+        // transform: scale(1.1);
+      }
+    }
+  }
+
+  .review-images {
+    margin-top: 12px;
+
+    .image-list {
+      display: flex;
+      gap: 10px;
+    }
+
+    .image-box {
+      position: relative;
+
+      .remove-btn {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 18px;
+      }
+    }
+  }
+}
+
+.review-card {
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("md");
+  background-color: fn-color("white");
+  padding: fn-rem(16);
+  display: flex;
+  flex-direction: column;
+  gap: fn-rem(12);
+
+  .review-header {
+    .store-name {
+      font-size: font("lg");
+      font-weight: 600;
+      color: fn-color("gray-900");
+      margin-bottom: fn-rem(4);
+    }
+
+    .order-summary {
+      font-size: font("sm");
+      color: fn-color("gray-600");
+
+      .order-date {
+        color: fn-color("gray-400");
+      }
+    }
+  }
+
+  .review-stars {
+    display: flex;
+    gap: fn-rem(4);
+
+    .star {
+      color: fn-color("gray-300");
+
+      &.active {
+        color: fn-color("primary");
+      }
+    }
+  }
+
+  .review-content {
+    font-size: font("md");
+    color: fn-color("gray-800");
+    line-height: 1.5;
+  }
+
+  .review-thumbnails {
+    display: flex;
+    gap: fn-rem(8);
+
+    .thumbnail {
+      width: fn-rem(70);
+      height: fn-rem(70);
+      border-radius: radius("sm");
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  .review-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: fn-rem(8);
+    margin-top: fn-rem(8);
+  }
+
+  .review-reply {
+    margin-top: fn-rem(10);
+    padding: fn-rem(12);
+    border-radius: radius("sm");
+    background-color: fn-color("primary-bg");
+
+    .reply-content {
+      font-size: font("md");
+      color: fn-color("dark");
+    }
+
+    .reply-date {
+      display: block;
+      text-align: right;
+      font-size: font("sm");
+      color: fn-color("gray-500");
+      margin-top: fn-rem(4);
+    }
+  }
+}
+
+/* ============================================================
+📸 Review Swiper (전체 이미지 보기)
+============================================================ */
+.review-swiper-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .review-swiper-container {
+    position: relative;
+    width: 90%;
+    max-width: fn-rem(600);
+    background: fn-color("white");
+    border-radius: radius("md");
+    overflow: hidden;
+    box-shadow: 0 0 fn-rem(20) rgba(0, 0, 0, 0.3);
+
+    .swiper-close-btn {
+      position: absolute;
+      top: fn-rem(8);
+      right: fn-rem(8);
+      background: none;
+      border: none;
+      color: fn-color("dark");
+      font-size: fn-rem(28);
+      cursor: pointer;
+      z-index: 10;
+
+      &:hover {
+        color: fn-color("primary");
+      }
+    }
+
+    .review-swiper {
+      width: 100%;
+      height: fn-rem(400);
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background-color: fn-color("gray-bg");
+      }
+
+      .swiper-pagination-bullet {
+        background: fn-color("gray-400");
+        opacity: 0.7;
+      }
+
+      .swiper-pagination-bullet-active {
+        background: fn-color("primary");
+      }
+
+      .swiper-button-prev,
+      .swiper-button-next {
+        color: fn-color("gray-700");
+
+        &:hover {
+          color: fn-color("primary");
+        }
+      }
+    }
+  }
+}

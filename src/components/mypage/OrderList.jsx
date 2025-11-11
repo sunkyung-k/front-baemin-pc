@@ -41,7 +41,7 @@ export default function OrderList({
       주문취소: "주문 취소",
     };
     const mapOwner = {
-      주문완료: "주문 완료",
+      주문완료: "",
       배달완료: "배달 완료",
       주문취소: "주문 취소",
     };

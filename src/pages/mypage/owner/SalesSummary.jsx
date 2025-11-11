@@ -11,8 +11,8 @@ export default function SalesSummary() {
   const storeId = myStore?.storeId;
   const { data } = useStoreSales(storeId);
 
-  const todaySales = data?.response?.todaySales ?? 0;
-  const monthSales = data?.response?.monthSales ?? 0;
+  const todaySales = data?.todaySales ?? 0;
+  const monthSales = data?.monthSales ?? 0;
 
   return (
     <Card title="매출 요약">

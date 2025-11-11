@@ -7,14 +7,17 @@ export default function ImageUpload({
   register,
   errorMessage,
   currentImageUrl = null,
+  onExternalChange, //  외부 제어용 prop 추가
 }) {
   const [preview, setPreview] = useState(currentImageUrl);
   const fileInputRef = useRef(null);
 
-  // RHF 등록
-  const { ref, onChange, ...rest } = register(name);
+  const {
+    ref,
+    onChange = () => {},
+    ...rest
+  } = register ? register(name) : { ref: () => {}, onChange: () => {} };
 
-  // 파일 선택 시 미리보기
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -23,7 +26,9 @@ export default function ImageUpload({
     } else {
       setPreview(currentImageUrl);
     }
+
     onChange(e);
+    onExternalChange?.(e); // 외부 함수 호출
   };
 
   useEffect(() => {
@@ -46,13 +51,6 @@ export default function ImageUpload({
       <div
         className={`image-preview ${errorMessage ? "error" : ""}`}
         onClick={() => fileInputRef.current?.click()}
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            fileInputRef.current?.click();
-          }
-        }}
       >
         {preview ? (
           <img src={preview} alt="미리보기" className="preview-img" />
@@ -60,6 +58,7 @@ export default function ImageUpload({
           <span className="plus-icon">+</span>
         )}
       </div>
+
       <input
         id={name}
         type="file"
