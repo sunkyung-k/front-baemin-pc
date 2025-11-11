@@ -21,13 +21,7 @@ export default function OrderLayout() {
   const handleError = useHandleError();
 
   const myDeposit = userInfo?.deposit ?? 0;
-  const [addr, setAddr] = useState(address || "");
   const [addrDetail, setAddrDetail] = useState("");
-
-  /** 전역 주소 상태 → 로컬 상태로 동기화 */
-  useEffect(() => {
-    if (address) setAddr(address);
-  }, [address]);
 
   /** 장바구니 데이터 조회 */
   const { data: basket } = useQuery({
@@ -69,28 +63,8 @@ export default function OrderLayout() {
   const finalTotal = productTotal;
   const isLackPoint = finalTotal > myDeposit;
 
-  /** 최소 주문 금액 */
-  const minPrice = basket?.store?.minPrice ?? basket?.minPrice ?? 0;
-
   /** 결제 실행 */
   const handleOrder = () => {
-    const trimmedAddr = addr?.trim();
-    const trimmedAddrDetail = addrDetail?.trim();
-
-    // 주소 입력 체크
-    if (!trimmedAddr) {
-      alert("주소를 입력해주세요!");
-      return;
-    }
-
-    // 최소 주문 금액 확인
-    if (minPrice > 0 && finalTotal < minPrice) {
-      alert(
-        `최소 주문 금액은 ${minPrice.toLocaleString()}원 이상이어야 합니다.`
-      );
-      return;
-    }
-
     // 보유금 체크
     if (isLackPoint) {
       alert("보유금이 부족합니다. 충전 후 다시 시도해주세요.");
@@ -102,8 +76,8 @@ export default function OrderLayout() {
 
     // 실제 결제 요청
     const payload = {
-      addr: trimmedAddr,
-      addrDetail: trimmedAddrDetail || "",
+      addr: address,
+      addrDetail: addrDetail.trim(),
     };
 
     orderMutation.mutate(payload);
@@ -114,8 +88,6 @@ export default function OrderLayout() {
       <section className={styles.leftArea}>
         <OrderCartBox
           basket={basket}
-          addr={addr}
-          setAddr={setAddr}
           addrDetail={addrDetail}
           setAddrDetail={setAddrDetail}
         />

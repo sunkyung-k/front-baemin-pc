@@ -3,6 +3,7 @@ import OrderCartItem from "./OrderCartItem";
 import { FaTrashAlt } from "react-icons/fa";
 import InputField from "@/components/form/InputField";
 import { useBasketOrder } from "@/hooks/useBasketOrder";
+import { useAddressStore } from "@/store/useAddressStore";
 import styles from "./OrderCartBox.module.scss";
 import stylesLayout from "./OrderLayout.module.scss";
 
@@ -13,14 +14,9 @@ import stylesLayout from "./OrderLayout.module.scss";
  * - 장바구니 목록 + 배송 정보 + 전체삭제 기능
  * - Mutation 로직은 useBasketOrder 훅으로 통합
  */
-export default function OrderCartBox({
-  basket,
-  addr,
-  setAddr,
-  addrDetail,
-  setAddrDetail,
-}) {
+export default function OrderCartBox({ basket, addrDetail, setAddrDetail }) {
   const { removeItem, clearAll } = useBasketOrder();
+  const { address } = useAddressStore();
 
   /** 단일 항목 삭제 */
   const handleRemove = (basketItemId) => {
@@ -63,15 +59,16 @@ export default function OrderCartBox({
       <div className={styles.formSection}>
         <h3>배송 정보</h3>
 
+        {/* 메인주소는 전역값 그대로 표시, 수정 불가 */}
         <InputField
           label="주소"
           name="addr"
           type="text"
-          value={addr}
-          onChange={(e) => setAddr(e.target.value)}
+          value={address}
           readOnly
         />
 
+        {/* 상세주소만 입력 가능 */}
         <InputField
           label="상세 주소"
           name="addrDetail"
