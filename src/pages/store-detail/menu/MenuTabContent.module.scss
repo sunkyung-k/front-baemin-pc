@@ -29,7 +29,7 @@
 
 .rightArea {
   position: sticky;
-  top: fn-rem(200);
+  top: fn-rem(150);
 
   /** md 이하일 때 하단 고정 팝업 스타일 */
   @media (max-width: bp("lg")) {
