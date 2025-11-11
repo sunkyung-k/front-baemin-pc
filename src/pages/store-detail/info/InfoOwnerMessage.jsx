@@ -5,8 +5,10 @@ export default function InfoOwnerMessage({ store }) {
   if (!store.notice) return null;
 
   return (
-    <section className={styles.ownerMessage}>
-      <h3 className={styles.sectionTitle}>사장님 한마디</h3>
+    <section className={styles.section}>
+      <h3 className={`${styles.sectionSubTitle} ${styles.bdNone}`}>
+        사장님 한마디
+      </h3>
       <div className={styles.messageBox}>
         <p style={{ whiteSpace: "pre-line" }}>{store.notice}</p>
       </div>

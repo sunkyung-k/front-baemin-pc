@@ -35,7 +35,8 @@ export default function InfoSection({ store }) {
           <ul className={styles.infoList}>
             {infoList.map((it, i) => (
               <li key={i}>
-                <strong>{it.label} :</strong> {it.value}
+                <strong>{it.label}</strong>
+                {it.value}
               </li>
             ))}
           </ul>
@@ -49,18 +50,18 @@ export default function InfoSection({ store }) {
           <ul className={styles.infoList}>
             {store.storeName && (
               <li>
-                <strong>상호명 :</strong> {store.storeName}
+                <strong>상호명</strong> {store.storeName}
               </li>
             )}
             {owner.businessNo && (
               <li>
-                <strong>사업자등록번호 :</strong>{" "}
+                <strong>사업자등록번호</strong>{" "}
                 {formatBusinessNo(owner.businessNo)}
               </li>
             )}
             {owner.userName && (
               <li>
-                <strong>대표자명 :</strong> {owner.userName}
+                <strong>대표자명</strong> {owner.userName}
               </li>
             )}
           </ul>
