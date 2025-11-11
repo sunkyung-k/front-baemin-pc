@@ -26,8 +26,18 @@ export default function OrderCartItem({ item, onRemove }) {
     onRemove?.(basketItemId);
   };
 
-  /** 옵션 가져오기 */
-  const optionNames = options?.map((opt) => opt.menuOption?.menuOptName) || [];
+  const optionLabels =
+    options?.length > 0
+      ? options
+          .map((opt) => {
+            const name = opt.menuOption?.menuOptName ?? "";
+            const optPrice = opt.menuOption?.price ?? 0;
+            return optPrice > 0
+              ? `${name} (+${formatPrice(optPrice)}원)`
+              : name;
+          })
+          .join(", ")
+      : "";
 
   return (
     <div className={styles.cartItem}>
@@ -42,10 +52,10 @@ export default function OrderCartItem({ item, onRemove }) {
 
         <div className={styles.cartInfo}>
           <p className={styles.name}>{menu?.menuName}</p>
-          {optionNames.length > 0 && (
-            <p className={styles.desc}>{optionNames.join(", ")}</p>
-          )}
-          <p className={styles.unitPrice}>{formatPrice(totalPrice)}원</p>
+
+          {/* {optionLabels && <p className={styles.desc}>{optionLabels}</p>} */}
+
+          <p className={styles.unitPrice}>{optionLabels}</p>
         </div>
       </div>
 

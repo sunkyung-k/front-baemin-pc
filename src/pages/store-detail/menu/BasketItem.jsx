@@ -6,15 +6,14 @@ export default function BasketItem({ item, onIncrease, onDecrease, onRemove }) {
   const { menu, quantity, totalPrice, options } = item;
   const isSoldOut = menu?.soldoutYn === "Y" || menu?.delYn === "Y";
 
-  // 옵션 이름 + 추가금 표시
   const optionLabels =
     options?.length > 0
       ? options
           .map((o) => {
-            const name = o.menuOption.menuOptName;
-            const totalOptPrice = o.totalPrice || 0;
-            return totalOptPrice > 0
-              ? `${name} (+${totalOptPrice.toLocaleString()}원)`
+            const name = o.menuOption?.menuOptName ?? "";
+            const optPrice = o.menuOption?.price ?? 0;
+            return optPrice > 0
+              ? `${name} (+${optPrice.toLocaleString()}원)`
               : name;
           })
           .join(", ")
@@ -39,7 +38,9 @@ export default function BasketItem({ item, onIncrease, onDecrease, onRemove }) {
             <span className={styles.options}>{optionLabels}</span>
           )}
         </div>
+
         {isSoldOut && <span className={styles.soldoutBadge}>품절</span>}
+
         <button
           type="button"
           className="btn btn-sm btn-secondary-line"
@@ -61,6 +62,7 @@ export default function BasketItem({ item, onIncrease, onDecrease, onRemove }) {
             disabled={isSoldOut}
           />
         </div>
+
         <div className={styles.price}>
           {(totalPrice || 0).toLocaleString()}원
         </div>
