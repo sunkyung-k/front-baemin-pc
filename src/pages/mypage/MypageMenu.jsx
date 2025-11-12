@@ -29,10 +29,12 @@ function MypageMenu() {
                 },
               ]
             : []),
+          { to: "/mypage/review", label: "리뷰 관리" },
           { to: "/mypage/account", label: "계정 설정" },
         ]
       : [
-          { to: "/mypage/order/info", label: "주문 정보" },
+          { to: "/mypage/order/info", label: "주문 보기" },
+          { to: "/mypage/review", label: "리뷰 보기" },
           { to: "/mypage/account", label: "계정 설정" },
         ];
 

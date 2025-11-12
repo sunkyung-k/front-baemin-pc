@@ -38,10 +38,6 @@ export const QUERY_KEYS = {
   BASKET_DETAIL: (basketId) => ["basketDetail", basketId],
   BASKET_ITEM_LIST: (basketId) => ["basketItemList", basketId],
 
-  /** 유틸성 (캐시 전체 초기화 등) */
-  ALL_MENUS: ["allMenus"],
-  ALL_OPTIONS: ["allOptions"],
-
   /** 사용자(User / Account) */
   USER_INFO: (userId) => ["userInfo", userId], // 내 정보
   USER_DEPOSIT: (userId) => ["userDeposit", userId], // 보유금
@@ -56,4 +52,18 @@ export const QUERY_KEYS = {
   MY_ORDER_RECENT_LIST: ["myOrderRecentList"], // 유저 최근 24시간 주문내역
   MY_STORE_ORDER_LIST: ["myStoreOrderList"], // 점주 주문 내역
   ORDER_DETAIL: (orderId) => ["orderDetail", orderId],
+
+  /** 리뷰(Review) */
+  MY_REVIEW_LIST: ["myReviewList"], // 내가 작성한 리뷰 목록
+  STORE_REVIEW_LIST: (storeId) => ["storeReviewList", storeId], // 특정 가게 리뷰 목록
+  MY_STORE_REVIEW_LIST: ["myStoreReviewList"], // 내 가게(점주) 리뷰 목록
+  REVIEW_DETAIL: (reviewId) => ["reviewDetail", reviewId], // 리뷰 상세 (선택)
+
+  /** 리뷰 답글(Review Reply) */
+  REVIEW_REPLY_DETAIL: (reviewReplyId) => ["reviewReplyDetail", reviewReplyId],
+  REVIEW_REPLY_LIST: (reviewId) => ["reviewReplyList", reviewId], // 리뷰별 답글 목록 (필요 시)
+
+  /** 유틸성 (캐시 전체 초기화 등) */
+  ALL_MENUS: ["allMenus"],
+  ALL_OPTIONS: ["allOptions"],
 };

@@ -20,6 +20,7 @@ import Favorite from "../pages/favorite/Favorite";
 import OrderLayout from "../pages/order/OrderLayout";
 import OrderComplete from "../pages/order/OrderComplete";
 import OrderStatus from "../pages/order/OrderStatus";
+import MypageReview from "../pages/mypage/MypageReview";
 
 export const router = createBrowserRouter([
   {
@@ -94,6 +95,10 @@ export const router = createBrowserRouter([
           {
             path: "account",
             Component: MypageAccount,
+          },
+          {
+            path: "review",
+            Component: MypageReview,
           },
         ],
       },

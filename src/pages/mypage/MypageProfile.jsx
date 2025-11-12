@@ -30,8 +30,8 @@ export default function MypageProfile() {
   const deposit = isUserInfoLoading
     ? "로딩 중..."
     : userInfo?.deposit
-    ? `₩${formatPrice(userInfo.deposit)}`
-    : "₩0";
+    ? `${formatPrice(userInfo.deposit)} 원`
+    : "0 원";
 
   const roleInfo = {
     ROLE_OWNER: {

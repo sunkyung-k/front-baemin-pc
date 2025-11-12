@@ -1,35 +1,47 @@
 import React, { useState, useEffect } from "react";
 import { formatPrice } from "@/utills/valueFormatter";
 import { FaAngleDown, FaUtensils } from "react-icons/fa";
-import EmptyState from "@/components/menu/EmptyState";
+import EmptyState from "../menu/EmptyState";
 
+/**
+ * OrderList (주문 내역 공용 컴포넌트)
+ * --------------------------------------------------
+ * - type: "user" | "owner"
+ * - data 변경 시 강제 리렌더 처리 (리뷰등록 직후 즉시 반영)
+ */
 export default function OrderList({
   data = [],
   type = "user",
   onReviewClick,
   onStatusChange,
-  refreshTrigger, // 페이지 이동 등 외부 트리거로 초기화
+  refreshTrigger,
   readOnly = false,
 }) {
   const [openIds, setOpenIds] = useState([]);
+  const [renderKey, setRenderKey] = useState(0); //  렌더 강제 트리거 키
 
-  /** 외부 트리거(page 등) 발생 시 자동 닫기 */
+  /**  외부 트리거 (페이지 변경 등) 시 아코디언 초기화 및 데이터 변경 시 강제 리렌더 */
   useEffect(() => {
-    if (!readOnly) setOpenIds([]);
-  }, [refreshTrigger, readOnly]);
+    // data 내부 값 변화(reviewed: true)에 대한 강제 리렌더 트리거
+    setRenderKey((prev) => prev + 1);
 
-  /** 데이터 변경 시 기존 open 상태 유지 */
-  useEffect(() => {
-    if (!readOnly) {
+    // readOnly 상태가 아니거나, 데이터가 변경되면 openIds 정리
+    if (!readOnly || data.length > 0) {
+      // 현재 데이터에 없는 orderId는 openIds에서 제거 (상태 유지)
       setOpenIds((prev) =>
         prev.filter((id) => data.some((o) => o.orderId === id))
       );
     }
-  }, [data, readOnly]);
+  }, [data, readOnly, refreshTrigger]);
 
-  /** 아코디언 토글 */
+  /**
+   * 아코디언 토글
+   * (기본적으로 토글 활성화. readOnly=true일 때만 비활성화)
+   */
   const toggleAccordion = (orderId) => {
+    // 토글 비활성화 조건: readOnly가 true일 때
     if (readOnly) return;
+
     setOpenIds((prev) =>
       prev.includes(orderId)
         ? prev.filter((id) => id !== orderId)
@@ -37,10 +49,8 @@ export default function OrderList({
     );
   };
 
-  /** 상태 텍스트 변환 */
+  /**  상태 표시 텍스트 */
   const getStatusLabel = (status) => {
-    if (readOnly && status === "주문완료") return "";
-
     const mapUser = {
       주문완료: "주문 확인중",
       배달완료: "배달 완료",
@@ -54,40 +64,72 @@ export default function OrderList({
     return type === "user" ? mapUser[status] : mapOwner[status];
   };
 
-  /** 데이터 없을 때 EmptyState 출력 */
+  /**  데이터 없을 때 EmptyState 출력 */
+  /**  데이터 없을 때 EmptyState 출력 */
   if (!data?.length) {
-    return (
-      <EmptyState
-        icon={<FaUtensils />}
-        title="주문 내역이 없습니다."
-        description="최근 주문하신 내역이 여기에 표시됩니다."
-      />
-    );
+    const emptyProps =
+      type === "user"
+        ? {
+            icon: <FaUtensils />,
+            title: "주문 내역이 없습니다.",
+            description: "최근 주문하신 내역이 여기에 표시됩니다.",
+          }
+        : {
+            icon: <FaUtensils />,
+            title: "접수된 주문이 없습니다.",
+            description: "새로운 주문이 들어오면 여기에 표시됩니다.",
+          };
+
+    return <EmptyState {...emptyProps} />;
   }
 
-  return (
-    <div className={`order-list ${readOnly ? "read-only" : ""}`}>
-      {data.map((order) => {
-        const { orderId, orderDate, totalPrice, status, itemList, storeName } =
-          order;
+  // 토글 기능이 활성화되었는지 확인하는 플래그 (UI 표시용)
+  const isToggleActive = !readOnly;
 
-        const isOpen = readOnly ? true : openIds.includes(orderId);
-        const isReviewable = type === "user" && status === "배달완료";
-        const formattedDate = orderDate?.split(" ")[0] ?? "";
+  return (
+    <div
+      key={renderKey} //  data 내부 값 변화(markReviewed)에 대한 강제 리렌더 트리거
+      className={`order-list ${readOnly ? "read-only" : ""}`}
+    >
+      {data.map((order) => {
+        const {
+          orderId,
+          orderDate,
+          totalPrice,
+          status,
+          itemList,
+          storeName,
+          reviewed,
+        } = order;
+
+        const isOpen = openIds.includes(orderId);
+
+        /**  리뷰쓰기 버튼 표시 조건
+         * - 배달완료 상태
+         * - reviewed === false (또는 undefined)
+         */
+        const isReviewable =
+          !readOnly &&
+          type === "user" &&
+          status === "배달완료" &&
+          (reviewed === false || reviewed === undefined);
 
         return (
           <div key={orderId} className={`order-card ${isOpen ? "open" : ""}`}>
             <div
               className="order-card-header"
-              onClick={() => toggleAccordion(orderId)}
+              onClick={
+                isToggleActive ? () => toggleAccordion(orderId) : undefined
+              }
+              style={{ cursor: isToggleActive ? "pointer" : "default" }}
             >
               <div className="order-info">
                 <h4 className="order-title">{storeName || "가게명 미표시"}</h4>
 
                 <div className="order-detail">
                   <p>{formatPrice(totalPrice)}원</p> /{" "}
-                  <span>{formattedDate}</span>
-                  {!readOnly && <FaAngleDown className="toggle-arrow" />}
+                  <span>{orderDate ?? ""}</span>
+                  {isToggleActive && <FaAngleDown className="toggle-arrow" />}
                 </div>
               </div>
 
@@ -104,27 +146,26 @@ export default function OrderList({
                   {getStatusLabel(status)}
                 </span>
 
-                {!readOnly && type === "user" && status !== "주문취소" && (
+                {/*  리뷰쓰기 버튼 */}
+                {isReviewable && (
                   <button
-                    className={`btn btn-round btn-sm ${
-                      isReviewable ? "btn-primary" : "btn-disabled"
-                    }`}
-                    disabled={!isReviewable}
+                    className="btn btn-round btn-sm btn-primary"
                     onClick={(e) => {
-                      e.stopPropagation(); // 부모 토글 차단
-                      isReviewable && onReviewClick(order);
+                      e.stopPropagation();
+                      onReviewClick(order);
                     }}
                   >
                     리뷰 쓰기
                   </button>
                 )}
 
+                {/*  점주용 상태 변경 버튼 */}
                 {type === "owner" && status === "주문완료" && (
                   <>
                     <button
                       className="btn btn-outline btn-round btn-sm btn-danger"
                       onClick={(e) => {
-                        e.stopPropagation(); // 부모 토글 이벤트 차단
+                        e.stopPropagation();
                         onStatusChange(orderId, "주문취소", order);
                       }}
                     >
@@ -133,7 +174,7 @@ export default function OrderList({
                     <button
                       className="btn btn-primary btn-round btn-sm"
                       onClick={(e) => {
-                        e.stopPropagation(); // 부모 토글 이벤트 차단
+                        e.stopPropagation();
                         onStatusChange(orderId, "배달완료", order);
                       }}
                     >
