@@ -25,7 +25,7 @@ export default function Favorite() {
         <EmptyState
           icon={<FaHeart />}
           title="찜한 가게가 없습니다."
-          description="마음에 드는 가게를 찜하면 이곳에 표시됩니다."
+          description="관심 있는 가게를 찜하면 이곳에 표시됩니다."
         />
       </section>
     );
@@ -37,7 +37,8 @@ export default function Favorite() {
 
   return (
     <main className="page-wrap">
-      <h2 className="page-title">내가 찜한 가게</h2>
+      <h2 className="page-title">찜 목록</h2>
+      <p className="page-txt">관심 있는 가게들을 한눈에 볼 수 있습니다.</p>
 
       <div className={styles.storeList}>
         {likedStores.map((store) => (

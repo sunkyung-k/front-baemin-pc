@@ -1,6 +1,6 @@
 .main {
   max-width: fn-rem(1200);
-  margin: 0 auto;
+  margin: space("md") auto 0;
   width: 100%;
   padding: 0 space("lg");
 
@@ -14,4 +14,14 @@
   flex-wrap: wrap;
   gap: space("md");
   margin-top: space("lg");
+}
+
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .resultCount {
+    font-size: font("md");
+  }
 }

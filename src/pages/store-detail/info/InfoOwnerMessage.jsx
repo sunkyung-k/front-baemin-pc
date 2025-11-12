@@ -10,7 +10,7 @@ export default function InfoOwnerMessage({ store }) {
         사장님 한마디
       </h3>
       <div className={styles.messageBox}>
-        <p style={{ whiteSpace: "pre-line" }}>{store.notice}</p>
+        <p>{store.notice}</p>
       </div>
     </section>
   );

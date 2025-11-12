@@ -38,6 +38,10 @@
     font-size: font("md");
     line-height: 1.7;
     color: fn-color("gray-800");
+
+    p {
+      white-space: pre-wrap;
+    }
   }
 
   .infoList {
@@ -63,6 +67,6 @@
     font-size: font("sm");
     color: fn-color("gray-600");
     line-height: 1.7;
-    white-space: pre-line;
+    white-space: pre-wrap;
   }
 }

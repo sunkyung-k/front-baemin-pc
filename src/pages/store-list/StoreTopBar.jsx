@@ -4,6 +4,13 @@ import { useCategory } from "@/hooks/useCategory";
 import InputField from "@/components/form/InputField";
 import styles from "./StoreTopBar.module.scss";
 
+/**
+ * StoreTopBar
+ * -----------------------------------------------------
+ * - 검색창 + 카테고리 탭 (정렬 셀렉트는 제거됨)
+ * - Home / StoreListLayout 과 연동
+ * -----------------------------------------------------
+ */
 export default function StoreTopBar({ filters, setCategory, setSearchText }) {
   const { categories } = useCategory();
   const [localValue, setLocalValue] = useState(filters.searchText);
@@ -25,7 +32,7 @@ export default function StoreTopBar({ filters, setCategory, setSearchText }) {
     inputRef.current?.focus();
   };
 
-  /** 전체보기 caId=0 */
+  /** 전체보기 caId=0 고정 */
   const allCategories = [{ id: 0, name: "전체보기" }, ...categories];
 
   /** 현재 활성 카테고리 판별 */

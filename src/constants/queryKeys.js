@@ -53,6 +53,7 @@ export const QUERY_KEYS = {
 
   /** 주문(Order) */
   MY_ORDER_LIST: ["myOrderList"], // 유저 주문 내역
+  MY_ORDER_RECENT_LIST: ["myOrderRecentList"], // 유저 최근 24시간 주문내역
   MY_STORE_ORDER_LIST: ["myStoreOrderList"], // 점주 주문 내역
   ORDER_DETAIL: (orderId) => ["orderDetail", orderId],
 };

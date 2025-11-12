@@ -4,26 +4,26 @@ import { useStoreList } from "@/hooks/useStoreList";
 import StoreCard from "@/components/store/StoreCard";
 import EmptyState from "@/components/menu/EmptyState";
 import Pagination from "@/components/common/Pagination";
+import SelectBox from "@/components/form/SelectBox";
 import { FaStore } from "react-icons/fa6";
 import styles from "./StoreList.module.scss";
 
 export default function StoreList() {
-  // StoreListLayout에서 전달한 filters 통째로 받기
-  const { filters } = useOutletContext();
-
-  // 현재 페이지 번호 관리
+  const { filters, setSort } = useOutletContext();
   const [page, setPage] = useState(0);
-
-  // filters 전체 전달 (React Query가 자동으로 refetch)
   const { stores, pageInfo } = useStoreList({
     ...filters,
     page,
   });
 
-  // 데이터 준비 전엔 아무것도 렌더하지 않음
-  if (stores === undefined) return null;
+  /** 정렬 옵션 리스트 */
+  const sortOptions = [
+    { label: "별점 높은순", value: "ratingAvg,desc" },
+    { label: "리뷰 많은순", value: "reviewCount,desc" },
+    { label: "최소주문금액 낮은순", value: "minPrice,asc" },
+  ];
 
-  // 가게가 하나도 없을 때만 EmptyState 노출
+  if (stores === undefined) return null;
   if (!stores.length) {
     return (
       <main className={styles.main}>
@@ -42,13 +42,29 @@ export default function StoreList() {
 
   return (
     <main className={styles.main}>
+      <div className={styles.listHeader}>
+        {/* 결과 개수 안내 */}
+        <p className={styles.resultCount}>
+          총 <strong>{pageInfo?.totalElements ?? stores.length}</strong>개
+        </p>
+
+        {/* 정렬 셀렉트 */}
+        <SelectBox
+          name="sort"
+          value={filters.sort || "ratingAvg,desc"}
+          onChange={(e) => setSort(e.target.value)}
+          options={sortOptions}
+        />
+      </div>
+
+      {/* 가게 리스트 */}
       <div className={styles.storeGrid}>
         {stores.map((s) => (
           <StoreCard key={s.storeId} store={s} showStatus />
         ))}
       </div>
 
-      {/* Pagination */}
+      {/* 페이지네이션 */}
       {pageInfo && (
         <Pagination pageInfo={pageInfo} onPageChange={handlePageChange} />
       )}

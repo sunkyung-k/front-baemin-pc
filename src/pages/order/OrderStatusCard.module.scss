@@ -1,0 +1,153 @@
+/* 카드 공통 */
+.orderCard {
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 calc((100% - 1 * space("md")) / 2);
+  border: 1px solid fn-color("gray-200");
+  padding: space("xl");
+  border-radius: radius("lg");
+  background: fn-color("white");
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
+  @media (max-width: bp("md")) {
+    flex: 0 0 100%;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  }
+
+  &.disabled {
+    background: fn-color("gray-100");
+    border-color: fn-color("gray-200");
+    box-shadow: none;
+    transform: none;
+    opacity: 0.6;
+    filter: grayscale(100%);
+    pointer-events: none;
+  }
+}
+
+/* 헤더 */
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: space("md");
+
+  h4 {
+    font-size: font("xl");
+    font-weight: 700;
+    color: fn-color("gray-900");
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* 주문 상세 */
+.orderDetail {
+  font-size: font("md");
+  color: fn-color("gray-700");
+  margin-bottom: space("lg");
+  line-height: 1.7;
+
+  dl {
+    display: flex;
+    flex-wrap: wrap;
+
+    dt {
+      width: fn-rem(90);
+      color: fn-color("gray-500");
+      font-weight: 500;
+    }
+
+    dd {
+      width: calc(100% - fn-rem(90));
+      margin: 0 0 space("xs");
+
+      &.ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      button {
+        text-decoration: underline;
+        color: fn-color("gray-800");
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+        display: inline-block;
+        vertical-align: middle;
+
+        &:hover {
+          color: fn-color("primary");
+        }
+      }
+    }
+  }
+
+  strong {
+    color: fn-color("primary");
+    font-weight: 700;
+  }
+}
+
+/* 상태 뱃지 */
+.badge {
+  font-size: font("sm");
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: radius("full");
+  background: fn-color("gray-200");
+  color: fn-color("gray-500");
+
+  &.pending {
+    background: fn-color("primary-bg");
+    color: fn-color("primary");
+  }
+
+  &.cancel {
+    background: fn-color("danger-bg");
+    color: fn-color("danger");
+  }
+}
+
+/* 단계 표시 */
+.steps {
+  display: flex;
+  justify-content: space-between;
+  font-size: font("sm");
+  color: fn-color("gray-400");
+  margin-bottom: space("xs");
+
+  .step {
+    transition: 0.2s ease;
+  }
+
+  .active {
+    color: fn-color("primary");
+    font-weight: 700;
+  }
+}
+
+/* 진행 바 */
+.progressContainer {
+  position: relative;
+  height: 6px;
+  background: fn-color("gray-200");
+  border-radius: radius("full");
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: fn-color("primary");
+  border-radius: radius("full");
+  transition: width 0.4s ease;
+}

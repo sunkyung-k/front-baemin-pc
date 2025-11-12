@@ -19,6 +19,7 @@ export function useStoreList(filters = {}) {
     addr: address,
     searchText: filters.searchText?.trim() || null,
     caId: filters.caId === 0 ? null : filters.caId,
+    sort: filters.sort || "ratingAvg,desc",
   };
 
   /** 쿼리 키 정의 */

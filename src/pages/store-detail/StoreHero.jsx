@@ -1,7 +1,7 @@
 import React from "react";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 import LikeButton from "@/components/store/StoreLikeButton";
-import useFavoriteToggle from "@/hooks/useFavoriteToggle";
+import useFavorite from "@/hooks/useFavorite";
 import styles from "./StoreHero.module.scss";
 import { FaStar, FaClock } from "react-icons/fa6";
 
@@ -17,7 +17,7 @@ export default function StoreHero({ storeDetail }) {
   const { storeId, storeName, ratingAvg, minPrice, hourComment, fileList } =
     detail;
 
-  const { isLiked, toggleLike } = useFavoriteToggle(storeId);
+  const { isLiked, toggleLike } = useFavorite(storeId);
 
   if (!storeDetail) return null;
 

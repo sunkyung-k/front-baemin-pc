@@ -5,6 +5,27 @@
   flex-direction: column;
   gap: space("md");
   width: 100%;
+
+  &.read-only {
+    .order-card-header {
+      cursor: inherit;
+    }
+
+    .order-card {
+      transition: none;
+      max-height: 65vh;
+      overflow-y: auto;
+
+      &:hover {
+        transform: none;
+        box-shadow: none;
+      }
+
+      &.open {
+        box-shadow: none;
+      }
+    }
+  }
 }
 
 .order-card {

@@ -8,9 +8,9 @@ import StoreTopBar from "./StoreTopBar";
 import styles from "./StoreListLayout.module.scss";
 
 export default function StoreListLayout() {
-  // 주소/카테고리/검색어 모두 useStoreFilters로 통합
-  const { filters, setCategory, setSearchText, address, setAddress } =
+  const { filters, setCategory, setSearchText, setSort, address, setAddress } =
     useStoreFilters();
+
   const { fetchAddress, loading } = useCurrentAddress();
   const { openAddressSearch } = useAddressSearch(setAddress);
 
@@ -32,7 +32,8 @@ export default function StoreListLayout() {
         setCategory={setCategory}
         setSearchText={setSearchText}
       />
-      <Outlet context={{ filters, setCategory, setSearchText }} />
+
+      <Outlet context={{ filters, setCategory, setSearchText, setSort }} />
     </>
   );
 }
