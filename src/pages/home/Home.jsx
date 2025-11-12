@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import AddressInput from "@/components/store/AddressInput";
 import { useCurrentAddress } from "@/hooks/useCurrentAddress";
 import { useCategory } from "@/hooks/useCategory";
-import { useAddressStore } from "@/store/useAddressStore";
 import { useAddressSearch } from "@/hooks/useAddressSearch";
+import { useStoreFilters } from "@/hooks/useStoreFilters";
 import styles from "./Home.module.scss";
 
 export default function Home() {
   const navigate = useNavigate();
   const { categories } = useCategory();
-  const { address, setAddress } = useAddressStore();
+  const { address, setAddress } = useStoreFilters();
   const { fetchAddress, loading } = useCurrentAddress();
   const { openAddressSearch } = useAddressSearch(setAddress);
 
@@ -37,13 +37,13 @@ export default function Home() {
     []
   );
 
-  /** 전체보기 포함한 카테고리 */
+  /** 전체보기 caId=0 */
   const categoryList = useMemo(
-    () => [{ id: "all", name: "전체보기" }, ...(categories || [])],
+    () => [{ id: 0, name: "전체보기" }, ...(categories || [])],
     [categories]
   );
 
-  /** 카테고리 클릭 시 이동 */
+  /** 카테고리 클릭 시 이동 로직 개선 */
   const handleCategoryClick = useCallback(
     (caId) => {
       if (!address) {
@@ -52,7 +52,7 @@ export default function Home() {
       }
 
       const params = new URLSearchParams({
-        addr: encodeURIComponent(address),
+        addr: address,
         caId,
       });
 
@@ -80,14 +80,12 @@ export default function Home() {
         />
       </section>
 
-      {/* Category Section */}
       <main className={styles.main}>
         <h2 className={styles.homeTit}>카테고리</h2>
         <div className={styles.categoryGrid}>
           {categoryList.map((cat, idx) => {
             const imgSrc = categoryImages[idx % categoryImages.length];
-            const caId = String(cat.id || "all");
-
+            const caId = cat.id ?? 0;
             return (
               <button
                 key={cat.id || idx}

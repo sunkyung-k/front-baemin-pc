@@ -1,6 +1,9 @@
 import api from "@/api/axiosApi";
 import { useAddressStore } from "@/store/useAddressStore";
 
+/**
+ * - Axios 호출, 주소/에러 처리
+ */
 const storeListAPI = {
   /** 가게 리스트 조회 (검색/카테고리 필터 포함) */
   async getStores(params = {}) {

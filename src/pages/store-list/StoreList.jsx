@@ -8,15 +8,15 @@ import { FaStore } from "react-icons/fa6";
 import styles from "./StoreList.module.scss";
 
 export default function StoreList() {
-  const { searchText, activeCaId } = useOutletContext();
+  // StoreListLayout에서 전달한 filters 통째로 받기
+  const { filters } = useOutletContext();
 
   // 현재 페이지 번호 관리
   const [page, setPage] = useState(0);
 
-  // useStoreList 훅에 page 전달
+  // filters 전체 전달 (React Query가 자동으로 refetch)
   const { stores, pageInfo } = useStoreList({
-    caId: activeCaId || null,
-    searchText: searchText || null,
+    ...filters,
     page,
   });
 

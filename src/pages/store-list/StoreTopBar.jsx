@@ -1,64 +1,35 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { useCategory } from "@/hooks/useCategory";
-import { useAddressStore } from "@/store/useAddressStore"; // 전역 주소 상태 불러오기
-import { useNavigate, useSearchParams } from "react-router-dom"; // URL 변경용 훅
 import InputField from "@/components/form/InputField";
 import styles from "./StoreTopBar.module.scss";
 
-export default function StoreTopBar({
-  activeCaId,
-  searchText,
-  onCategoryChange,
-  onSearchChange,
-}) {
+export default function StoreTopBar({ filters, setCategory, setSearchText }) {
   const { categories } = useCategory();
-  const [localValue, setLocalValue] = useState(searchText);
+  const [localValue, setLocalValue] = useState(filters.searchText);
   const inputRef = useRef(null);
 
-  // 현재 주소 가져오기 (Zustand 등 전역 상태)
-  const { address } = useAddressStore();
-
-  // URL 조작용 훅
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-
-  // 주소 변경 시 URL 자동 갱신
-  useEffect(() => {
-    if (!address) return;
-
-    // 현재 URL의 쿼리 파라미터들 복사
-    const params = new URLSearchParams(searchParams);
-
-    // addr 값만 새로 세팅
-    params.set("addr", address);
-
-    // 변경된 쿼리 문자열로 이동 (히스토리 쌓임)
-    navigate(`/store?${params.toString()}`, { replace: false });
-  }, [address]);
-
   /** 외부 searchText 변경 시 내부 input 반영 */
-  useEffect(() => setLocalValue(searchText), [searchText]);
+  useEffect(() => setLocalValue(filters.searchText), [filters.searchText]);
 
   /** 검색 실행 */
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSearchChange(localValue.trim());
+    setSearchText(localValue.trim());
   };
 
   /** 검색어 초기화 */
   const handleClear = () => {
     setLocalValue("");
-    onSearchChange("");
+    setSearchText("");
     inputRef.current?.focus();
   };
 
-  /** 카테고리 데이터 */
-  const allCategories = [{ id: "all", name: "전체보기" }, ...categories];
+  /** 전체보기 caId=0 */
+  const allCategories = [{ id: 0, name: "전체보기" }, ...categories];
 
   /** 현재 활성 카테고리 판별 */
-  const isActive = (catId) =>
-    String(activeCaId || "all") === String(catId || "all");
+  const isActive = (catId) => Number(filters.caId ?? 0) === Number(catId ?? 0);
 
   return (
     <section className={styles.topBar}>
@@ -93,7 +64,7 @@ export default function StoreTopBar({
           {allCategories.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => onCategoryChange(cat.id)}
+              onClick={() => setCategory(cat.id)}
               className={`${styles.tab} ${
                 isActive(cat.id) ? styles.active : ""
               }`}

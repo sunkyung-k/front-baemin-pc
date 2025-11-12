@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useAfterMutation, AFTER_TYPES } from "@/hooks/common/useAfterMutation";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import storeListAPI from "@/service/storeListAPI";
 import { handleApiError } from "@/utills/handleApiError";
@@ -8,24 +7,18 @@ import { useAddressStore } from "@/store/useAddressStore";
 /**
  * useStoreList 훅
  * ------------------------------------------------------
- * - 가게 목록 조회 전용
- * - 주소 기반 필터링 + 카테고리, 검색어 옵션 지원
- * - useAfterMutation으로 목록 캐시 자동 갱신
- * - 로딩/에러는 전역(GlobalLoading + handleApiError) 처리
+ * - 주소 기반 가게 목록 조회 (필터는 상위 훅에서 세팅)
+ * - 전역 에러 및 로딩은 공용으로 처리
  */
 export function useStoreList(filters = {}) {
   const { address } = useAddressStore();
-
-  /** 필터 정규화 */
-  const normalizedCaId =
-    !filters.caId || filters.caId === "all" ? null : filters.caId;
 
   /** 서버 요청 파라미터 */
   const params = {
     ...filters,
     addr: address,
-    caId: normalizedCaId,
     searchText: filters.searchText?.trim() || null,
+    caId: filters.caId === 0 ? null : filters.caId,
   };
 
   /** 쿼리 키 정의 */
