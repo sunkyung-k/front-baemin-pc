@@ -82,6 +82,11 @@
     p {
       font-size: font("sm");
       color: fn-color("gray-600");
+
+      &.not-available {
+        color: fn-color("danger");
+        font-size: font("sm");
+      }
     }
   }
 

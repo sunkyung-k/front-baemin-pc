@@ -45,6 +45,16 @@ export const useOrderStatus = (page = 0) => {
         exact: false,
       });
 
+      /* 최근 24시간 주문 내역도 함께 갱신 [주문 현황] */
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.MY_ORDER_RECENT_LIST],
+        refetchType: "active",
+      });
+      await queryClient.refetchQueries({
+        queryKey: [QUERY_KEYS.MY_ORDER_RECENT_LIST],
+        exact: false,
+      });
+
       // 매출 요약 캐시도 즉시 무효화 + 재조회
       await queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.STORE_SALES],

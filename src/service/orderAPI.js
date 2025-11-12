@@ -10,6 +10,14 @@ const orderAPI = {
     return res.data.response;
   },
 
+  /** [USER] 최근 24시간 주문 내역 조회 */
+  async getRecentMyOrders(page = 0) {
+    const res = await api.get(`/api/v1/order/recent/my`, {
+      params: { page },
+    });
+    return res.data.response;
+  },
+
   /** [OWNER] 점주용 주문 리스트 조회 (페이지 포함) */
   async getMyStoreOrders(page = 0) {
     const res = await api.get(`/api/v1/order/store/my`, {

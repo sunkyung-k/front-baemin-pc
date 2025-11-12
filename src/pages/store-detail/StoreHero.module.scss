@@ -1,3 +1,5 @@
+/* 기존 fn-rem, fn-color, space, font 함수는 정의되어 있다고 가정합니다. */
+
 .heroWrap {
   .storeHero {
     position: relative;
@@ -12,37 +14,29 @@
     gap: space("sm");
     padding: space("lg");
     color: fn-color("gray-600");
+    font-size: font("sm");
 
     .storeName {
+      margin-bottom: space("xs");
       font-size: font("xxl");
       font-weight: 700;
-      color: fn-color("gray-900");
+      color: fn-color("gray-800");
     }
 
-    /* 별점 + 최소주문금액 */
-    .storeMeta {
+    /* 공통 아이콘 + 텍스트 스타일 */
+    .infoRow {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
       gap: space("xs");
-      font-size: font("sm");
-
-      svg {
-        color: fn-color("rating");
-        font-size: font("md");
-      }
-    }
-
-    /* 영업 상태 */
-    .storeHour {
-      display: flex;
-      align-items: center;
-      gap: space("xs");
-      font-size: font("sm");
 
       svg {
         font-size: font("md");
-        color: fn-color("primary");
+        color: fn-color("gray-500");
+
+        &.starIcon {
+          color: fn-color("rating");
+        }
       }
     }
   }

@@ -5,6 +5,13 @@ import LikeButton from "@/components/store/StoreLikeButton";
 import useFavorite from "@/hooks/useFavorite";
 import { FaStar } from "react-icons/fa6";
 
+/**
+ * StoreCard
+ * -------------------------------------------------
+ * - 공통 가게 카드 컴포넌트
+ * - 찜 버튼 / 영업 상태 / 거리 정보 표시
+ * - 최소주문금액 쉼표 포맷 적용 (3자리)
+ */
 export default function StoreCard({
   store,
   linkable = true,
@@ -14,17 +21,28 @@ export default function StoreCard({
     storeId,
     storeName,
     branchName,
+    minPrice,
     ratingAvg,
     open,
     hourComment,
-    minPrice,
+    isAround,
+    around,
   } = store;
+
   const { isLiked, toggleLike } = useFavorite(storeId);
 
   if (!store) return null;
 
-  const cardInner = (
+  // 반경 (기본값 true)
+  const available = isAround ?? around ?? true;
+
+  // 최소주문금액 포맷
+  const formattedPrice = Number(minPrice)?.toLocaleString() ?? "0";
+
+  // 카드 내용
+  const content = (
     <>
+      {/* 찜 버튼 */}
       <LikeButton
         isActive={isLiked}
         onToggle={toggleLike}
@@ -35,7 +53,13 @@ export default function StoreCard({
       />
 
       <div className="card-thumb">
-        <img src={getAbsoluteImageUrl(store)} alt={storeName} />
+        <img
+          src={getAbsoluteImageUrl(store)}
+          alt={storeName || "가게 이미지"}
+          loading="lazy"
+        />
+
+        {/* 휴무 뱃지 */}
         {showStatus && open === false && (
           <span className="closedBadge">{hourComment || "휴무"}</span>
         )}
@@ -43,28 +67,29 @@ export default function StoreCard({
 
       <div className="card-info">
         <h3 className="card-title">
-          {storeName}
-          {branchName && <span className="branch-name"> - {branchName}</span>}
+          {storeName} {branchName && <span>- {branchName}</span>}
         </h3>
 
-        {minPrice && (
-          <p className="min-price">
-            최소주문금액 {minPrice.toLocaleString()}원
-          </p>
-        )}
+        <p>최소주문금액 {formattedPrice}원</p>
 
+        {/* 평점 */}
         <p className="card-rating">
-          <FaStar /> {ratingAvg?.toFixed(1) ?? 0}
+          <FaStar /> {(ratingAvg ?? 0).toFixed(1)}
         </p>
+
+        {/* 반경 4km 이상 시 표시 */}
+        {!available && (
+          <p className="not-available">현재 위치에서는 주문이 불가합니다.</p>
+        )}
       </div>
     </>
   );
 
   return linkable ? (
     <Link to={`/store/${storeId}`} className="card-store">
-      {cardInner}
+      {content}
     </Link>
   ) : (
-    <div className="card-store">{cardInner}</div>
+    <div className="card-store">{content}</div>
   );
 }
