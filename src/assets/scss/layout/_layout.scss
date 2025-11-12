@@ -42,7 +42,14 @@
   &-title {
     font-size: font("xxl");
     font-weight: 800;
-    margin-bottom: space("xl");
     text-align: center;
+  }
+
+  &-txt {
+    margin-top: space("md");
+    text-align: center;
+    font-size: font("sm");
+    color: fn-color("gray-500");
+    line-height: 1.4;
   }
 }

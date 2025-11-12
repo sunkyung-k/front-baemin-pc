@@ -80,7 +80,7 @@
     display: flex;
     align-items: center;
     gap: space("sm");
-    font-size: fn-rem(13);
+    font-size: font("sm");
 
     .btn {
       background: fn-color("white");

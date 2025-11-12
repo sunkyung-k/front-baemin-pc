@@ -1,36 +1,69 @@
-import React, { useState } from "react";
+import React from "react";
 import { NavLink, useNavigate } from "react-router";
-import { FaHeart, FaUser, FaBookOpen, FaBars, FaTimes } from "react-icons/fa";
-import { RiEBike2Fill } from "react-icons/ri";
+import { FaHeart, FaUser, FaStore } from "react-icons/fa";
+import { RiEBike2Fill, RiAdminFill } from "react-icons/ri";
 import { authStore } from "@/store/authStore";
-import { eventSourceRef } from "../../utills/eventSourceRef";
 
-function Header() {
+const MENU_ITEMS = [
+  {
+    to: "/store",
+    label: "가게",
+    Icon: FaStore,
+    roles: ["ROLE_USER", "ROLE_OWNER", "ROLE_ADMIN"],
+  },
+  {
+    to: "/favorite",
+    label: "찜",
+    Icon: FaHeart,
+    roles: ["ROLE_USER", "ROLE_OWNER", "ROLE_ADMIN"],
+  },
+  {
+    to: "/order/status",
+    label: "주문 현황",
+    Icon: RiEBike2Fill,
+    roles: ["ROLE_USER"],
+  },
+  {
+    to: "/mypage",
+    label: "마이페이지",
+    Icon: FaUser,
+    roles: ["ROLE_USER", "ROLE_OWNER"],
+  },
+  {
+    to: "/admin",
+    label: "관리자 페이지",
+    Icon: RiAdminFill,
+    roles: ["ROLE_ADMIN"],
+  },
+];
+
+export default function Header() {
   const { isAuthenticated, clearAuth, getUserRole } = authStore();
   const userName = authStore((state) => state.userName);
   const navigate = useNavigate();
+
+  /** 로그아웃 처리 */
   const handleLogout = () => {
     clearAuth();
-    localStorage.removeItem("auth-info");
-    // SSE 연결 종료하기
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
     navigate("/login");
   };
+
+  const role = getUserRole();
+  const visibleMenus = MENU_ITEMS.filter((menu) => menu.roles.includes(role));
 
   return (
     <header className="header">
       <div className="header-inner">
+        {/* 로고 */}
         <div className="logo">
           <NavLink to="/">배민PC</NavLink>
         </div>
 
+        {/* 사용자 메뉴 */}
         <div className="user-menu">
           {isAuthenticated() ? (
             <>
-              <span>{userName}님, 안녕하세요.</span>
+              <span className="user-name">{userName}님, 안녕하세요.</span>
               <button className="btn btn-round" onClick={handleLogout}>
                 로그아웃
               </button>
@@ -43,25 +76,23 @@ function Header() {
         </div>
       </div>
 
-      <nav className="nav">
-        {isAuthenticated() && getUserRole() === "ROLE_ADMIN" ? (
-          <NavLink to="/admin">관리자 페이지</NavLink>
-        ) : (
-          <>
-            <NavLink to="/order/status">
-              <RiEBike2Fill /> 주문 현황
+      {/* 네비게이션 (로그인 상태일 때만 표시) */}
+      {isAuthenticated() && (
+        <nav className="nav">
+          {visibleMenus.map(({ to, Icon, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `nav-link ${isActive ? "active" : ""}`
+              }
+            >
+              <Icon aria-hidden="true" />
+              <span className="nav-label">{label}</span>
             </NavLink>
-            <NavLink to="/favorite">
-              <FaHeart /> 찜
-            </NavLink>
-            <NavLink to="/mypage">
-              <FaUser /> 마이페이지
-            </NavLink>
-          </>
-        )}
-      </nav>
+          ))}
+        </nav>
+      )}
     </header>
   );
 }
-
-export default Header;
