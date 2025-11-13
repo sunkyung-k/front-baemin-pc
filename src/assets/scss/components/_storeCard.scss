@@ -8,7 +8,6 @@
   width: calc(50% - space("sm"));
   border: 1px solid fn-color("gray-200");
   border-radius: space("md");
-  transition: 0.3s ease;
 
   @media (max-width: bp("lg")) {
     width: 100%;
@@ -49,6 +48,30 @@
     }
   }
 
+  &.disabled {
+    pointer-events: none;
+    opacity: 0.75;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: fn-color("gray-200");
+    }
+
+    .card-thumb img {
+      filter: brightness(0.92);
+    }
+
+    .card-info p,
+    .card-info .card-title {
+      opacity: 0.85;
+    }
+
+    .not-available {
+      color: fn-color("danger");
+    }
+  }
+
   .closedBadge {
     position: absolute;
     top: 0;
@@ -82,11 +105,6 @@
     p {
       font-size: font("sm");
       color: fn-color("gray-600");
-
-      &.not-available {
-        color: fn-color("danger");
-        font-size: font("sm");
-      }
     }
   }
 

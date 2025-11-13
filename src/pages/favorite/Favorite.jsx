@@ -65,6 +65,7 @@ export default function Favorite() {
             store={store}
             showStatus={true}
             showMinPrice={false}
+            userAddress={address}
           />
         ))}
       </div>
