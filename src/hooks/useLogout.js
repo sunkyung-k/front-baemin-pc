@@ -30,7 +30,7 @@ export const useLogout = () => {
       clearAuth();
 
       // 로그아웃 후 이동할 페이지 (예: 로그인 화면)
-      navigate("/login");
+      navigate("/login", { replace: true });
     },
     onError: (error) => {
       console.error("Logout 실패:", error);

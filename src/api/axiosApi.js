@@ -63,6 +63,16 @@ api.interceptors.response.use(
 
     // (4) 인증 만료 (401)
     if (status === 401) {
+      const token = authStore.getState().token;
+      const isLoggedOut = !token; // 이미 로그아웃 상태라면 true
+
+      // 로그아웃 API 요청이거나 이미 로그아웃된 상태면 알림 띄우지 않음
+      if (requestUrl.includes("/api/v1/logout") || isLoggedOut) {
+        authStore.getState().clearAuth();
+        location.href = "/login";
+        return Promise.reject(error);
+      }
+
       alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
       authStore.getState().clearAuth();
       location.href = "/login";
