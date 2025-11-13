@@ -1,44 +1,51 @@
 import api from "@/api/axiosApi";
 
 /**
- * Review API
+ * Review API (최신 안정형)
  * ------------------------------------------------------------
- * - 리뷰 등록/수정: multipart/form-data 전송
- * - 리뷰 삭제: path variable
- * - 리뷰 조회: 일반 GET
+ * - create / update → multipart/form-data
+ * - remove → path variable
+ * - list → 일반 GET
+ * - 모든 응답은 { resultCode, response, ... } 구조로 맞춤
  */
 export const reviewAPI = {
-  /** 리뷰 등록 */
+  /** 리뷰 등록 (POST) */
   create: async (formData) => {
-    return await api.post("/api/v1/review", formData, {
+    const res = await api.post("/api/v1/review", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
+    return res.data?.response ?? res.data; // 일관된 응답 보장
   },
 
-  /** 리뷰 수정 */
+  /** 리뷰 수정 (PUT) */
   update: async (formData) => {
-    return await api.put("/api/v1/review", formData, {
+    const res = await api.put("/api/v1/review", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
+    return res.data?.response ?? res.data;
   },
 
-  /** 리뷰 삭제 */
+  /** 리뷰 삭제 (DELETE) */
   remove: async (reviewId) => {
-    return await api.delete(`/api/v1/review/${reviewId}`);
+    const res = await api.delete(`/api/v1/review/${reviewId}`);
+    return res.data?.response ?? res.data;
   },
 
-  /** 내가 작성한 리뷰 리스트 */
+  /** 내가 작성한 리뷰 목록 */
   getMyReviews: async (params) => {
-    return await api.get("/api/v1/review", { params });
+    const res = await api.get("/api/v1/review", { params });
+    return res.data;
   },
 
-  /** 특정 가게 리뷰 리스트 (storeId 기반) */
+  /** 특정 가게 리뷰 목록 (storeId 기준) */
   getStoreReviews: async (storeId, params) => {
-    return await api.get(`/api/v1/review/store/${storeId}`, { params });
+    const res = await api.get(`/api/v1/review/store/${storeId}`, { params });
+    return res.data;
   },
 
-  /** 내 가게 리뷰 리스트 (점주용) */
+  /** 내 가게 리뷰 목록 (점주용) */
   getMyStoreReviews: async (params) => {
-    return await api.get("/api/v1/review/store/my", { params });
+    const res = await api.get("/api/v1/review/store/my", { params });
+    return res.data;
   },
 };

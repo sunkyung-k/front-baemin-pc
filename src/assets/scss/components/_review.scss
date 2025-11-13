@@ -1,30 +1,30 @@
 @use "@/assets/scss/utils" as *;
 
-// ------------------------------------------------------------
-// -------------------- Review Card Styles --------------------
-// ------------------------------------------------------------
 .review-card {
   position: relative;
-  // border: 1px solid fn-color("gray-200"); // ❌ 경계선 제거
-  border-radius: radius("lg"); // 둥근 정도를 좀 더 키워 트렌디함 강조
   background-color: fn-color("white");
-  padding: fn-rem(24); // 패딩 증가로 여백 확보
+  padding: fn-rem(24);
   display: flex;
   flex-direction: column;
-  gap: fn-rem(16); // 간격 증가
+  gap: fn-rem(16);
 
   &:not(:first-child) {
     border-top: 1px solid fn-color("gray-200");
     border-radius: 0;
   }
 
-  // --- 상단 별점/기본 정보 ---
   .review-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .review-info {
     display: flex;
     flex-direction: column;
     gap: fn-rem(8);
 
-    .review-header-top {
+    .review-info-top {
       display: flex;
       align-items: center;
       gap: fn-rem(8);
@@ -42,7 +42,6 @@
     }
   }
 
-  // --- 별점 영역 ---
   .review-stars {
     display: flex;
     gap: fn-rem(3);
@@ -56,7 +55,6 @@
     }
   }
 
-  // --- 주문 요약 (메뉴 정보) ---
   .order-summary {
     margin-top: fn-rem(4);
     cursor: pointer;
@@ -64,13 +62,13 @@
     flex-direction: column;
     align-items: flex-start;
     gap: space("xs");
-    padding: fn-rem(8) fn-rem(12); // 메뉴 정보에 약간의 패딩
-    background-color: fn-color("gray-bg"); // 배경색 추가 (무신사/29CM 스타일)
-    border-radius: radius("sm"); // 모서리 둥글게
+    padding: fn-rem(8) fn-rem(12);
+    background-color: fn-color("gray-bg");
+    border-radius: radius("sm");
 
     .order-txt {
       font-size: font("sm");
-      color: fn-color("gray-600"); // 텍스트 색상 조정
+      color: fn-color("gray-600");
       line-height: 1.4;
       width: 100%;
       @include ellipsis(1);
@@ -79,7 +77,7 @@
 
     .order-button {
       font-size: font("sm");
-      color: fn-color("gray-500"); // 버튼 색상 조정
+      color: fn-color("gray-500");
       text-decoration: underline;
     }
 
@@ -95,28 +93,26 @@
     }
   }
 
-  // --- 리뷰 내용 (줄바꿈 유지) ---
   .review-content {
-    font-size: font("md"); // 폰트 크기 조정
-    color: fn-color("gray-800"); // 내용 색상 진하게
-    line-height: 1.6; // 가독성을 위한 줄 간격 확대
-    white-space: pre-wrap; // ✅ 줄바꿈 유지
-    margin-top: fn-rem(4); // 위쪽 여백 추가
+    font-size: font("md");
+    color: fn-color("gray-800");
+    line-height: 1.6;
+    white-space: pre-wrap;
+    margin-top: fn-rem(4);
   }
 
-  // --- 이미지 썸네일 ---
   .review-thumbnails {
     display: flex;
     gap: fn-rem(8);
     margin-top: fn-rem(8);
 
     .thumbnail {
-      width: fn-rem(80); // 이미지 크기 키움
+      width: fn-rem(80);
       height: fn-rem(80);
       border-radius: radius("sm");
       object-fit: cover;
       cursor: pointer;
-      border: 1px solid fn-color("gray-200"); // 얇은 테두리 추가
+      border: 1px solid fn-color("gray-200");
       transition: all 0.2s ease;
 
       &:hover {
@@ -126,43 +122,105 @@
     }
   }
 
-  // --- 버튼/답글 영역 (수정, 삭제 등) ---
   .review-actions {
-    position: static; // 카드의 가장 아래로 이동
+    position: static;
     display: flex;
     align-items: center;
-    justify-content: flex-end; // 오른쪽 정렬
+    justify-content: flex-end;
     gap: space("sm");
     margin-top: fn-rem(4);
 
     .btn {
       font-weight: 500;
       font-size: font("sm");
-      color: fn-color("gray-600");
     }
   }
 
-  // --- 사장님 답글 영역 ---
-  .review-reply {
+  // 사장님 답글
+  .review-reply-display {
     margin-top: fn-rem(10);
-    padding: fn-rem(16); // 패딩 증가
+    padding: fn-rem(16);
     border-radius: radius("md");
-    background-color: fn-color("primary-bg"); // 배경색 유지
+    border: 1px solid fn-color("gray-200");
+    background-color: fn-color("white");
+
+    .reply-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: fn-rem(8);
+
+      .reply-label {
+        font-size: font("md");
+        font-weight: 700;
+        color: fn-color("dark");
+      }
+
+      .reply-actions {
+        display: flex;
+        gap: fn-rem(10);
+
+        .btn-text-sm {
+          background: none;
+          border: none;
+          padding: 0;
+          font-size: font("sm");
+          color: fn-color("gray-500");
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
 
     .reply-content {
       font-size: font("md");
-      color: fn-color("dark");
+      color: fn-color("gray-800");
       line-height: 1.6;
-      white-space: pre-wrap; /* 답글 내용도 줄바꿈 유지 */
+      white-space: pre-wrap;
+    }
+  }
+
+  .review-reply-form {
+    .textarea-field .textarea-txt {
+      height: fn-rem(100);
+    }
+  }
+
+  .reply-view {
+    padding: space("md");
+    border: 1px solid fn-color("gray-200");
+    background-color: fn-color("gray-50");
+    border-radius: radius("sm");
+  }
+  .reply-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    strong {
+      font-size: font("sm");
+      color: fn-color("primary");
     }
 
-    .reply-date {
-      display: block;
-      text-align: right;
-      font-size: font("sm");
-      color: fn-color("gray-500");
-      margin-top: fn-rem(8); // 여백 증가
+    .reply-btn {
+      display: flex;
+      align-items: center;
+      gap: space("sm");
     }
+    .btn {
+      padding: 0;
+      font-weight: 500;
+    }
+  }
+
+  .reply-content {
+    padding-top: space("md");
+    font-size: font("md");
+    color: fn-color("gray-600");
+    white-space: pre-wrap;
   }
 }
 
@@ -265,7 +323,7 @@
 }
 
 /* ============================================================
-📸 Review Swiper (전체 이미지 보기)
+  Review Swiper (전체 이미지 보기)
 ============================================================ */
 .review-swiper-overlay {
   position: fixed;
@@ -353,6 +411,7 @@
   border-radius: radius("sm");
   padding: fn-rem(8);
   resize: none;
+  font-size: font("md");
 }
 
 .reply-btns {

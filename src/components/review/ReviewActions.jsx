@@ -1,3 +1,5 @@
+// ReviewActions.js (전체 소스)
+
 import React from "react";
 
 /**
@@ -5,7 +7,13 @@ import React from "react";
  * --------------------------------------------------
  * 역할별 버튼 공용 컴포넌트
  */
-export default function ReviewActions({ role, reply, onEdit, onDelete }) {
+export default function ReviewActions({
+  role,
+  reply,
+  onEdit,
+  onDelete,
+  onToggleReplyMode,
+}) {
   return (
     <>
       {role === "user" && (
@@ -16,14 +24,6 @@ export default function ReviewActions({ role, reply, onEdit, onDelete }) {
           <button className="btn btn-danger btn-sm" onClick={onDelete}>
             삭제
           </button>
-        </div>
-      )}
-
-      {role === "owner" && (
-        <div className="review-actions">
-          {!reply && (
-            <button className="btn btn-outline btn-sm">답글 달기</button>
-          )}
         </div>
       )}
     </>

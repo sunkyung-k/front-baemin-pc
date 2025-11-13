@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
-import ReviewActions from "./ReviewActions";
 import ReviewReplyBox from "./ReviewReplyBox";
 import ReviewSwiper from "./ReviewSwiper";
 import ReviewModal from "./ReviewModal";
@@ -10,7 +9,7 @@ import { useReviewUpdate } from "@/hooks/review/useReviewUpdate";
 /**
  * ReviewItem (리뷰 카드 공용)
  * --------------------------------------------------
- * - role: "user" | "owner"
+ * - role: "user" | "owner" | "store"
  * - review: 리뷰 데이터
  * - onDelete: 상위 리스트 동기화를 위한 삭제 핸들러 (선택)
  */
@@ -18,84 +17,100 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
   const [isSwiperOpen, setSwiperOpen] = useState(false);
   const [isEditOpen, setEditOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [isReplyMode, setReplyMode] = useState(false);
 
-  /** ✅ 수정 / 삭제 훅 */
-  const { updateReview, deleteReview } = useReviewUpdate();
-
-  const toggleExpand = () => setExpanded((prev) => !prev);
+  const { updateReview, removeReview } = useReviewUpdate();
 
   const {
     reviewId,
     rating,
     content,
-    // orderDate,
+    writer,
     fileList = [],
     reply,
     order,
   } = review;
 
-  /** 이미지 URL 변환 */
+  const toggleExpand = () => setExpanded((prev) => !prev);
   const images = fileList.map((f) => getAbsoluteImageUrl(f)).filter(Boolean);
 
-  /** ✅ 리뷰 수정 */
+  /** 리뷰 수정 */
   const handleEditSubmit = (formData) => {
-    updateReview.mutate(formData, {
-      onSuccess: () => {
-        setEditOpen(false); // 수정 완료 후 모달 닫기
-      },
+    updateReview.mutate(formData, { onSuccess: () => setEditOpen(false) });
+  };
+
+  /** 리뷰 삭제 */
+  const handleDelete = () => {
+    removeReview.mutate(reviewId, {
+      onSuccess: () => onDelete?.(reviewId),
     });
   };
 
-  /** ✅ 리뷰 삭제 */
-  const handleDelete = () => {
-    deleteReview.mutate(reviewId, {
-      onSuccess: () => {
-        onDelete?.(reviewId); // 상위 목록에서 제거
-      },
-    });
-  };
+  /** 상단 표시명 */
+  const displayName =
+    role === "user"
+      ? order?.storeName || "가게명 없음"
+      : writer || "작성자 없음";
 
   return (
     <div className="review-card">
-      {/* 별점 */}
-      <div className="review-stars">
-        {[1, 2, 3, 4, 5].map((num) => (
-          <FaStar
-            key={num}
-            size={15}
-            className={`star ${num <= rating ? "active" : ""}`}
-          />
-        ))}
-      </div>
-      {/* 상단 - 가게명 / 주문메뉴 */}
       <div className="review-header">
-        <div className="review-header-top">
-          <strong className="store-name">
-            {order?.storeName || "가게명 없음"}
-          </strong>
+        {/* 별점 */}
+        <div className="review-stars">
+          {[1, 2, 3, 4, 5].map((num) => (
+            <FaStar
+              key={num}
+              size={15}
+              className={`star ${num <= rating ? "active" : ""}`}
+            />
+          ))}
+        </div>
+
+        {/* 유저 전용: 수정 / 삭제 버튼 */}
+        {role === "user" && (
+          <div className="review-actions">
+            <button
+              className="btn btn-secondary-line btn-sm"
+              onClick={() => setEditOpen(true)}
+            >
+              수정
+            </button>
+            <button className="btn btn-danger btn-sm" onClick={handleDelete}>
+              삭제
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 상단 - 가게명(유저) or 작성자명(점주/가게상세) */}
+      <div className="review-info">
+        <div className="review-info-top">
+          <strong className="store-name">{displayName}</strong>
           <span className="order-date"> / {order?.orderDate ?? ""}</span>
         </div>
 
-        <div
-          className={`order-summary ${expanded ? "expanded" : ""}`}
-          onClick={toggleExpand}
-          role="button"
-          tabIndex={0}
-        >
-          <p className="order-txt">
-            {order?.itemList
-              ?.map((item) => {
-                const options =
-                  item.optionNames && item.optionNames.length > 0
-                    ? `(${item.optionNames.join(", ")})`
-                    : "";
-                return `${item.menuName}${options} x${item.quantity}`;
-              })
-              .join(", ")}
-          </p>
-
-          <p className="order-button">{expanded ? "접기" : ""}</p>
-        </div>
+        {/* 주문 항목 요약 */}
+        {order?.itemList && (
+          <div
+            className={`order-summary ${expanded ? "expanded" : ""}`}
+            onClick={toggleExpand}
+            role="button"
+            tabIndex={0}
+          >
+            <p className="order-txt">
+              {order.itemList
+                .map((item) => {
+                  const options =
+                    item.optionNames?.length > 0
+                      ? `(${item.optionNames.join(", ")})`
+                      : "";
+                  return `${item.menuName}${options} x${item.quantity}`;
+                })
+                .join(", ")}
+            </p>
+            {expanded && <p className="order-button">접기</p>}
+          </div>
+        )}
       </div>
 
       {/* 내용 */}
@@ -116,22 +131,21 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
         </div>
       )}
 
-      {/* 버튼/답글 영역 */}
-      <ReviewActions
-        role={role}
+      {/* 사장님 답글  */}
+      <ReviewReplyBox
         reply={reply}
-        onEdit={() => setEditOpen(true)}
-        onDelete={handleDelete}
+        reviewId={reviewId}
+        onClose={() => setReplyMode(false)}
+        onOpen={() => setReplyMode(true)}
+        isReadOnly={role !== "owner"} //  점주만 수정 가능
       />
-
-      {role === "owner" && <ReviewReplyBox reply={reply} reviewId={reviewId} />}
 
       {/* 이미지 전체보기 */}
       {isSwiperOpen && (
         <ReviewSwiper images={images} onClose={() => setSwiperOpen(false)} />
       )}
 
-      {/* ✅ 수정 모달 */}
+      {/* 리뷰 수정 모달 */}
       {isEditOpen && (
         <ReviewModal
           isOpen={isEditOpen}
@@ -139,7 +153,7 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
           mode="edit"
           order={order}
           defaultValues={review}
-          onSubmit={handleEditSubmit} // ✅ 수정 시 useReviewUpdate로 전달
+          onSubmit={handleEditSubmit}
         />
       )}
     </div>

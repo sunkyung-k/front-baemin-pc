@@ -2,43 +2,44 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 /**
- * useReviewStore (하이브리드 통합형)
+ * useReviewStore (주문 + 리뷰 통합형)
  * -------------------------------------------------
- * - orders: 주문 목록 (리뷰 등록 시 버튼 숨김)
- * - reviews: 리뷰 목록 (리뷰 수정 시 즉시 반영)
+ * - orders: 주문 내역 (리뷰 작성 후 버튼 숨김 처리)
+ * - reviews: 리뷰 목록 (수정 시 UI 즉시 반영)
  */
 export const useReviewStore = create(
   devtools((set, get) => ({
-    /** ✅ [주문 관련 상태] */
+    /** 주문 관련 상태 */
     orders: [],
 
-    /** 서버에서 내려온 주문 리스트 */
+    /** 서버에서 내려온 주문 리스트 저장 */
     setOrders: (orderList = []) =>
       set(() => ({
         orders: Array.isArray(orderList) ? [...orderList] : [],
       })),
 
-    /** 리뷰 완료된 주문을 불변성 유지하며 새 배열로 교체 */
+    /** 특정 주문의 reviewed 상태 true로 변경 */
     markReviewed: (orderId) =>
       set((state) => {
-        const updated = state.orders.map((o) =>
+        const updatedOrders = state.orders.map((o) =>
           o.orderId === orderId ? { ...o, reviewed: true } : o
         );
-        return { orders: [...updated] };
+        return { orders: [...updatedOrders] };
       }),
 
+    /** 주문 초기화 */
     clearOrders: () => set({ orders: [] }),
 
-    /** ✅ [리뷰 관련 상태] */
+    /** 리뷰 관련 상태 */
     reviews: [],
 
-    /** 리뷰 목록 교체 (React Query → store 동기화용) */
+    /** 리뷰 목록 교체 */
     setReviews: (reviewList = []) =>
       set(() => ({
         reviews: Array.isArray(reviewList) ? [...reviewList] : [],
       })),
 
-    /** 단일 리뷰 수정 (수정 후 즉시 UI 반영) */
+    /** 단일 리뷰 수정 (UI 즉시 반영) */
     updateReviewLocal: (updated) =>
       set((state) => {
         const newList = state.reviews.map((r) =>
@@ -47,6 +48,14 @@ export const useReviewStore = create(
         return { reviews: [...newList] };
       }),
 
+    /** 단일 리뷰 삭제 (UI 즉시 반영) */
+    removeReviewLocal: (reviewId) =>
+      set((state) => {
+        const newList = state.reviews.filter((r) => r.reviewId !== reviewId);
+        return { reviews: [...newList] };
+      }),
+
+    /** 리뷰 초기화 */
     clearReviews: () => set({ reviews: [] }),
   }))
 );

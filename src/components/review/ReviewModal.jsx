@@ -10,12 +10,9 @@ import ImageUpload from "@/components/form/ImageUpload";
 import OrderList from "@/components/mypage/OrderList";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 
-/* 유효성 검사 스키마 */
+/* yup 스키마 */
 const schema = yup.object().shape({
-  rating: yup
-    .number()
-    .min(1, "별점을 선택해주세요.")
-    .required("별점을 선택해주세요."),
+  rating: yup.number().min(1, "별점을 선택해주세요.").required(),
   content: yup
     .string()
     .max(500, "최대 500자까지 입력 가능합니다.")
@@ -44,86 +41,91 @@ export default function ReviewModal({
     },
   });
 
-  const [hoverRating, setHoverRating] = useState(0);
   const rating = watch("rating");
 
-  /** 이미지 리스트 상태 */
+  /** 이미지 상태 (기존 + 빈칸) */
   const [images, setImages] = useState(() => {
-    const existingImages =
+    const existing =
       defaultValues?.fileList?.map((f) => ({
+        rfId: f.rfId,
         file: null,
         preview: getAbsoluteImageUrl(f),
+        isExisting: true,
       })) || [];
-
-    if (existingImages.length === 0) return [null];
-    if (existingImages.length < 3 && !existingImages.includes(null))
-      return [...existingImages, null];
-    return existingImages;
+    if (existing.length === 0) return [null];
+    if (existing.length < 3 && !existing.includes(null))
+      return [...existing, null];
+    return existing;
   });
 
-  /** 파일 추가 */
+  /** 파일 변경 */
   const handleFileChange = (e, idx) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const preview = URL.createObjectURL(file);
 
-    const newImages = [...images];
-    newImages[idx] = { file, preview };
+    const updated = [...images];
+    updated[idx] = { file, preview, isExisting: false };
 
-    const filled = newImages.filter(Boolean).length;
-    if (filled < 3 && !newImages.includes(null)) newImages.push(null);
+    const filled = updated.filter(Boolean).length;
+    if (filled < 3 && !updated.includes(null)) updated.push(null);
 
-    setImages(newImages);
-    setValue("imageList", newImages.map((img) => img?.file).filter(Boolean), {
-      shouldDirty: true,
-    });
+    setImages(updated);
+    setValue("imageList", updated.map((img) => img?.file).filter(Boolean));
   };
 
-  /** 삭제 */
+  /** 이미지 삭제 */
   const handleRemove = (idx) => {
-    const newImages = images.filter((_, i) => i !== idx);
-    const filled = newImages.filter(Boolean).length;
-    if (filled < 3 && !newImages.includes(null)) newImages.push(null);
-    setImages(newImages);
-    setValue("imageList", newImages.map((img) => img?.file).filter(Boolean), {
-      shouldDirty: true,
-    });
+    const updated = images.filter((_, i) => i !== idx);
+    const filled = updated.filter(Boolean).length;
+    if (filled < 3 && !updated.includes(null)) updated.push(null);
+    setImages(updated);
+    setValue("imageList", updated.map((img) => img?.file).filter(Boolean));
   };
 
-  /** 리뷰 등록/수정 요청 */
+  /** formData 구성 (rfId 기반, 전부 삭제 시 key 생략) */
   const handleReviewSubmit = async (data) => {
     const formData = new FormData();
+    const activeImages = images.filter(Boolean);
 
+    // 필수 필드
     if (mode === "edit" && defaultValues?.reviewId) {
       formData.append("reviewId", defaultValues.reviewId);
     }
-
     formData.append("orderId", order.orderId);
     formData.append("userId", order.userId || "user");
     formData.append("rating", data.rating);
     formData.append("content", data.content);
 
-    // ✅ 현재 보여지는 이미지 전체를 순회
-    for (const [idx, img] of images.entries()) {
-      if (!img) continue;
+    // 기존 이미지 유지 목록 (rfId)
+    const keepImageList = activeImages
+      .filter((img) => img.isExisting && img.rfId)
+      .map((img) => img.rfId);
 
-      if (img.file instanceof File) {
-        // 새 이미지
-        formData.append(`imageList[${idx}].image`, img.file);
-        formData.append(`imageList[${idx}].displayOrder`, idx + 1);
-      } else if (img.preview?.startsWith("http")) {
-        // ✅ 기존 이미지도 fetch해서 다시 File로 append
-        const fileBlob = await fetch(img.preview).then((r) => r.blob());
-        const file = new File([fileBlob], `existing_${idx}.jpg`, {
-          type: fileBlob.type || "image/jpeg",
-        });
-        formData.append(`imageList[${idx}].image`, file);
-        formData.append(`imageList[${idx}].displayOrder`, idx + 1);
-      }
+    // 기존 이미지가 하나라도 있으면 배열 형태로 append
+    if (keepImageList.length > 0) {
+      keepImageList.forEach((rfId, index) => {
+        formData.append(`keepImageList[${index}]`, rfId);
+      });
     }
 
-    // ✅ 부모 onSubmit 호출
+    // 새로 추가된 이미지 파일만 append
+    const newFiles = activeImages
+      .filter((img) => img && img.file instanceof File)
+      .slice(0, 3);
+    newFiles.forEach((img, index) => {
+      formData.append(`imageList[${index}].image`, img.file);
+      formData.append(`imageList[${index}].displayOrder`, index + 1);
+    });
+
+    // 최종 제출
     onSubmit(formData, mode);
+
+    // 확인용 콘솔
+    console.log("===== FormData 확인 =====");
+    for (let [k, v] of formData.entries()) {
+      console.log(k, v);
+    }
   };
 
   if (!isOpen) return null;
@@ -137,6 +139,7 @@ export default function ReviewModal({
       submitLabel={mode === "create" ? "등록" : "수정"}
     >
       <div className="review-modal">
+        {/* 주문 정보 */}
         {order && (
           <div className="review-order-info">
             <OrderList data={[order]} type="user" />
@@ -147,9 +150,9 @@ export default function ReviewModal({
         <div className="review-rating">
           {[1, 2, 3, 4, 5].map((star) => (
             <FaStar
-              className={`star ${star <= rating ? "active" : ""}`}
               key={star}
               size={28}
+              className={`star ${star <= rating ? "active" : ""}`}
               onClick={() => setValue("rating", star, { shouldValidate: true })}
             />
           ))}
@@ -198,7 +201,7 @@ export default function ReviewModal({
             ))}
           </div>
           <p className="hint">
-            JPG, PNG 형식 / 최대 50MB까지 업로드 가능합니다.
+            JPG, PNG 형식 / 최대 3장, 50MB 이하 파일만 업로드 가능합니다.
           </p>
         </div>
       </div>
