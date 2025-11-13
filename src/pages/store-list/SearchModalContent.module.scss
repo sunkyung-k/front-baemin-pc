@@ -1,0 +1,146 @@
+/* 🔍 검색 한 줄 구성 */
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 8px; // 인풋과 검색 버튼 사이 간격
+  margin-bottom: 12px;
+}
+
+/* 인풋 + 아이콘 + X버튼 묶음 */
+.inputWrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0 10px;
+
+  :global(.input-field) {
+    width: 100%;
+  }
+
+  :global(.input-field .input-txt) {
+    border: none;
+    background: none;
+    padding-right: 0;
+  }
+}
+
+/* 돋보기 아이콘 */
+.searchIcon {
+  flex-shrink: 0;
+  color: fn-color("dark");
+  font-size: fn-rem(20);
+}
+
+/* X 버튼 */
+.btnClear {
+  border: none;
+  background: none;
+  font-size: 18px;
+  color: #aaa;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    color: #444;
+  }
+}
+
+/* 검색 버튼 */
+.searchBtn {
+  height: fn-rem(44);
+  padding: 0 14px;
+  background: fn-color("primary");
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: darken(fn-color("primary"), 4%);
+  }
+}
+
+.section {
+  margin-top: fn-rem(30);
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* 인기검색어 2열 정렬 */
+.keywordGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 12px;
+}
+
+.keywordRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 6px;
+  background: #fafafa;
+  cursor: pointer;
+  border: 1px solid transparent;
+
+  &:hover {
+    background: #f0f0f0;
+    border-color: #e1e1e1;
+  }
+}
+
+.rank {
+  width: 20px;
+  font-weight: 700;
+  color: #000;
+}
+
+.word {
+  flex: 1;
+  font-size: 14px;
+  text-align: left;
+}
+
+/* 등락 영역 */
+.diff {
+  width: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.up {
+  color: red;
+}
+
+.down {
+  color: blue;
+}
+
+.diffNum {
+  font-size: 12px;
+  margin-left: 2px;
+}
+
+.new {
+  color: #e38100;
+  font-weight: 700;
+}
+
+.same {
+  color: #aaa;
+}

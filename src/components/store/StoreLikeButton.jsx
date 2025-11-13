@@ -10,7 +10,6 @@ import { FaHeart, FaRegHeart } from "react-icons/fa6";
 export default function LikeButton({
   isActive = false,
   onToggle,
-  size = 18,
   round = true,
   animated = true,
 }) {
@@ -29,7 +28,7 @@ export default function LikeButton({
       } ${animated ? "animated" : ""}`}
       onClick={handleClick}
     >
-      {isActive ? <FaHeart size={size} /> : <FaRegHeart size={size} />}
+      {isActive ? <FaHeart /> : <FaRegHeart />}
     </button>
   );
 }

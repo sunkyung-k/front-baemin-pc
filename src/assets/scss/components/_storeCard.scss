@@ -8,6 +8,7 @@
   width: calc(50% - space("sm"));
   border: 1px solid fn-color("gray-200");
   border-radius: space("md");
+  transition: transform 0.2s ease;
 
   @media (max-width: bp("lg")) {
     width: 100%;

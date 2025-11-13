@@ -53,8 +53,8 @@
   border: 1px solid fn-color("gray-200");
   border-radius: radius("lg");
   overflow: hidden;
-  transition: 0.25s;
   background: fn-color("white");
+  transition: transform 0.2s ease;
 
   &:hover {
     transform: translateY(-5px);

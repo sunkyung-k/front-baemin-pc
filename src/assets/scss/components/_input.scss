@@ -54,6 +54,13 @@
     font-size: font("sm");
     color: fn-color("danger");
   }
+
+  /* selectBox */
+  &.select-field {
+    .input-txt {
+      cursor: pointer;
+    }
+  }
 }
 
 /* 숫자 입력창에서 스핀 버튼 제거 */

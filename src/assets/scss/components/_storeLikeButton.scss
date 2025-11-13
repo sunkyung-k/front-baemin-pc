@@ -4,8 +4,8 @@
   position: absolute;
   top: space("md");
   right: space("md");
-  width: fn-rem(40);
-  height: fn-rem(40);
+  width: fn-rem(32);
+  height: fn-rem(32);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid fn-color("gray-200");
@@ -17,7 +17,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 
   svg {
-    font-size: fn-rem(15);
+    font-size: font("lg");
     color: fn-color("gray-500");
     transition: transform 0.25s ease, color 0.25s ease;
   }

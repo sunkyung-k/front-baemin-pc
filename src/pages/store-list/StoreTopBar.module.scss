@@ -8,7 +8,7 @@
   padding: space("md") 0;
   background: fn-color("white");
   border-bottom: 1px solid fn-color("gray-200");
-  z-index: 10;
+  z-index: 1;
   transition: box-shadow 0.2s ease;
 
   &.scrolled {
@@ -17,6 +17,15 @@
 
   @media (max-width: bp("md")) {
     top: $header-height;
+  }
+
+  :global(.modal-overlay) {
+    align-items: flex-start;
+    padding: space("lg");
+  }
+
+  :global(.modal) {
+    min-width: 100%;
   }
 }
 
@@ -28,16 +37,12 @@
   gap: space("md");
 }
 
-.innerArea {
+.searchWrap {
   display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.searchForm {
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-  width: calc(100% - space("lg"));
+  width: 100%;
+  gap: space("sm");
   max-width: fn-rem(600);
   padding: 0 space("sm");
   background: fn-color("gray-50");
@@ -46,49 +51,26 @@
   height: fn-rem(44);
   transition: all 0.2s ease;
 
-  &:focus-within {
-    border-color: fn-color("primary");
-    background: fn-color("white");
-    box-shadow: 0 0 0 fn-rem(3) rgba(fn-color("primary"), 0.08);
-  }
-
-  .searchIcon {
-    flex-shrink: 0;
-    color: fn-color("gray-500");
-    font-size: font("lg");
-    margin-left: space("sm");
-  }
-
-  :global(.input-field) {
-    flex: 1;
+  .searchBtn {
+    width: calc(100% - fn-rem(80));
     height: 100%;
-  }
 
-  :global(.input-field .input-txt) {
-    border: none;
-    background: transparent;
-    outline: none;
-    font-size: font("md");
-    color: fn-color("gray-900");
-
-    &::placeholder {
+    &.valueNone {
       color: fn-color("gray-400");
     }
   }
 
-  .btnClear {
-    background: none;
-    border: none;
-    color: fn-color("gray-400");
-    font-size: fn-rem(20);
-    cursor: pointer;
-    padding: space("xs");
-    margin-inline-end: space("sm");
-    transition: color 0.2s ease;
+  .searchIcon {
+    flex-shrink: 0;
+    width: fn-rem(40);
+    color: fn-color("gray-500");
+    font-size: font("lg");
+  }
 
-    &:hover {
-      color: fn-color("gray-600");
-    }
+  .clearBtn {
+    width: fn-rem(40);
+    font-size: font("lg");
+    color: fn-color("gray-500");
   }
 }
 
@@ -107,8 +89,10 @@
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 
-  &::-webkit-scrollbar {
-    display: none;
+  @media (max-width: bp("md")) {
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
