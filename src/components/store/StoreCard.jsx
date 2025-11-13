@@ -8,8 +8,7 @@ import { FaStar } from "react-icons/fa6";
 /**
  * StoreCard
  * -------------------------------------------------
- * - 찜 버튼 / 이미지 / 평점 / 최소주문금액 / 반경
- * - showMinPrice 옵션 추가 (favorite 페이지에서 금액 숨기기)
+ * - 찜 버튼 / 이미지 / 평점 / 최소주문금액 / 반경 / 주소
  */
 export default function StoreCard({
   store,
@@ -27,6 +26,7 @@ export default function StoreCard({
     hourComment,
     isAround,
     around,
+    addr,
   } = store;
 
   const { isLiked, toggleLike } = useFavorite(storeId);
@@ -80,14 +80,30 @@ export default function StoreCard({
 
         {/* 반경 4km 이상 시 */}
         {!available && (
-          <p className="not-available">현재 위치에서는 주문이 불가합니다.</p>
+          <>
+            <p>{addr}</p>
+            <p className="not-available">
+              해당 주소에서는 서비스가 제공되지 않습니다.
+              <br />
+              주소를 변경한 뒤 다시 확인해주세요.
+            </p>
+          </>
         )}
       </div>
     </>
   );
 
   return linkable ? (
-    <Link to={`/store/${storeId}`} className="card-store">
+    <Link
+      to={`/store/${storeId}`}
+      className={`card-store ${!available ? "disabled" : ""}`}
+      onClick={(e) => {
+        if (!available) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+    >
       {content}
     </Link>
   ) : (
