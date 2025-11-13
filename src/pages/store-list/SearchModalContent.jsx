@@ -68,45 +68,47 @@ export default function SearchModalContent({ closePopup, onSearch }) {
       </form>
 
       {/* 인기 검색어 */}
-      <div className={styles.section}>
-        <h4 className={styles.sectionTitle}>인기 검색어</h4>
+      {keywords?.length > 0 && (
+        <div className={styles.section}>
+          <h4 className={styles.sectionTitle}>인기 검색어</h4>
 
-        <div className={styles.keywordGrid}>
-          {keywords.map((item) => (
-            <button
-              key={item.statId}
-              className={styles.keywordRow}
-              onClick={() => {
-                onSearch(item.keyword);
-                closePopup();
-              }}
-            >
-              <span className={styles.rank}>{item.rank}</span>
-              <span className={styles.word}>{item.keyword}</span>
+          <div className={styles.keywordGrid}>
+            {keywords.map((item) => (
+              <button
+                key={item.statId}
+                className={styles.keywordRow}
+                onClick={() => {
+                  onSearch(item.keyword);
+                  closePopup();
+                }}
+              >
+                <span className={styles.rank}>{item.rank}</span>
+                <span className={styles.word}>{item.keyword}</span>
 
-              <span className={styles.diff}>
-                {item.rankDiff === null ? (
-                  <span className={styles.new}>NEW</span>
-                ) : item.rankDiff > 0 ? (
-                  <>
-                    <FaArrowUp className={styles.up} />
-                    <span className={styles.diffNum}>{item.rankDiff}</span>
-                  </>
-                ) : item.rankDiff < 0 ? (
-                  <>
-                    <FaArrowDown className={styles.down} />
-                    <span className={styles.diffNum}>
-                      {Math.abs(item.rankDiff)}
-                    </span>
-                  </>
-                ) : (
-                  <span className={styles.same}>-</span>
-                )}
-              </span>
-            </button>
-          ))}
+                <span className={styles.diff}>
+                  {item.rankDiff === null ? (
+                    <span className={styles.new}>NEW</span>
+                  ) : item.rankDiff > 0 ? (
+                    <>
+                      <FaArrowUp className={styles.up} />
+                      <span className={styles.diffNum}>{item.rankDiff}</span>
+                    </>
+                  ) : item.rankDiff < 0 ? (
+                    <>
+                      <FaArrowDown className={styles.down} />
+                      <span className={styles.diffNum}>
+                        {Math.abs(item.rankDiff)}
+                      </span>
+                    </>
+                  ) : (
+                    <span className={styles.same}>-</span>
+                  )}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
