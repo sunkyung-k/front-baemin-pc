@@ -21,6 +21,12 @@ import OrderLayout from "../pages/order/OrderLayout";
 import OrderComplete from "../pages/order/OrderComplete";
 import OrderStatus from "../pages/order/OrderStatus";
 import MypageReview from "../pages/mypage/MypageReview";
+import ResetPassword from "../pages/auth/ResetPassword";
+import ResetPasswordComplete from "../pages/auth/ResetPasswordComplete";
+import FindPasswordComplete from "../pages/auth/FindPasswordComplete";
+import FindIdComplete from "../pages/auth/FindIdComplete";
+import FindId from "../pages/auth/FindId";
+import FindPassword from "../pages/auth/FindPassword";
 
 export const router = createBrowserRouter([
   {
@@ -116,4 +122,12 @@ export const router = createBrowserRouter([
     path: "/menuRegister/:storeId",
     Component: MenuLayout,
   },
+
+  // 아이디 비밀번호 찾기
+  { path: "/find-id", Component: FindId },
+  { path: "/find-id/complete", Component: FindIdComplete },
+  { path: "/find-password", Component: FindPassword },
+  { path: "/find-password/complete", Component: FindPasswordComplete },
+  { path: "/reset-password", Component: ResetPassword },
+  { path: "/reset-password/complete", Component: ResetPasswordComplete },
 ]);

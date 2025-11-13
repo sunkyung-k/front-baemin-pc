@@ -1,0 +1,43 @@
+@use "@/assets/scss/utils" as *;
+
+.complete-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: space("xl");
+  height: 100%;
+  min-height: 600px;
+  padding: space("2xl");
+  background-color: fn-color("white");
+}
+
+.complete-icon {
+  font-size: fn-rem(80);
+  color: fn-color("primary");
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08));
+}
+
+.complete-title {
+  font-size: font("3xl");
+  font-weight: 800;
+  color: fn-color("gray-900");
+  letter-spacing: -0.3px;
+}
+
+.complete-desc-box {
+  .complete-desc {
+    font-size: font("lg");
+    color: fn-color("gray-700");
+    line-height: 1.8;
+    white-space: pre-line;
+    text-align: center;
+  }
+
+  .complete-sub {
+    font-size: font("md");
+    color: fn-color("gray-500");
+    margin-top: space("lg");
+  }
+}

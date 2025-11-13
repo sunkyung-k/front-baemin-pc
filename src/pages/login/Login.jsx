@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import styles from "./Login.module.scss";
 import { Link } from "react-router-dom";
-import { useLogin } from "../../hooks/useLogin";
-import InputField from "../../components/form/InputField";
+import InputField from "@/components/form/InputField";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useLogin } from "@/hooks/useLogin";
+import AuthLayout from "@/components/auth/AuthLayout";
 
+/* ============================================================
+  로그인 유효성 스키마
+------------------------------------------------------------ */
 const schema = yup.object().shape({
   username: yup.string().required("아이디를 입력해주세요."),
   password: yup.string().required("비밀번호를 입력해주세요."),
@@ -17,82 +20,67 @@ export default function Login() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
+  } = useForm({ resolver: yupResolver(schema) });
 
   const { mutateAsync: loginMutate } = useLogin();
   const [loginError, setLoginError] = useState("");
 
+  /** 로그인 요청 */
   const onSubmit = async (data) => {
     try {
       await loginMutate(data);
-    } catch (error) {
-      const backendMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "아이디 또는 비밀번호가 일치하지 않습니다.";
-
-      if (import.meta.env.MODE === "development") {
-        console.warn("[Login Error]", backendMessage);
-      }
-
-      // 사용자에게 보여줄 메시지 통일
+    } catch {
       setLoginError("아이디 또는 비밀번호가 일치하지 않습니다.");
     }
   };
 
+  /** 입력 포커스 시 에러 초기화 */
   const handleFocus = () => {
     if (loginError) setLoginError("");
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <div className={styles.loginBox}>
-        <h2 className={styles.title}>로그인</h2>
-
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.loginForm}>
-          {/* 아이디 */}
-          <InputField
-            label="아이디"
-            name="username"
-            placeholder="아이디를 입력하세요"
-            {...register("username")}
-            register={register}
-            errorMessage={errors.username?.message}
-            onFocus={handleFocus}
-          />
-
-          {/* 비밀번호 */}
-          <InputField
-            label="비밀번호"
-            type="password"
-            name="password"
-            placeholder="비밀번호를 입력하세요"
-            {...register("password")}
-            register={register}
-            errorMessage={errors.password?.message}
-            onFocus={handleFocus}
-          />
-
-          {/* 통합 로그인 실패 문구 (폼 하단 공통 위치) */}
-          {loginError && <p className={styles.error}>{loginError}</p>}
-
-          <button
-            type="submit"
-            className="btn btn-default btn-primary btn-round"
-          >
-            로그인
-          </button>
-        </form>
-
-        <p className={styles.signupText}>
+    <AuthLayout
+      title="로그인"
+      footer={
+        <>
           아직 회원이 아니신가요?{" "}
           <Link to="/join" className="btn-hv">
             회원가입하기
           </Link>
-        </p>
-      </div>
-    </div>
+        </>
+      }
+      subFooter
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="authForm">
+        {/* 아이디 */}
+        <InputField
+          label="아이디"
+          name="username"
+          placeholder="아이디를 입력하세요"
+          register={register}
+          errorMessage={errors.username?.message}
+          onFocus={handleFocus}
+        />
+
+        {/* 비밀번호 */}
+        <InputField
+          label="비밀번호"
+          type="password"
+          name="password"
+          placeholder="비밀번호를 입력하세요"
+          register={register}
+          errorMessage={errors.password?.message}
+          onFocus={handleFocus}
+        />
+
+        {/* 로그인 실패 메시지 */}
+        {loginError && <p className="authError">{loginError}</p>}
+
+        <button type="submit" className="btn btn-default btn-primary btn-round">
+          로그인
+        </button>
+      </form>
+    </AuthLayout>
   );
 }
