@@ -8,7 +8,7 @@
   padding-top: $header-height;
 
   @media (max-width: bp("md")) {
-    padding-top: $header-height + $gnb-height-mobile;
+    padding-top: $header-height;
   }
 }
 

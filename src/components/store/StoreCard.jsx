@@ -8,14 +8,14 @@ import { FaStar } from "react-icons/fa6";
 /**
  * StoreCard
  * -------------------------------------------------
- * - 공통 가게 카드 컴포넌트
- * - 찜 버튼 / 영업 상태 / 거리 정보 표시
- * - 최소주문금액 쉼표 포맷 적용 (3자리)
+ * - 찜 버튼 / 이미지 / 평점 / 최소주문금액 / 반경
+ * - showMinPrice 옵션 추가 (favorite 페이지에서 금액 숨기기)
  */
 export default function StoreCard({
   store,
   linkable = true,
   showStatus = true,
+  showMinPrice = true,
 }) {
   const {
     storeId,
@@ -33,13 +33,13 @@ export default function StoreCard({
 
   if (!store) return null;
 
-  // 반경 (기본값 true)
+  // 반경 가능 여부
   const available = isAround ?? around ?? true;
 
-  // 최소주문금액 포맷
+  // 최소 주문 금액 포맷
   const formattedPrice = Number(minPrice)?.toLocaleString() ?? "0";
 
-  // 카드 내용
+  // 카드 본문
   const content = (
     <>
       {/* 찜 버튼 */}
@@ -70,14 +70,15 @@ export default function StoreCard({
           {storeName} {branchName && <span>- {branchName}</span>}
         </h3>
 
-        <p>최소주문금액 {formattedPrice}원</p>
+        {/* 최소주문금액 표시 여부 */}
+        {showMinPrice && <p>최소주문금액 {formattedPrice}원</p>}
 
         {/* 평점 */}
         <p className="card-rating">
           <FaStar /> {(ratingAvg ?? 0).toFixed(1)}
         </p>
 
-        {/* 반경 4km 이상 시 표시 */}
+        {/* 반경 4km 이상 시 */}
         {!available && (
           <p className="not-available">현재 위치에서는 주문이 불가합니다.</p>
         )}

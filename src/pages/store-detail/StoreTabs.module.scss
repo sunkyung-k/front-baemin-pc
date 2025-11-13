@@ -37,7 +37,7 @@
 
 @media (max-width: bp("md")) {
   .tabs {
-    top: $header-height + $gnb-height-mobile;
+    top: $header-height;
   }
 
   .tabBtn {
