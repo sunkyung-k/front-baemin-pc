@@ -1,47 +1,5 @@
-.tabs {
-  display: flex;
-  justify-content: center;
-  background-color: fn-color("gray-100");
+.sticky {
   position: sticky;
   top: $header-height;
-  z-index: 2;
-}
-
-.tabBtn {
-  flex: 1;
-  text-align: center;
-  padding: space("md") 0;
-  font-size: font("lg");
-  font-weight: 700;
-  color: fn-color("dark");
-  cursor: pointer;
-  background: none;
-  border: none;
-  border-bottom: 3px solid transparent;
-  transition: all 0.25s ease;
-
-  &:hover {
-    color: fn-color("primary");
-    background-color: fn-color("primary-bg");
-  }
-
-  &.active {
-    color: fn-color("primary");
-    border-color: fn-color("primary");
-  }
-
-  &:focus {
-    outline: none;
-  }
-}
-
-@media (max-width: bp("md")) {
-  .tabs {
-    top: $header-height;
-  }
-
-  .tabBtn {
-    font-size: font("md");
-    padding: space("sm") 0;
-  }
+  z-index: 10;
 }

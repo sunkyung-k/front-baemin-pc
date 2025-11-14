@@ -92,8 +92,7 @@
       align-items: center;
       gap: space("xs");
       color: #fff;
-      font-size: font("md");
-      font-weight: 600;
+      font-size: font("xl");
       padding: fn-rem(4) fn-rem(2);
 
       &::after {
@@ -182,10 +181,9 @@
       gap: space("lg");
 
       .nav-link {
-        font-size: fn-rem(22);
+        font-size: fn-rem(30);
         color: fn-color("dark");
         padding: fn-rem(6) 0;
-        font-weight: 600;
 
         &::after {
           background-color: fn-color("dark");

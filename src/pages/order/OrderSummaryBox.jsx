@@ -18,7 +18,7 @@ export default function OrderSummaryBox({
   const handleCloseModal = () => setModalOpen(false);
 
   const handleSuccess = () => {
-    // ✅ 충전 성공 → useAccount 내부 invalidate로 자동 리프레시
+    // 충전 성공 → useAccount 내부 invalidate로 자동 리프레시
     setModalOpen(false);
   };
 

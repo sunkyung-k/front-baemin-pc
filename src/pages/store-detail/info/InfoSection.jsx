@@ -31,7 +31,7 @@ export default function InfoSection({ store }) {
       {/* 가게 정보 */}
       {hasBusinessInfo && (
         <section className={styles.section}>
-          <h4 className={styles.sectionSubTitle}>가게 정보</h4>
+          <h3 className={styles.sectionSubTitle}>가게 정보</h3>
           <ul className={styles.infoList}>
             {infoList.map((it, i) => (
               <li key={i}>
@@ -46,7 +46,7 @@ export default function InfoSection({ store }) {
       {/* 사업자 정보 */}
       {hasOwnerInfo && (
         <section className={styles.section}>
-          <h4 className={styles.sectionSubTitle}>사업자정보</h4>
+          <h3 className={styles.sectionSubTitle}>사업자정보</h3>
           <ul className={styles.infoList}>
             {store.storeName && (
               <li>
@@ -71,7 +71,7 @@ export default function InfoSection({ store }) {
       {/* 원산지 정보 */}
       {hasOrigin && (
         <section className={styles.section}>
-          <h4 className={styles.sectionSubTitle}>원산지정보</h4>
+          <h3 className={styles.sectionSubTitle}>원산지정보</h3>
           <p className={styles.infoText}>{store.origin}</p>
         </section>
       )}

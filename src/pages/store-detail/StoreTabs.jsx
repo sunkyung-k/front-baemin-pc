@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { Tabs, TabButton } from "@/components/common/Tabs";
 import styles from "./StoreTabs.module.scss";
 
 export default function StoreTabs() {
@@ -12,33 +13,21 @@ export default function StoreTabs() {
     : "menu";
 
   return (
-    <div className={styles.tabs}>
-      <button
-        className={`${styles.tabBtn} ${
-          activeTab === "menu" ? styles.active : ""
-        }`}
-        onClick={() => navigate(".")}
-      >
+    <Tabs className={styles.sticky}>
+      <TabButton active={activeTab === "menu"} onClick={() => navigate(".")}>
         메뉴
-      </button>
+      </TabButton>
 
-      <button
-        className={`${styles.tabBtn} ${
-          activeTab === "review" ? styles.active : ""
-        }`}
+      <TabButton
+        active={activeTab === "review"}
         onClick={() => navigate("review")}
       >
         리뷰
-      </button>
+      </TabButton>
 
-      <button
-        className={`${styles.tabBtn} ${
-          activeTab === "info" ? styles.active : ""
-        }`}
-        onClick={() => navigate("info")}
-      >
+      <TabButton active={activeTab === "info"} onClick={() => navigate("info")}>
         가게정보
-      </button>
-    </div>
+      </TabButton>
+    </Tabs>
   );
 }

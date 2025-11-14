@@ -29,8 +29,8 @@ export default function StoreList() {
       <main className={styles.main}>
         <EmptyState
           icon={<FaStore />}
-          title="아직 등록된 음식점이 없습니다."
-          description="빠른 시일 내에 서비스를 제공할 수 있도록 최선을 다하겠습니다."
+          title="현재 등록된 가게가 없습니다."
+          description="새로운 가게가 입점되면 바로 확인하실 수 있습니다."
         />
       </main>
     );
