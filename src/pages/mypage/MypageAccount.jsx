@@ -8,6 +8,7 @@ import InputField from "@/components/form/InputField";
 import RadioGroup from "@/components/form/RadioGroup";
 import SelectBox from "@/components/form/SelectBox";
 import useAccount from "@/hooks/useAccount";
+import { useHandleError } from "@/hooks/common/useHandleError";
 import {
   formatPhone,
   formatBirth,
@@ -41,6 +42,7 @@ const schema = yup.object().shape({
     .matches(/^[0-9-]{8,13}$/, "전화번호 형식이 올바르지 않습니다."),
   emailId: yup.string().required("이메일 아이디를 입력해주세요."),
   emailDomain: yup.string().required("이메일 도메인을 선택해주세요."),
+  emailDomainType: yup.string(),
   userRole: yup.string().required("회원구분을 선택해주세요."),
   businessNo: yup.string().nullable(),
 });
@@ -52,16 +54,19 @@ export default function MypageAccount() {
   const { userInfo, update, remove } = useAccount();
   const [selectedType, setSelectedType] = useState("USER");
   const [emailDomainType, setEmailDomainType] = useState("naver.com");
+  const handleError = useHandleError();
 
   const {
     register,
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors, isDirty },
   } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
+    shouldUnregister: false, // ✅ 숨김필드 유지
   });
 
   /** 사용자 정보 초기 세팅 */
@@ -77,7 +82,6 @@ export default function MypageAccount() {
       }
 
       const formattedBirth = formatBirth(birthVal);
-
       const [emailId, domainPart] = userInfo.email?.split("@") || ["", ""];
       const domainOptions = ["naver.com", "gmail.com", "daum.net", "nate.com"];
       const isCustom = !domainOptions.includes(domainPart);
@@ -93,23 +97,35 @@ export default function MypageAccount() {
         phone: formatPhone(userInfo.phone),
         emailId,
         emailDomain: domainPart || "naver.com",
+        emailDomainType: isCustom ? "custom" : domainPart || "naver.com",
         userRole: userInfo.businessNo ? "OWNER" : "USER",
         businessNo: formatBusinessNo(userInfo.businessNo ?? ""),
       });
 
       setSelectedType(userInfo.businessNo ? "OWNER" : "USER");
       setEmailDomainType(isCustom ? "custom" : domainPart || "naver.com");
+      setValue("emailDomain", domainPart || "naver.com", {
+        shouldDirty: false,
+      });
     }
-  }, [userInfo, reset]);
+  }, [userInfo, reset, setValue]);
 
   /** 이메일 도메인 변경 */
   const handleEmailDomainChange = (e) => {
     const value = e.target.value;
     setEmailDomainType(value);
+    setValue("emailDomainType", value, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+
     if (value === "custom") {
-      reset((prev) => ({ ...prev, emailDomain: "" }));
+      setValue("emailDomain", "", { shouldDirty: true, shouldValidate: true });
     } else {
-      reset((prev) => ({ ...prev, emailDomain: value }));
+      setValue("emailDomain", value, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
     }
   };
 
@@ -137,8 +153,7 @@ export default function MypageAccount() {
         alert("회원정보 수정에 실패했습니다.");
       }
     } catch (err) {
-      console.error("[회원정보 수정 실패]", err);
-      alert("서버 통신 중 오류가 발생했습니다.");
+      handleError(err, "accountAPI.register");
     }
   };
 
@@ -248,7 +263,13 @@ export default function MypageAccount() {
                   { label: "nate.com", value: "nate.com" },
                   { label: "직접입력", value: "custom" },
                 ]}
+                isControlled
               />
+
+              {/* ✅ RHF 등록 유지용 hidden input */}
+              <input type="hidden" {...register("emailDomain")} />
+              <input type="hidden" {...register("emailDomainType")} />
+
               {emailDomainType === "custom" && (
                 <InputField
                   name="emailDomain"

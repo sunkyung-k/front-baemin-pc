@@ -26,11 +26,18 @@ export default function MypageProfile() {
     navigate(`/store/${myStore.storeId}`);
   };
 
-  /** 보유 포인트 표시 */
+  /** 보유 포인트 표시 (유저) */
   const deposit = isUserInfoLoading
     ? "로딩 중..."
     : userInfo?.deposit
     ? `${formatPrice(userInfo.deposit)} 원`
+    : "0 원";
+
+  /** 총 수입 표시 (점주) */
+  const balance = isUserInfoLoading
+    ? "로딩 중..."
+    : userInfo?.balance
+    ? `${formatPrice(userInfo.balance)} 원`
     : "0 원";
 
   const roleInfo = {
@@ -38,7 +45,7 @@ export default function MypageProfile() {
       labelTxt: "가게명:",
       label: storeName,
       subText: "총 수입",
-      value: "₩1,203,000",
+      value: balance,
       button: (
         <button
           type="button"

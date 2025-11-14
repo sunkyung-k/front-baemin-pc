@@ -27,9 +27,10 @@ function MypageMenu() {
                   label: "메뉴 관리",
                   state: { from: "mypage" },
                 },
+                { to: "/mypage/review", label: "리뷰 관리" },
               ]
             : []),
-          { to: "/mypage/review", label: "리뷰 관리" },
+
           { to: "/mypage/account", label: "계정 설정" },
         ]
       : [
