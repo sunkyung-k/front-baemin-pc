@@ -37,10 +37,6 @@
     font-size: font("md");
     font-weight: 600;
     border-radius: radius("md");
-
-    &:hover {
-      background-color: darken(fn-color("primary"), 5%);
-    }
   }
 }
 
