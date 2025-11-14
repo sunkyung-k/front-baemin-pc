@@ -36,6 +36,7 @@ import FindPasswordComplete from "../pages/auth/FindPasswordComplete";
 import FindIdComplete from "../pages/auth/FindIdComplete";
 import FindId from "../pages/auth/FindId";
 import FindPassword from "../pages/auth/FindPassword";
+import UserList from "../pages/admin/user/UserList";
 
 export const router = createBrowserRouter([
   {
@@ -45,7 +46,11 @@ export const router = createBrowserRouter([
       // ---------------------- 게스트 전체 공개 ----------------------
       {
         index: true,
-        element: <Home />,
+        element: (
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        ),
         handle: { layoutClass: "wide" },
       },
 
@@ -73,7 +78,7 @@ export const router = createBrowserRouter([
       {
         path: "favorite",
         element: (
-          <ProtectedRoute allowedRoles={["ROLE_USER"]}>
+          <ProtectedRoute allowedRoles={["ROLE_USER", "ROLE_OWNER"]}>
             <Favorite />
           </ProtectedRoute>
         ),
@@ -157,10 +162,10 @@ export const router = createBrowserRouter([
 
       // ---------------------- ADMIN ONLY ----------------------
       {
-        path: "admin",
+        path: "admin/user",
         element: (
           <ProtectedRoute allowedRoles={["ROLE_ADMIN"]}>
-            <div>관리자 페이지</div>
+            <UserList />
           </ProtectedRoute>
         ),
       },

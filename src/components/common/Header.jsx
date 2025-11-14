@@ -15,6 +15,9 @@ import { IoClose } from "react-icons/io5";
  * GUEST는 userRole이 없는 상태 → role = "GUEST" 로 치환
  */
 const MENU_ITEMS = [
+  // ADMIN 전용
+  { to: "/admin/user", label: "회원 관리", visible: ["ROLE_ADMIN"] },
+
   {
     to: "/store",
     label: "가게",
@@ -36,9 +39,6 @@ const MENU_ITEMS = [
 
   // OWNER 전용 마이페이지
   { to: "/mypage/order/manage", label: "마이페이지", visible: ["ROLE_OWNER"] },
-
-  // ADMIN 전용
-  { to: "/admin", label: "관리자 페이지", visible: ["ROLE_ADMIN"] },
 ];
 
 export default function Header() {
