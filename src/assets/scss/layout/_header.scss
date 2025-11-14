@@ -1,4 +1,5 @@
 @use "@/assets/scss/utils" as *;
+@use "@/assets/scss/base" as *;
 
 .header {
   position: fixed;
@@ -45,6 +46,7 @@
   }
 
   .logo a {
+    font-family: $font-family-BM;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -84,6 +86,7 @@
     gap: space("md");
 
     .nav-link {
+      font-family: $font-family-BM;
       position: relative;
       display: flex;
       align-items: center;
