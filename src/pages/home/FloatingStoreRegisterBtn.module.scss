@@ -1,0 +1,42 @@
+.floatingBtn {
+  position: fixed;
+  right: space("xl");
+  bottom: space("xl");
+
+  display: flex;
+  align-items: center;
+  gap: space("sm");
+
+  padding: space("md") space("lg");
+  background: fn-color("primary");
+  color: fn-color("white");
+  border-radius: radius("full");
+  font-size: fn-rem(15);
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+
+  cursor: pointer;
+  z-index: 999;
+
+  animation: floatBtn 2s ease-in-out infinite;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  svg {
+    color: fn-color("white");
+  }
+}
+
+@keyframes floatBtn {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

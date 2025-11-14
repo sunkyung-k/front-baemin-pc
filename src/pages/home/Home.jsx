@@ -6,6 +6,7 @@ import { useCategory } from "@/hooks/useCategory";
 import { useAddressSearch } from "@/hooks/useAddressSearch";
 import { useAddressStore } from "@/store/useAddressStore";
 import styles from "./Home.module.scss";
+import FloatingStoreRegisterBtn from "./FloatingStoreRegisterBtn";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -70,6 +71,7 @@ export default function Home() {
 
   return (
     <div className={styles.home}>
+      <FloatingStoreRegisterBtn />
       {/* HERO : 주소 입력 영역 */}
       <section className={styles.hero}>
         <p className={styles.tit}>“어디로 배달해 드릴까요?”</p>
