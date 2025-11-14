@@ -12,32 +12,32 @@ function MypageMenu() {
   const storeName = myStore?.storeName || "등록된 가게 없음";
   const isEdit = !!myStore;
 
-  const menuItems =
-    userRole === "ROLE_OWNER"
-      ? [
-          { to: "/mypage/order/manage", label: "주문 관리" },
-          {
-            to: "/mypage/store",
-            label: isEdit ? "가게 관리" : "가게 등록",
-          },
-          ...(myStore
-            ? [
-                {
-                  to: `/menuRegister/${myStore.storeId}`,
-                  label: "메뉴 관리",
-                  state: { from: "mypage" },
-                },
-                { to: "/mypage/review", label: "리뷰 관리" },
-              ]
-            : []),
+  const isOwner = userRole === "ROLE_OWNER";
 
-          { to: "/mypage/account", label: "계정 설정" },
-        ]
-      : [
-          { to: "/mypage/order/info", label: "주문 보기" },
-          { to: "/mypage/review", label: "리뷰 보기" },
-          { to: "/mypage/account", label: "계정 설정" },
-        ];
+  const menuItems = isOwner
+    ? [
+        { to: "/mypage/order/manage", label: "주문 관리" },
+        {
+          to: "/mypage/store",
+          label: isEdit ? "가게 관리" : "가게 등록",
+        },
+        ...(myStore
+          ? [
+              {
+                to: `/menuRegister/${myStore.storeId}`,
+                label: "메뉴 관리",
+                state: { from: "mypage" },
+              },
+              { to: "/mypage/review", label: "리뷰 관리" },
+            ]
+          : []),
+        { to: "/mypage/account", label: "계정 설정" },
+      ]
+    : [
+        { to: "/mypage/order/info", label: "주문 보기" },
+        { to: "/mypage/review", label: "리뷰 보기" },
+        { to: "/mypage/account", label: "계정 설정" },
+      ];
 
   return (
     <aside className={styles.sidebar}>
@@ -62,13 +62,15 @@ function MypageMenu() {
         ))}
       </nav>
 
-      <div className={styles.notice}>
-        <strong>내 가게 이용 안내</strong>
-        <p>
-          <em>가게 등록</em>과 <em> 메뉴 등록</em>을 완료해야
-          <br />내 가게 페이지가 활성화됩니다.
-        </p>
-      </div>
+      {isOwner && (
+        <div className={styles.notice}>
+          <strong>내 가게 이용 안내</strong>
+          <p>
+            <em>가게 등록</em>과 <em>메뉴 등록</em>을 완료해야
+            <br />내 가게 페이지가 활성화됩니다.
+          </p>
+        </div>
+      )}
     </aside>
   );
 }

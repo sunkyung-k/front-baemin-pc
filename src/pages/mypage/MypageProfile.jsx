@@ -89,7 +89,6 @@ export default function MypageProfile() {
         {info.subText} : {info.value}
       </div>
       <div>{info.button}</div>
-      {/* <div>{info.txt}</div> */}
 
       {/* 포인트 충전 모달 */}
       <PointChargeModal
