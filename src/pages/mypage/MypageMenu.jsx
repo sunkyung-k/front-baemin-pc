@@ -15,7 +15,10 @@ function MypageMenu() {
   const menuItems =
     userRole === "ROLE_OWNER"
       ? [
-          { to: "/mypage/order/manage", label: "주문 관리" },
+          ...(myStore
+            ? [{ to: "/mypage/order/manage", label: "주문 관리" }]
+            : []),
+
           {
             to: "/mypage/store",
             label: isEdit ? "가게 관리" : "가게 등록",
