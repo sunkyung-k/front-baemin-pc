@@ -1,71 +1,50 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import { useHandleError } from "@/hooks/common/useHandleError";
+import { authStore } from "@/store/authStore";
 import orderAPI from "@/service/orderAPI";
+import accountAPI from "@/service/accountAPI";
 
 /**
- * 주문 상태 변경 훅 (v4 완전형)
+ * useOrderStatus
  * -----------------------------------------------------
- * - 배달완료 / 주문취소 등 상태 업데이트
- * - React Query 캐시 무효화 + 강제 refetch
- * - 매출요약(STORE_SALES) 즉시 반영
- * - 새로고침 없이 실시간 반영 보장
+ * - 배달완료 / 주문취소 후 React Query 캐시 자동 무효화
+ * - invalidate 기반 자동 리렌더 (refetchQueries 미사용)
+ * - STORE_SALES, USER_INFO 모두 실시간 반영
  */
 export const useOrderStatus = (page = 0) => {
   const queryClient = useQueryClient();
   const handleError = useHandleError();
+  const { userId } = authStore.getState();
 
   const updateStatus = async (orderId, newStatus) => {
     try {
-      // 서버에 주문 상태 변경 요청
+      // 1. 서버에 주문 상태 변경 요청
       await orderAPI.updateStatus(orderId, newStatus);
 
-      // 현재 페이지의 점주 주문 목록 캐시 취소 및 즉시 refetch
-      await queryClient.cancelQueries({
-        queryKey: [QUERY_KEYS.MY_STORE_ORDER_LIST, page],
-      });
+      // 2. 관련 쿼리 무효화 (자동 리렌더 유도)
+      const invalidateTargets = [
+        [QUERY_KEYS.MY_STORE_ORDER_LIST, page],
+        [QUERY_KEYS.MY_ORDER_LIST],
+        [QUERY_KEYS.MY_ORDER_RECENT_LIST],
+        [QUERY_KEYS.STORE_SALES],
+      ];
 
-      // invalidate + refetch 보장 (즉시 새 데이터 요청)
-      await queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.MY_STORE_ORDER_LIST, page],
-        refetchType: "active",
-      });
-      await queryClient.refetchQueries({
-        queryKey: [QUERY_KEYS.MY_STORE_ORDER_LIST, page],
-        exact: true,
-      });
+      for (const key of invalidateTargets) {
+        queryClient.invalidateQueries({ queryKey: key, exact: false });
+      }
 
-      // 유저 주문 내역도 함께 갱신
-      await queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.MY_ORDER_LIST],
-        refetchType: "active",
-      });
-      await queryClient.refetchQueries({
-        queryKey: [QUERY_KEYS.MY_ORDER_LIST],
-        exact: false,
-      });
+      // 3. 내 정보(balance/deposit)도 즉시 반영
+      if (userId) {
+        const key = QUERY_KEYS.USER_INFO(userId);
 
-      /* 최근 24시간 주문 내역도 함께 갱신 [주문 현황] */
-      await queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.MY_ORDER_RECENT_LIST],
-        refetchType: "active",
-      });
-      await queryClient.refetchQueries({
-        queryKey: [QUERY_KEYS.MY_ORDER_RECENT_LIST],
-        exact: false,
-      });
+        // (1) invalidate로 쿼리 무효화
+        queryClient.invalidateQueries({ queryKey: key, exact: true });
 
-      // 매출 요약 캐시도 즉시 무효화 + 재조회
-      await queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.STORE_SALES],
-        refetchType: "active",
-      });
-      await queryClient.refetchQueries({
-        queryKey: [QUERY_KEYS.STORE_SALES],
-        exact: false,
-      });
-
-      console.info("주문 상태 갱신 및 캐시 동기화 완료");
+        // (2) 서버에서 최신 데이터 직접 받아와 캐시에 즉시 주입
+        const latestUserInfo = await accountAPI.getUserInfo();
+        queryClient.setQueryData(key, latestUserInfo);
+      }
     } catch (err) {
       handleError(err, "useOrderStatus.updateStatus");
     }

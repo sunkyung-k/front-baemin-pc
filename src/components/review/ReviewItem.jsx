@@ -21,6 +21,8 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
 
   const { updateReview, removeReview } = useReviewUpdate();
 
+  if (!review) return null;
+
   const {
     reviewId,
     rating,

@@ -22,7 +22,7 @@ export default function MypageReview() {
   const [page, setPage] = useState(0);
   const handleError = useHandleError();
 
-  const { data, isLoading } = useReviewList(page, role);
+  const { data } = useReviewList(page, role);
   const { updateReview, removeReview } = useReviewUpdate();
 
   const reviews =
@@ -44,8 +44,6 @@ export default function MypageReview() {
       onError: (err) => handleError(err, "MypageReview.handleDelete"),
     });
   };
-
-  if (isLoading) return <div>로딩 중...</div>;
 
   return (
     <Card title={isOwner ? "내 가게 리뷰 관리" : "내 리뷰 내역"}>

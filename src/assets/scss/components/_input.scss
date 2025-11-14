@@ -37,11 +37,13 @@
       background-color: #f5f5f5;
     }
 
-    &:read-only {
-      background-color: fn-color("gray-50");
-      color: fn-color("gray-700");
-      border-color: fn-color("gray-200");
-      cursor: default;
+    &input {
+      &:read-only {
+        background-color: fn-color("gray-50");
+        color: fn-color("gray-700");
+        border-color: fn-color("gray-200");
+        cursor: default;
+      }
     }
 
     &.error {

@@ -1,4 +1,5 @@
 import api from "@/api/axiosApi";
+import { authStore } from "@/store/authStore";
 
 /**
  * Review API (최신 안정형)
@@ -45,6 +46,16 @@ export const reviewAPI = {
 
   /** 내 가게 리뷰 목록 (점주용) */
   getMyStoreReviews: async (params) => {
+    const { storeId } = authStore.getState();
+
+    if (!storeId) {
+      const error = new Error(
+        "가게 정보가 없습니다. 로그인 후 다시 시도해주세요."
+      );
+      error.code = "NO_STORE_ID";
+      throw error;
+    }
+
     const res = await api.get("/api/v1/review/store/my", { params });
     return res.data;
   },

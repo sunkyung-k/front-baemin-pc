@@ -1,5 +1,16 @@
 @use "@/assets/scss/utils" as *;
+.review-stars {
+  display: flex;
+  gap: fn-rem(3);
 
+  .star {
+    color: fn-color("gray-300");
+
+    &.active {
+      color: fn-color("rating");
+    }
+  }
+}
 .review-card {
   position: relative;
   background-color: fn-color("white");
@@ -38,19 +49,6 @@
       .order-date {
         font-size: font("sm");
         color: fn-color("gray-500");
-      }
-    }
-  }
-
-  .review-stars {
-    display: flex;
-    gap: fn-rem(3);
-
-    .star {
-      color: fn-color("gray-300");
-
-      &.active {
-        color: fn-color("rating");
       }
     }
   }

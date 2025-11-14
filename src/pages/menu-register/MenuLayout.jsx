@@ -53,9 +53,6 @@ export default function MenuLayout() {
     };
   }, [clearActiveCategory]);
 
-  // 렌더링 (로딩 중엔 단순 null만 반환)
-  if (isLoading) return null;
-
   return (
     <div className={styles.wrap}>
       <main className={styles.main}>

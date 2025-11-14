@@ -7,8 +7,8 @@ import { useHandleError } from "@/hooks/common/useHandleError";
 /**
  * useReviewCreate
  * -------------------------------------------------------
- * - 유저/점주 구분에 따라 각각 다른 리뷰 API 호출
- * - 리뷰 등록 시: 즉시 버튼 사라짐 + 서버 데이터 자동 동기화
+ * - 유저 주문 목록 조회 + 리뷰 등록 전용
+ * - 등록 성공 시: 버튼 숨김 + 서버 invalidate
  */
 export const useReviewCreate = (page = 0, role = "user") => {
   const queryClient = useQueryClient();
@@ -23,17 +23,6 @@ export const useReviewCreate = (page = 0, role = "user") => {
     onError: (err) => handleError(err, "useReviewCreate.orderQuery"),
   });
 
-  /** 내 리뷰 목록 (유저 or 점주) */
-  const myReviewQuery = useQuery({
-    queryKey: [QUERY_KEYS.MY_REVIEW_LIST, page, role],
-    queryFn: () =>
-      role === "owner"
-        ? reviewAPI.getMyStoreReviews({ page })
-        : reviewAPI.getMyReviews({ page }),
-    staleTime: 1000 * 60 * 3,
-    onError: (err) => handleError(err, "useReviewCreate.myReviewQuery"),
-  });
-
   /** 리뷰 등록 */
   const createReview = useMutation({
     mutationFn: reviewAPI.create,
@@ -41,7 +30,7 @@ export const useReviewCreate = (page = 0, role = "user") => {
       const orderId = Number(formData.get("orderId"));
       console.info("리뷰 등록 성공:", orderId);
 
-      // React Query 캐시 즉시 갱신 (리뷰쓰기 버튼 즉시 숨김)
+      // ✅ React Query 캐시 즉시 반영
       queryClient.setQueryData([QUERY_KEYS.MY_ORDER_LIST, page], (prev) => {
         if (!prev) return prev;
         const response =
@@ -55,22 +44,10 @@ export const useReviewCreate = (page = 0, role = "user") => {
           order.orderId === orderId ? { ...order, reviewed: true } : order
         );
 
-        const newResponse = { ...response, content: [...newContent] };
-        if (prev.response) return { ...prev, response: newResponse };
-        else if (prev.data?.response)
-          return { ...prev, data: { ...prev.data, response: newResponse } };
-        else if (prev.data?.data?.response)
-          return {
-            ...prev,
-            data: {
-              ...prev.data,
-              data: { ...prev.data.data, response: newResponse },
-            },
-          };
-        return prev;
+        return { ...prev, response: { ...response, content: newContent } };
       });
 
-      // 서버 invalidate (백엔드 최신화)
+      // ✅ 서버 invalidate
       await Promise.all([
         queryClient.invalidateQueries([QUERY_KEYS.MY_ORDER_LIST]),
         queryClient.invalidateQueries([QUERY_KEYS.MY_REVIEW_LIST]),
@@ -79,5 +56,5 @@ export const useReviewCreate = (page = 0, role = "user") => {
     onError: (err) => handleError(err, "useReviewCreate.createReview"),
   });
 
-  return { orderQuery, myReviewQuery, createReview };
+  return { orderQuery, createReview };
 };
