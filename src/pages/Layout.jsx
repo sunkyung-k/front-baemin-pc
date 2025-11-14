@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet, useMatches } from "react-router";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
+import ScrollToTop from "../components/common/ScrollToTop";
 
 function Layout() {
   const matches = useMatches();
@@ -14,6 +15,9 @@ function Layout() {
 
   return (
     <div className="wrap">
+      {/* 페이지 이동 시 스크롤 맨 위로 */}
+      <ScrollToTop />
+
       <Header />
       <main className={`container ${layoutClass || ""}`}>
         <Outlet />
