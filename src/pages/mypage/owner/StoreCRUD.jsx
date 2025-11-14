@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
+import { toast } from "react-toastify";
 import { useStore } from "@/hooks/useStore";
 import { useCategory } from "@/hooks/useCategory";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
@@ -240,6 +241,7 @@ export default function StoreCRUD() {
       } else {
         await create.mutateAsync(formData);
         alert("가게가 등록되었습니다.");
+        toast.info("메뉴 관리에서 메뉴 등록을 해주세요.");
       }
 
       // 후처리
