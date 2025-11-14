@@ -17,7 +17,7 @@ export default function OrderManage() {
   const [page, setPage] = useState(0);
   const { updateStatus } = useOrderStatus(page);
 
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: [QUERY_KEYS.MY_STORE_ORDER_LIST, page],
     queryFn: () => orderAPI.getMyStoreOrders(page),
     onError: handleError,
@@ -25,8 +25,6 @@ export default function OrderManage() {
     gcTime: 0,
     refetchOnWindowFocus: false,
   });
-
-  if (isLoading) return <div>로딩 중...</div>;
 
   const orders = data?.content || [];
   const pageInfo = data?.pageInfo;
