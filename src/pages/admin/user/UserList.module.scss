@@ -1,0 +1,107 @@
+.pageTitle {
+  margin-bottom: space("lg");
+  font-size: font("xxl");
+  color: fn-color("gray-900");
+}
+
+/* ===============================
+    SEARCH AREA
+=============================== */
+
+.searchArea {
+  margin: space("lg") 0 space("md"); // ⭐ 탭과 리스트 사이 breathing space 확보
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: space("sm");
+
+  input {
+    flex: 1;
+    max-width: 600px;
+    padding: space("sm") space("md");
+    border: 1px solid fn-color("gray-300");
+    border-radius: radius("md");
+    background-color: fn-color("white");
+    font-size: font("md");
+
+    &:focus {
+      border-color: fn-color("primary");
+      outline: none;
+    }
+  }
+
+  .addBtn {
+    padding: space("sm") space("md");
+    background-color: fn-color("primary");
+    color: fn-color("white");
+    font-size: font("md");
+    font-weight: 600;
+    border-radius: radius("md");
+
+    &:hover {
+      background-color: darken(fn-color("primary"), 5%);
+    }
+  }
+}
+
+/* ===============================
+    RESULT COUNT
+=============================== */
+
+.resultCount {
+  margin: space("md") 0 space("sm");
+  font-size: font("md");
+  color: fn-color("gray-600");
+}
+
+/* ===============================
+    TABLE
+=============================== */
+
+.adminTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: space("sm");
+  background-color: fn-color("white");
+  border-radius: radius("md");
+  overflow: hidden;
+  border: 1px solid fn-color("gray-200");
+
+  thead {
+    background-color: fn-color("gray-100");
+
+    th {
+      padding: space("md");
+      font-size: font("md"); // ⭐ lg → md (데이터와 균형)
+      font-weight: 600;
+      color: fn-color("gray-700");
+      text-align: left;
+      border-bottom: 1px solid fn-color("gray-200");
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid fn-color("gray-200");
+    transition: background-color 0.15s;
+
+    &:hover {
+      background-color: fn-color("gray-50");
+    }
+  }
+
+  td {
+    padding: space("md");
+    font-size: font("md");
+    color: fn-color("gray-700");
+  }
+}
+
+.editableName {
+  cursor: pointer;
+  color: fn-color("primary");
+  font-weight: 600;
+}
+
+.disabledName {
+  color: fn-color("gray-500");
+}

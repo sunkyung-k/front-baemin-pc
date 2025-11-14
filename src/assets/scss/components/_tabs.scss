@@ -1,0 +1,83 @@
+@use "@/assets/scss/utils" as *;
+
+/* 기본 탭 스타일 (가게 상세) */
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: fn-color("gray-50");
+  border-bottom: 1px solid fn-color("gray-200");
+
+  /* 기본 버튼 */
+  .tab-btn {
+    flex: 1;
+    padding: space("md") 0;
+    font-size: font("lg");
+    font-weight: 600;
+    color: fn-color("gray-600");
+    position: relative;
+    transition: color 0.2s ease;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: fn-rem(3);
+      background-color: transparent;
+      transition: background-color 0.2s ease;
+    }
+
+    &.active {
+      color: fn-color("primary");
+
+      &::after {
+        background-color: fn-color("primary");
+      }
+    }
+  }
+}
+
+/* 관리자 탭 */
+.tabs--admin {
+  background: transparent;
+  border-bottom: 1px solid fn-color("gray-100");
+  justify-content: flex-start;
+  gap: space("xl");
+  padding-bottom: space("xs");
+
+  .tab-btn {
+    flex: none;
+    padding: 0;
+    font-size: font("md");
+    font-weight: 600;
+    color: fn-color("gray-600");
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: fn-rem(-2);
+      left: 0;
+      width: 0;
+      height: fn-rem(2);
+      background-color: rgba(#fff, 0.85);
+    }
+
+    &::after {
+      height: 2px;
+      bottom: -6px;
+      border-radius: radius("full");
+      transition: width 0.2s;
+    }
+
+    &:hover,
+    &.active {
+      color: fn-color("primary");
+
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+}
