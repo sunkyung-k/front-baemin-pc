@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import adminUserAPI from "@/service/adminUserAPI";
+import adminUserAPI from "@/service/admin/adminUserAPI";
 import { handleApiError } from "@/utills/handleApiError";
 
 export function useAdminUserList(params) {

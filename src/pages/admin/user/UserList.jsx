@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import adminUserAPI from "@/service/adminUserAPI";
+import adminUserAPI from "@/service/admin/adminUserAPI";
 import UserModal from "./UserModal";
 import Pagination from "@/components/common/Pagination";
 

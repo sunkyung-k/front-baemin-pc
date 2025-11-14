@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Modal from "@/components/common/Modal";
-import adminUserAPI from "@/service/adminUserAPI";
+import adminUserAPI from "@/service/admin/adminUserAPI";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function UserModal({ userId, isOpen, onClose }) {
