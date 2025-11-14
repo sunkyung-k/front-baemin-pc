@@ -3,16 +3,19 @@ import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import favoriteAPI from "@/service/favoriteAPI";
 import { handleApiError } from "@/utills/handleApiError";
+import { authStore } from "@/store/authStore";
 
 /**
  * useFavorite
  * -------------------------------------------------
  * - 개별 가게 찜 상태 관리 훅
  * - 찜 등록/해제 + React Query 캐시 동기화
+ * - 비회원은 API 호출하지 않도록 방어 처리
  */
 export default function useFavorite(storeId) {
   const [isLiked, setIsLiked] = useState(false);
   const queryClient = useQueryClient();
+  const isAuthenticated = authStore((s) => s.isAuthenticated)();
 
   /**
    * 초기 찜 상태 조회
@@ -20,6 +23,12 @@ export default function useFavorite(storeId) {
    */
   useEffect(() => {
     if (!storeId) return;
+
+    // 비회원이면 favorite 체크 API 호출하면 안 됨
+    if (!isAuthenticated) {
+      setIsLiked(false);
+      return;
+    }
 
     const fetchFavoriteState = async () => {
       try {
@@ -31,7 +40,7 @@ export default function useFavorite(storeId) {
     };
 
     fetchFavoriteState();
-  }, [storeId]);
+  }, [storeId, isAuthenticated]);
 
   /**
    * 찜 토글 핸들러
@@ -41,6 +50,12 @@ export default function useFavorite(storeId) {
   const toggleLike = useCallback(
     async (nextState) => {
       if (!storeId) return;
+
+      // 비회원이면 찜 기능 자체를 막음
+      if (!isAuthenticated) {
+        alert("로그인 후 이용 가능한 기능입니다.");
+        return;
+      }
 
       try {
         // 서버에 찜 상태 반영
@@ -60,7 +75,7 @@ export default function useFavorite(storeId) {
         handleApiError(err, "useFavorite");
       }
     },
-    [storeId, queryClient]
+    [storeId, queryClient, isAuthenticated]
   );
 
   return { isLiked, toggleLike };

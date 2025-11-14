@@ -66,13 +66,20 @@ api.interceptors.response.use(
       const token = authStore.getState().token;
       const isLoggedOut = !token; // 이미 로그아웃 상태라면 true
 
-      // 로그아웃 API 요청이거나 이미 로그아웃된 상태면 알림 띄우지 않음
-      if (requestUrl.includes("/api/v1/logout") || isLoggedOut) {
+      // Case 1: 로그아웃 API 요청
+      if (requestUrl.includes("/api/v1/logout")) {
         authStore.getState().clearAuth();
         location.href = "/login";
         return Promise.reject(error);
       }
 
+      // Case 2: 비로그인 상태에서 401 → 리다이렉트 금지
+      if (isLoggedOut) {
+        authStore.getState().clearAuth();
+        return Promise.reject(error);
+      }
+
+      // Case 3: 로그인 상태였고 토큰이 만료됨
       alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
       authStore.getState().clearAuth();
       location.href = "/login";

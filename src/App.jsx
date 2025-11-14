@@ -1,9 +1,10 @@
 import { RouterProvider } from "react-router-dom";
-import { router } from "./router/router";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import OrderStatusNotifier from "./components/order/OrderStatusNotifier";
 import { ToastContainer } from "react-toastify";
 import GlobalLoading from "./components/GlobalLoading";
+import { router } from "./router/router";
 
 const queryClient = new QueryClient({
   defaultOptions: {

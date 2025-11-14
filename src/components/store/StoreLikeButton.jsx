@@ -1,11 +1,13 @@
 import React from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa6";
+import { authStore } from "@/store/authStore";
 
 /**
  * LikeButton
  * -------------------------------------------------
  * - 상태 제어는 부모에서 담당
  * - 클릭 시 링크 이동 방지 및 이벤트 전파 차단
+ * - 비회원(GUEST)일 경우: 로그인 유도 + toggle 호출하지 않음
  */
 export default function LikeButton({
   isActive = false,
@@ -13,9 +15,19 @@ export default function LikeButton({
   round = true,
   animated = true,
 }) {
+  const isAuthenticated = authStore((s) => s.isAuthenticated)();
+
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // 비회원이면 찜 기능 막고 로그인 유도
+    if (!isAuthenticated) {
+      alert("로그인이 필요한 기능입니다. 로그인 후 이용해주세요.");
+      return;
+    }
+
+    // 부모에게 toggle된 상태 전달
     onToggle?.(!isActive);
   };
 
