@@ -61,6 +61,14 @@ function MypageMenu() {
           </NavLink>
         ))}
       </nav>
+
+      <div className={styles.notice}>
+        <strong>내 가게 이용 안내</strong>
+        <p>
+          <em>가게 등록</em>과 <em> 메뉴 등록</em>을 완료해야
+          <br />내 가게 페이지가 활성화됩니다.
+        </p>
+      </div>
     </aside>
   );
 }

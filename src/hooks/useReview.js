@@ -10,7 +10,7 @@ import { useHandleError } from "@/hooks/common/useHandleError";
  * - 유저/점주 구분에 따라 각각 다른 리뷰 API 호출
  * - 리뷰 등록 시: 즉시 버튼 사라짐 + 서버 데이터 자동 동기화
  */
-export const useReview = (page = 0, role = "user") => {
+export const useReview = (page = 0, role = "user", storeId = null) => {
   const queryClient = useQueryClient();
   const handleError = useHandleError();
 
@@ -23,13 +23,13 @@ export const useReview = (page = 0, role = "user") => {
     onError: (err) => handleError(err, "useReview.orderQuery"),
   });
 
-  /** 내 리뷰 목록 (유저 or 점주) */
   const myReviewQuery = useQuery({
-    queryKey: [QUERY_KEYS.MY_REVIEW_LIST, page, role],
+    queryKey: [QUERY_KEYS.MY_REVIEW_LIST, page, role, storeId],
     queryFn: () =>
       role === "owner"
-        ? reviewAPI.getMyStoreReviews({ page })
+        ? reviewAPI.getMyStoreReviews({ page, storeId })
         : reviewAPI.getMyReviews({ page }),
+    enabled: role === "user" || !!storeId,
     staleTime: 1000 * 60 * 3,
     onError: (err) => handleError(err, "useReview.myReviewQuery"),
   });
@@ -41,7 +41,7 @@ export const useReview = (page = 0, role = "user") => {
       const orderId = Number(formData.get("orderId"));
       console.info("리뷰 등록 성공:", orderId);
 
-      // React Query 캐시 즉시 갱신 (리뷰쓰기 버튼 즉시 숨김)
+      // 즉시 캐시 수정
       queryClient.setQueryData([QUERY_KEYS.MY_ORDER_LIST, page], (prev) => {
         if (!prev) return prev;
         const response =
@@ -70,7 +70,7 @@ export const useReview = (page = 0, role = "user") => {
         return prev;
       });
 
-      // 서버 데이터 invalidate
+      // 서버 invalidate
       await Promise.all([
         queryClient.invalidateQueries([QUERY_KEYS.MY_ORDER_LIST]),
         queryClient.invalidateQueries([QUERY_KEYS.MY_REVIEW_LIST]),

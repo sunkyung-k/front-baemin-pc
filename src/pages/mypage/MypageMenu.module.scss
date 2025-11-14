@@ -43,3 +43,28 @@
     width: 100%;
   }
 }
+
+.notice {
+  background-color: fn-color("gray-200");
+  padding: space("md");
+  border-radius: radius("sm");
+
+  strong {
+    font-size: font("sm");
+    text-align: center;
+    display: block;
+    color: fn-color("gray-500");
+  }
+  p {
+    padding-top: space("sm");
+    font-size: font("sm");
+    text-align: center;
+    color: fn-color("gray-500");
+    line-height: 1.4;
+  }
+
+  em {
+    font-weight: 500;
+    color: fn-color("gray-800");
+  }
+}

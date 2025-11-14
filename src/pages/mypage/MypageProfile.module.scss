@@ -41,3 +41,9 @@
     color: fn-color("primary");
   }
 }
+
+.ownerTxt {
+  margin: 0 space("lg");
+  font-size: font("xs");
+  color: fn-color("gray-600");
+}

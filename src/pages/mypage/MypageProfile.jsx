@@ -51,6 +51,7 @@ export default function MypageProfile() {
           type="button"
           className="btn btn-round btn-primary"
           onClick={handleGoMyStore}
+          disabled={!myStore || !myStore.storeId}
         >
           내 가게 보기
         </button>
@@ -88,6 +89,7 @@ export default function MypageProfile() {
         {info.subText} : {info.value}
       </div>
       <div>{info.button}</div>
+      {/* <div>{info.txt}</div> */}
 
       {/* 포인트 충전 모달 */}
       <PointChargeModal

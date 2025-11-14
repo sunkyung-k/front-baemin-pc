@@ -5,11 +5,13 @@ import ReviewReplyBox from "./ReviewReplyBox";
 import ReviewSwiper from "./ReviewSwiper";
 import ReviewModal from "./ReviewModal";
 import { useReviewUpdate } from "@/hooks/review/useReviewUpdate";
+import { useAdminReview } from "@/hooks/admin/useAdminReview";
+import { authStore } from "@/store/authStore";
 
 /**
  * ReviewItem (리뷰 카드 공용)
  * --------------------------------------------------
- * - role: "user" | "owner" | "store"
+ * - role: "user" | "owner" | "store" | "admin"
  * - review: 리뷰 데이터
  * - onDelete: 상위 리스트 동기화를 위한 삭제 핸들러 (선택)
  */
@@ -17,9 +19,11 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
   const [isSwiperOpen, setSwiperOpen] = useState(false);
   const [isEditOpen, setEditOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [isReplyMode, setReplyMode] = useState(false);
 
   const { updateReview, removeReview } = useReviewUpdate();
+  const { reviewDelete, replyDelete } = useAdminReview();
+
+  const loginRole = authStore.getState().userRole;
 
   if (!review) return null;
 
@@ -38,13 +42,37 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
 
   /** 리뷰 수정 */
   const handleEditSubmit = (formData) => {
-    updateReview.mutate(formData, { onSuccess: () => setEditOpen(false) });
+    updateReview.mutate(formData, {
+      onSuccess: () => setEditOpen(false),
+    });
   };
 
-  /** 리뷰 삭제 */
-  const handleDelete = () => {
+  /** 유저 리뷰 삭제 */
+  const handleUserDelete = () => {
     removeReview.mutate(reviewId, {
       onSuccess: () => onDelete?.(reviewId),
+    });
+  };
+
+  /** 관리자 리뷰 삭제 */
+  const handleAdminReviewDelete = () => {
+    if (!window.confirm("정말 이 리뷰를 삭제하시겠습니까?")) return;
+
+    reviewDelete.mutate(reviewId, {
+      onSuccess: () => onDelete?.(reviewId),
+    });
+  };
+
+  /** 관리자 답변 삭제 */
+  const handleAdminReplyDelete = () => {
+    if (!reply) return;
+    if (!window.confirm("정말 이 답변을 삭제하시겠습니까?")) return;
+
+    replyDelete.mutate(reply.reviewReplyId, {
+      onSuccess: () => {
+        // ⭐ 관리자 답변 삭제 시 reply를 즉시 제거해서 state 꼬임 방지
+        review.reply = null;
+      },
     });
   };
 
@@ -53,6 +81,9 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
     role === "user"
       ? order?.storeName || "가게명 없음"
       : writer || "작성자 없음";
+
+  /** 관리자 역할인지 체크 */
+  const isAdmin = loginRole === "ROLE_ADMIN";
 
   return (
     <div className="review-card">
@@ -68,7 +99,7 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
           ))}
         </div>
 
-        {/* 유저 전용: 수정 / 삭제 버튼 */}
+        {/* 유저 전용: 수정 / 삭제 */}
         {role === "user" && (
           <div className="review-actions">
             <button
@@ -77,14 +108,38 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
             >
               수정
             </button>
-            <button className="btn btn-danger btn-sm" onClick={handleDelete}>
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={handleUserDelete}
+            >
               삭제
             </button>
           </div>
         )}
+
+        {/* 관리자 전용 삭제 */}
+        {isAdmin && (
+          <div className="review-actions">
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={handleAdminReviewDelete}
+            >
+              리뷰 삭제
+            </button>
+
+            {reply && (
+              <button
+                className="btn btn-secondary-line btn-sm"
+                onClick={handleAdminReplyDelete}
+              >
+                답변 삭제
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* 상단 - 가게명(유저) or 작성자명(점주/가게상세) */}
+      {/* 상단 - 가게명(유저) or 작성자명(점주/가게상세/관리자) */}
       <div className="review-info">
         <div className="review-info-top">
           <strong className="store-name">{displayName}</strong>
@@ -96,8 +151,6 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
           <div
             className={`order-summary ${expanded ? "expanded" : ""}`}
             onClick={toggleExpand}
-            role="button"
-            tabIndex={0}
           >
             <p className="order-txt">
               {order.itemList
@@ -133,13 +186,11 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
         </div>
       )}
 
-      {/* 사장님 답글  */}
+      {/* 사장님 답글 - owner 전용 readonly 제어 */}
       <ReviewReplyBox
-        reply={reply}
+        reply={review.reply ?? null} // ⭐ 관리자 삭제 후 즉시 null 넘어감
         reviewId={reviewId}
-        onClose={() => setReplyMode(false)}
-        onOpen={() => setReplyMode(true)}
-        isReadOnly={role !== "owner"} //  점주만 수정 가능
+        isReadOnly={role !== "owner"} // 점주만 수정 가능
       />
 
       {/* 이미지 전체보기 */}

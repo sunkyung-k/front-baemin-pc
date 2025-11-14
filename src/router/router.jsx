@@ -26,6 +26,7 @@ import OrderManage from "../pages/mypage/owner/OrderManage";
 import StoreCRUD from "../pages/mypage/owner/StoreCRUD";
 import OrderInfo from "../pages/mypage/user/OrderInfo";
 import MypageAccount from "../pages/mypage/MypageAccount";
+import MypageReview from "../pages/mypage/MypageReview";
 
 import MenuLayout from "../pages/menu-register/MenuLayout";
 
@@ -37,6 +38,7 @@ import FindIdComplete from "../pages/auth/FindIdComplete";
 import FindId from "../pages/auth/FindId";
 import FindPassword from "../pages/auth/FindPassword";
 import UserList from "../pages/admin/user/UserList";
+import ReviewTabContent from "../pages/store-detail/review/ReviewTabContent";
 
 export const router = createBrowserRouter([
   {
@@ -71,6 +73,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <MenuTabContent /> },
           { path: "info", element: <InfoTabContent /> },
+          { path: "review", element: <ReviewTabContent /> },
         ],
       },
 
@@ -144,6 +147,14 @@ export const router = createBrowserRouter([
             element: (
               <ProtectedRoute allowedRoles={["ROLE_OWNER"]}>
                 <StoreCRUD />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "review",
+            element: (
+              <ProtectedRoute allowedRoles={["ROLE_USER", "ROLE_OWNER"]}>
+                <MypageReview />
               </ProtectedRoute>
             ),
           },

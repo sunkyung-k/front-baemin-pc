@@ -1,0 +1,38 @@
+.listWrap {
+  width: 100%;
+  padding: space("xl") 0;
+}
+
+.loading {
+  text-align: center;
+  padding: space("lg") 0;
+  color: fn-color("gray-600");
+}
+
+.empty {
+  text-align: center;
+  padding: space("lg") 0;
+  color: fn-color("gray-600");
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: space("xs");
+  margin-top: space("xl");
+}
+
+.pageBtn {
+  padding: space("xs") space("sm");
+  border: 1px solid fn-color("gray-300");
+  background: #fff;
+  border-radius: radius("sm");
+  font-size: fn-rem(14);
+  cursor: pointer;
+}
+
+.active {
+  background: fn-color("primary");
+  color: #fff;
+  border-color: fn-color("primary");
+}

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import TextareaField from "@/components/form/TextareaField";
 import { useReviewReply } from "@/hooks/review/useReviewReply";
+import { useAdminReview } from "@/hooks/admin/useAdminReview";
+import { authStore } from "@/store/authStore";
 
 /**
  * ReviewReplyBox (사장님 답글 / 공용 보기)
@@ -17,9 +19,14 @@ export default function ReviewReplyBox({
   isReadOnly = false,
 }) {
   const { createReply, updateReply, removeReply } = useReviewReply();
+  const { replyDelete } = useAdminReview();
+
+  // 🔥 관리자 여부 확인
+  const { userRole } = authStore();
+  const isAdmin = userRole === "ROLE_ADMIN";
 
   const [content, setContent] = useState(reply?.content || "");
-  const [isEditing, setEditing] = useState(!reply && !isReadOnly); // 답글 없고 수정 가능할 때만 true
+  const [isEditing, setEditing] = useState(!reply && !isReadOnly);
   const [loading, setLoading] = useState(false);
 
   /** 저장 (등록 or 수정) */
@@ -49,13 +56,13 @@ export default function ReviewReplyBox({
     }
   };
 
-  /** 수정모드 진입 */
+  /** 점주 수정모드 진입 */
   const handleEdit = () => {
     setEditing(true);
     onOpen?.();
   };
 
-  /** 답글 삭제 */
+  /** 점주 답글 삭제 */
   const handleDelete = async () => {
     if (!window.confirm("정말 답글을 삭제하시겠습니까?")) return;
 
@@ -75,6 +82,14 @@ export default function ReviewReplyBox({
     }
   };
 
+  /** 관리자 점주 답변 삭제 */
+  const handleAdminReplyDelete = () => {
+    if (!reply) return;
+    if (!window.confirm("정말 이 답변을 삭제하시겠습니까?")) return;
+
+    replyDelete.mutate(reply.reviewReplyId);
+  };
+
   return (
     <div className={`review-reply-box ${isReadOnly ? "readonly" : ""}`}>
       {/* 보기 모드 */}
@@ -83,7 +98,7 @@ export default function ReviewReplyBox({
           <div className="reply-header">
             <strong>사장님 답변</strong>
 
-            {/* 점주(owner)만 수정/삭제 버튼 노출 */}
+            {/* 점주(owner)만 수정/삭제 */}
             {!isReadOnly && (
               <div className="reply-btn">
                 <button
@@ -103,6 +118,17 @@ export default function ReviewReplyBox({
                   삭제
                 </button>
               </div>
+            )}
+
+            {/* 🔥 관리자 전용 삭제 버튼 */}
+            {isAdmin && (
+              <button
+                type="button"
+                className="btn btn-danger btn-sm"
+                onClick={handleAdminReplyDelete}
+              >
+                답변 삭제
+              </button>
             )}
           </div>
 
