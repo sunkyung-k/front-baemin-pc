@@ -7,6 +7,7 @@ import { useStore } from "@/hooks/useStore";
 import { useCategory } from "@/hooks/useCategory";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 import { useAddressSearch } from "@/hooks/useAddressSearch";
+import { useHandleError } from "@/hooks/common/useHandleError";
 
 import Card from "@/components/mypage/Card";
 import InputField from "@/components/form/InputField";
@@ -27,11 +28,10 @@ import {
 
 const DAY_OPTIONS = ["월", "화", "수", "목", "금", "토", "일", "휴무 없음"];
 
-/* ============================================================
-  mapStoreToForm
-  API로부터 받은 데이터 → RHF 기본값 형태로 변환
-  (등록모드 / 수정모드 자동 구분)
-  ============================================================ */
+/**
+ * mapStoreToForm
+ * API로부터 받은 데이터 → RHF 기본값 형태로 변환 (등록모드 / 수정모드 자동 구분)
+ */
 const mapStoreToForm = (store, DAY_OPTIONS) => {
   if (!store || store.delYn === "Y") {
     // 신규 등록 (store 없음 or 삭제된 경우)
@@ -64,10 +64,10 @@ const mapStoreToForm = (store, DAY_OPTIONS) => {
   return {
     storeName: store.storeName,
     branchName: store.branchName,
-    phone: store.phone ? formatPhone(store.phone) : "", // 전화번호 포맷 (공통 함수 사용)
+    phone: store.phone ? formatPhone(store.phone) : "",
     addr: store.addr,
     addrDetail: store.addrDetail,
-    minPrice: store.minPrice ? formatPrice(store.minPrice.toString()) : "", // 금액 포맷 (공통 함수 사용)
+    minPrice: store.minPrice ? formatPrice(store.minPrice.toString()) : "",
     origin: store.origin,
     notice: store.notice,
     categoryIds: store.categoryList.map((c) => c.category.caId.toString()),
@@ -77,9 +77,7 @@ const mapStoreToForm = (store, DAY_OPTIONS) => {
   };
 };
 
-/* ============================================================
-  유효성 스키마
-  ============================================================ */
+/** 유효성 스키마 */
 const schema = yup.object().shape({
   categoryIds: yup
     .array()
@@ -110,16 +108,17 @@ const schema = yup.object().shape({
 });
 
 export default function StoreCRUD() {
+  const handleError = useHandleError();
   const { myStore, create, update, remove } = useStore();
   const { categories } = useCategory();
   const [isEdit, setIsEdit] = useState(false);
   const [mainImageUrl, setMainImageUrl] = useState(null);
 
-  /* ------------------------------------------------------------
-    RHF 설정
-    - yupResolver로 유효성 검사
-    - defaultValues는 등록 시 초기화용
-    ------------------------------------------------------------ */
+  /**
+   * RHF 설정
+   * - yupResolver로 유효성 검사
+   * - defaultValues는 등록 시 초기화용
+   */
   const {
     register,
     handleSubmit,
@@ -137,10 +136,7 @@ export default function StoreCRUD() {
     mode: "onChange",
   });
 
-  /* ------------------------------------------------------------
-    내 가게 정보 로드 및 폼 초기화
-    - 수정 모드 자동 감지
-    ------------------------------------------------------------ */
+  /** 내 가게 정보 로드 및 폼 초기화 (수정 감지) */
   useEffect(() => {
     const isStoreValid = myStore && myStore.delYn !== "Y";
 
@@ -160,9 +156,7 @@ export default function StoreCRUD() {
     }
   }, [myStore, reset]);
 
-  /* ------------------------------------------------------------
-    휴무 요일 체크박스 핸들러
-    ------------------------------------------------------------ */
+  /** 휴무 요일 체크박스 핸들러 */
   const handleDaysChange = (e) => {
     const { value, checked } = e.target;
     const current = watch("days") || [];
@@ -181,9 +175,7 @@ export default function StoreCRUD() {
     setValue("days", updated, { shouldValidate: true });
   };
 
-  /* ------------------------------------------------------------
-    onSubmit - 등록 / 수정 처리
-    ------------------------------------------------------------ */
+  /** onSubmit - 등록 / 수정 처리 */
   const onSubmit = async (data) => {
     const confirmText = isEdit
       ? "가게 정보를 수정하시겠습니까?"
@@ -254,32 +246,24 @@ export default function StoreCRUD() {
       reset(data, { keepValues: true });
       if (!isEdit) setIsEdit(true);
     } catch (err) {
-      console.error("등록/수정 실패:", err);
+      handleError(err, "StoreCRUD.onSubmit");
     }
   };
 
-  /* ------------------------------------------------------------
-    가게 삭제
-    ------------------------------------------------------------ */
+  /** 가게 삭제 */
   const handleDelete = async () => {
     if (!window.confirm("정말 가게를 삭제하시겠습니까?")) return;
     try {
       await remove.mutateAsync(myStore?.storeId);
       alert("가게가 삭제 처리되었습니다.");
     } catch (err) {
-      console.error("삭제 실패:", err);
-      alert("삭제 처리 중 오류가 발생했습니다.");
+      handleError(err, "StoreCRUD.handleDelete");
     }
   };
 
-  /* ------------------------------------------------------------
-    주소 검색
-    ------------------------------------------------------------ */
+  /** 주소 검색 */
   const { openAddressSearch } = useAddressSearch((addr) => {
-    setValue("addr", addr, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+    setValue("addr", addr, { shouldValidate: true, shouldDirty: true });
   });
 
   return (
