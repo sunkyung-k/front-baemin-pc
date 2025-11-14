@@ -19,34 +19,17 @@ const storeAPI = {
   async getMyStore() {
     const { userRole } = authStore.getState();
 
-    if (import.meta.env.MODE === "development") {
-      console.log("[DEBUG] [storeAPI] getMyStore 호출 (/store/my)");
-    }
-
-    // OWNER 계정 아닌 경우
     if (!userRole?.includes("OWNER")) {
-      if (import.meta.env.MODE === "development") {
-        console.warn("[storeAPI] OWNER 계정이 아닙니다.");
-      }
       return null;
     }
 
     const res = await api.get(`/api/v1/store/my`);
     const data = res.data.response?.vo ?? res.data.response;
 
-    // 유효한 가게만 상태 반영
     if (data?.storeId && data.delYn !== "Y") {
-      authStore.getState().setStoreId(data.storeId);
-
-      if (import.meta.env.MODE === "development") {
-        console.log("[storeAPI] 내 가게 조회 성공:", data);
-      }
-
-      return data;
+      return data; // storeId는 여기서 반환
     }
 
-    // 가게가 없거나 삭제된 경우 초기화
-    authStore.getState().clearStoreId();
     return null;
   },
 
@@ -66,13 +49,7 @@ const storeAPI = {
   /** 가게 삭제 */
   async remove(storeId) {
     const res = await api.delete(`/api/v1/store/${storeId}`);
-
-    if (import.meta.env.MODE === "development") {
-      console.log(`[storeAPI] 가게 삭제 완료 (storeId=${storeId})`);
-    }
-
-    authStore.getState().clearStoreId();
-    return res.data;
+    return res.data; // 상태 조작은 useStore가 담당
   },
 
   /** 유저용 가게 상세 조회 (로그인 불필요, ownerInfo 병합 포함) */
