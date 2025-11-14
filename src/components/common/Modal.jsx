@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import { IoClose } from "react-icons/io5";
 
 /**
@@ -10,6 +11,8 @@ import { IoClose } from "react-icons/io5";
 export default function Modal({ isOpen, title, onClose, children }) {
   const [isActive, setIsActive] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
+
+  const modalRoot = document.getElementById("global-modal-root");
 
   useEffect(() => {
     if (isOpen) {
@@ -30,7 +33,7 @@ export default function Modal({ isOpen, title, onClose, children }) {
     }
   };
 
-  return (
+  const modalElement = (
     <div
       className={`modal-overlay ${isActive ? "active" : ""}`}
       onClick={handleOverlayClick}
@@ -44,4 +47,8 @@ export default function Modal({ isOpen, title, onClose, children }) {
       </div>
     </div>
   );
+
+  if (!modalRoot) return null;
+
+  return ReactDOM.createPortal(modalElement, modalRoot);
 }
