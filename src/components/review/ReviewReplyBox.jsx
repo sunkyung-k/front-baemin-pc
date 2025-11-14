@@ -21,7 +21,6 @@ export default function ReviewReplyBox({
   const { createReply, updateReply, removeReply } = useReviewReply();
   const { replyDelete } = useAdminReview();
 
-  // 🔥 관리자 여부 확인
   const { userRole } = authStore();
   const isAdmin = userRole === "ROLE_ADMIN";
 
@@ -29,13 +28,17 @@ export default function ReviewReplyBox({
   const [isEditing, setEditing] = useState(!reply && !isReadOnly);
   const [loading, setLoading] = useState(false);
 
-  /** 저장 (등록 or 수정) */
+  // ⭐ 삭제된 리뷰는 답글 비활성
+  const isDeletedByAdmin =
+    reply?.delYn === "A" ||
+    content === "해당 리뷰는 관리자에 의해 삭제된 리뷰입니다.";
+
+  /** 저장 */
   const handleSave = async () => {
     if (!content.trim()) return;
 
     try {
       setLoading(true);
-
       const payload = reply
         ? { reviewReplyId: reply.reviewReplyId, reviewId, content }
         : { reviewId, content };
@@ -50,19 +53,17 @@ export default function ReviewReplyBox({
         onSettled: () => setLoading(false),
       });
     } catch (err) {
-      console.error("답글 저장 중 오류:", err);
-      alert("답글 저장 중 오류가 발생했습니다.");
       setLoading(false);
     }
   };
 
-  /** 점주 수정모드 진입 */
+  /** 수정 모드 */
   const handleEdit = () => {
     setEditing(true);
     onOpen?.();
   };
 
-  /** 점주 답글 삭제 */
+  /** 삭제 */
   const handleDelete = async () => {
     if (!window.confirm("정말 답글을 삭제하시겠습니까?")) return;
 
@@ -77,12 +78,11 @@ export default function ReviewReplyBox({
         onSettled: () => setLoading(false),
       });
     } catch (err) {
-      console.error("답글 삭제 오류:", err);
       setLoading(false);
     }
   };
 
-  /** 관리자 점주 답변 삭제 */
+  /** 관리자 삭제 */
   const handleAdminReplyDelete = () => {
     if (!reply) return;
     if (!window.confirm("정말 이 답변을 삭제하시겠습니까?")) return;
@@ -92,14 +92,14 @@ export default function ReviewReplyBox({
 
   return (
     <div className={`review-reply-box ${isReadOnly ? "readonly" : ""}`}>
-      {/* 보기 모드 */}
+      {/* 보기 */}
       {!isEditing && reply && (
         <div className="reply-view">
           <div className="reply-header">
             <strong>사장님 답변</strong>
 
-            {/* 점주(owner)만 수정/삭제 */}
-            {!isReadOnly && (
+            {/* 점주 버튼 */}
+            {!isReadOnly && !isDeletedByAdmin && (
               <div className="reply-btn">
                 <button
                   type="button"
@@ -120,8 +120,8 @@ export default function ReviewReplyBox({
               </div>
             )}
 
-            {/* 🔥 관리자 전용 삭제 버튼 */}
-            {isAdmin && (
+            {/* 관리자 버튼 */}
+            {isAdmin && !isDeletedByAdmin && (
               <button
                 type="button"
                 className="btn btn-danger btn-sm"
@@ -132,12 +132,19 @@ export default function ReviewReplyBox({
             )}
           </div>
 
-          <p className="reply-content">{reply.content}</p>
+          {/* 답글 내용 */}
+          <p
+            className={`reply-content ${
+              isDeletedByAdmin ? "deleted-review" : ""
+            }`}
+          >
+            {reply.content}
+          </p>
         </div>
       )}
 
       {/* 작성/수정 모드 */}
-      {!isReadOnly && isEditing && (
+      {!isReadOnly && isEditing && !isDeletedByAdmin && (
         <div className="review-reply-form">
           <TextareaField
             name="replyContent"
@@ -155,6 +162,7 @@ export default function ReviewReplyBox({
             >
               {reply ? "수정 완료" : "등록"}
             </button>
+
             {reply && (
               <button
                 type="button"

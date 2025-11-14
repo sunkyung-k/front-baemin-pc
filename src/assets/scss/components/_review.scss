@@ -418,3 +418,8 @@
   gap: fn-rem(8);
   margin-top: fn-rem(8);
 }
+
+.deleted-review {
+  font-size: fn-rem(13) !important;
+  color: fn-color("gray-500") !important;
+}

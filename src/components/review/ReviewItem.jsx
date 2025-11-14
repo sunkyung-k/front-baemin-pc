@@ -35,7 +35,12 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
     fileList = [],
     reply,
     order,
+    delYn,
   } = review;
+
+  // ⭐ 삭제된 리뷰 체크
+  const isDeletedByAdmin =
+    delYn === "A" || content === "해당 리뷰는 관리자에 의해 삭제된 리뷰입니다.";
 
   const toggleExpand = () => setExpanded((prev) => !prev);
   const images = fileList.map((f) => getAbsoluteImageUrl(f)).filter(Boolean);
@@ -70,19 +75,17 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
 
     replyDelete.mutate(reply.reviewReplyId, {
       onSuccess: () => {
-        // ⭐ 관리자 답변 삭제 시 reply를 즉시 제거해서 state 꼬임 방지
         review.reply = null;
       },
     });
   };
 
-  /** 상단 표시명 */
+  /** 표시명 */
   const displayName =
     role === "user"
       ? order?.storeName || "가게명 없음"
       : writer || "작성자 없음";
 
-  /** 관리자 역할인지 체크 */
   const isAdmin = loginRole === "ROLE_ADMIN";
 
   return (
@@ -99,8 +102,8 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
           ))}
         </div>
 
-        {/* 유저 전용: 수정 / 삭제 */}
-        {role === "user" && (
+        {/* 유저 수정/삭제 (삭제된 리뷰면 숨김) */}
+        {role === "user" && !isDeletedByAdmin && (
           <div className="review-actions">
             <button
               className="btn btn-secondary-line btn-sm"
@@ -117,8 +120,8 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
           </div>
         )}
 
-        {/* 관리자 전용 삭제 */}
-        {isAdmin && (
+        {/* 관리자 삭제 버튼 (삭제 리뷰는 숨김) */}
+        {isAdmin && !isDeletedByAdmin && (
           <div className="review-actions">
             <button
               className="btn btn-danger btn-sm"
@@ -139,14 +142,14 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
         )}
       </div>
 
-      {/* 상단 - 가게명(유저) or 작성자명(점주/가게상세/관리자) */}
+      {/* 상단 정보 */}
       <div className="review-info">
         <div className="review-info-top">
           <strong className="store-name">{displayName}</strong>
           <span className="order-date"> / {order?.orderDate ?? ""}</span>
         </div>
 
-        {/* 주문 항목 요약 */}
+        {/* 주문 요약 */}
         {order?.itemList && (
           <div
             className={`order-summary ${expanded ? "expanded" : ""}`}
@@ -168,10 +171,14 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
         )}
       </div>
 
-      {/* 내용 */}
-      <p className="review-content">{content}</p>
+      {/* 리뷰 내용  */}
+      <p
+        className={`review-content ${isDeletedByAdmin ? "deleted-review" : ""}`}
+      >
+        {content}
+      </p>
 
-      {/* 이미지 썸네일 */}
+      {/* 이미지 */}
       {images.length > 0 && (
         <div className="review-thumbnails">
           {images.map((src, idx) => (
@@ -186,19 +193,19 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
         </div>
       )}
 
-      {/* 사장님 답글 - owner 전용 readonly 제어 */}
+      {/* 답글 — 삭제되면 readOnly */}
       <ReviewReplyBox
-        reply={review.reply ?? null} // ⭐ 관리자 삭제 후 즉시 null 넘어감
+        reply={review.reply ?? null}
         reviewId={reviewId}
-        isReadOnly={role !== "owner"} // 점주만 수정 가능
+        isReadOnly={role !== "owner" || isDeletedByAdmin}
       />
 
-      {/* 이미지 전체보기 */}
+      {/* 전체보기 */}
       {isSwiperOpen && (
         <ReviewSwiper images={images} onClose={() => setSwiperOpen(false)} />
       )}
 
-      {/* 리뷰 수정 모달 */}
+      {/* 수정모달 */}
       {isEditOpen && (
         <ReviewModal
           isOpen={isEditOpen}
