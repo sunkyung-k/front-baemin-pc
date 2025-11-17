@@ -112,7 +112,7 @@
   &--compact {
     max-width: fn-rem(420);
     height: auto;
-    padding: space("xs");
+    padding: fn-rem(2) space("xs");
     border-color: transparent;
     background: fn-color("gray-50");
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
