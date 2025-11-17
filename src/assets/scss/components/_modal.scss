@@ -1,11 +1,11 @@
 @use "@/assets/scss/utils" as *;
+
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -13,6 +13,7 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
+  background: rgba(0, 0, 0, 0.6);
 
   &.active {
     opacity: 1;
@@ -27,14 +28,19 @@
 
 .modal {
   min-width: fn-rem(450);
-  background: #fff;
-  padding: 35px;
+  padding: fn-rem(35);
   border-radius: radius("md");
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 fn-rem(10) fn-rem(30) rgba(0, 0, 0, 0.25);
   position: relative;
   opacity: 0;
   transform: translateY(-20px);
   transition: opacity 0.3s ease, transform 0.3s ease;
+  background: fn-color("white");
+
+  @media (max-width: bp("sm")) {
+    min-width: auto;
+    width: calc(100% - fn-rem(70));
+  }
 
   h3 {
     font-size: fn-rem(22);
@@ -47,13 +53,9 @@
     position: absolute;
     top: fn-rem(15);
     right: fn-rem(15);
-    background: none;
-    border: none;
-    font-size: fn-rem(28);
-    color: #999;
-    cursor: pointer;
-    line-height: 1;
     padding: fn-rem(5);
+    font-size: fn-rem(28);
+    color: fn-color("gray-400");
     transition: color 0.2s;
 
     &:hover {
