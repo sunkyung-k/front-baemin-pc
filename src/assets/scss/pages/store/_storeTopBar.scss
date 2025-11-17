@@ -55,6 +55,7 @@
   &-search-btn {
     width: calc(100% - fn-rem(80));
     height: 100%;
+    text-align: left;
 
     &-empty {
       color: fn-color("gray-400");
@@ -62,7 +63,7 @@
   }
 
   &-placeholder {
-    font-size: inherit;
+    font-size: font("lg");
   }
 
   &-clear-btn {
