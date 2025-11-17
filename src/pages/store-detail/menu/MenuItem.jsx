@@ -28,32 +28,30 @@ export default function MenuItem({ menuId }) {
   /** Admin 삭제 훅 */
   const { removeMenu, removeOption } = useMenuAdmin(currentStoreId);
 
-  /** 현재 storeDetail에서 존재하는 menuId 리스트 */
-  const categoryMenuIds = useMemo(() => {
-    if (!storeDetail?.menuCategoryList) return [];
-    return storeDetail.menuCategoryList.flatMap((cat) =>
-      cat.menuList?.map((m) => m.menuId)
+  /** 메뉴 존재 여부 (storeDetail 기준 + delYn="N") */
+  const menuExistsInStore = useMemo(() => {
+    return (
+      storeDetail?.menuCategoryList
+        ?.flatMap((cat) => cat.menuList ?? [])
+        ?.some((m) => m.menuId === menuId && m.delYn !== "Y") ?? false
     );
-  }, [storeDetail]);
+  }, [storeDetail, menuId]);
 
-  /** 메뉴 존재 여부 (삭제 즉시 false) */
-  const menuExistsInStore = categoryMenuIds.includes(menuId);
-
-  /**
-   * useQuery — 훅 규칙 100% 지키고 enabled로 호출 완전 차단
-   * retry: false → 실패 시 재요청 0회 (500 두 번 방지)
-   */
+  /** 메뉴 상세 조회 */
   const { data: menu } = useQuery({
     queryKey: QUERY_KEYS.MENU_DETAIL(menuId),
     queryFn: () => menuAPI.getMenuDetail(menuId),
+
+    /** 메뉴가 storeDetail 안에 존재할 때만 조회 */
     enabled: !!menuId && menuExistsInStore,
-    retry: false, // 🔥 핵심: 실패 재시도 완전 OFF
+
+    retry: false,
     staleTime: 0,
   });
 
-  /** 메뉴가 삭제되었으면 UI 렌더링도 안함 */
   if (!menuExistsInStore) return null;
   if (!menu) return null;
+  if (menu.menuId === 0 || menu.delYn === "Y") return null;
 
   const imageUrl = getAbsoluteImageUrl(menu);
   const optionGroups = menu.menuOptionGroupList || [];

@@ -7,7 +7,7 @@ export const useMenuAdmin = (storeId) => {
   const queryClient = useQueryClient();
   const { activeCategory, setActiveCategory } = useMenuCategoryStore();
 
-  /** 메뉴 삭제 */
+  /** 메뉴 삭제 (관리자용) */
   const removeMenu = useMutation({
     mutationFn: adminMenuAPI.removeMenu,
     onSuccess: (_, menuId) => {
@@ -37,6 +37,4 @@ export const useMenuAdmin = (storeId) => {
 
   return { removeMenu, removeOption };
 };
-
-/** ⬅⬅⬅⬅⬅ 이거 반드시 있어야 함 */
 export default useMenuAdmin;
