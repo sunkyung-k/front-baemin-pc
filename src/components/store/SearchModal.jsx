@@ -14,8 +14,10 @@ export default function SearchModal({ closePopup, onSearch }) {
   }, []);
 
   const submitSearch = () => {
-    if (!keyword.trim()) return;
-    onSearch(keyword.trim());
+    const value = keyword.trim();
+
+    // 빈값일 때 전체 검색
+    onSearch(value);
     closePopup();
   };
 
