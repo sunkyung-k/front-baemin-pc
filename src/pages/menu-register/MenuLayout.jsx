@@ -61,7 +61,7 @@ export default function MenuLayout() {
           className={`${styles.close} btn btn-default btn-sm btn-primary`}
           onClick={handleClose}
         >
-          등록
+          나가기
         </button>
         <div className={styles.panelWrapper}>
           <CategoryPanel storeId={storeId} />
