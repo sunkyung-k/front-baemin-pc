@@ -68,6 +68,12 @@
     color: fn-color("gray-800");
     background: fn-color("gray-100");
 
+    @media (max-width: bp("sm")) {
+      span {
+        display: none;
+      }
+    }
+
     svg {
       color: fn-color("primary");
     }
