@@ -12,7 +12,7 @@ import { dummyRegister } from "@/utills/formUtils";
 import EmptyState from "@/components/menu/EmptyState";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useHandleError } from "@/hooks/common/useHandleError";
-import menuAPI from "@/service/menu/menuAPI"; // ⭐ 추가 (필수)
+import menuAPI from "@/service/menu/menuAPI";
 
 /** 유효성 검증 스키마 */
 const schema = yup.object({

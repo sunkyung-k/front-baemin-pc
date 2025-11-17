@@ -66,7 +66,7 @@ export default function MypageAccount() {
   } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
-    shouldUnregister: false, // ✅ 숨김필드 유지
+    shouldUnregister: false, // 숨김필드 유지
   });
 
   /** 사용자 정보 초기 세팅 */
@@ -266,7 +266,7 @@ export default function MypageAccount() {
                 isControlled
               />
 
-              {/* ✅ RHF 등록 유지용 hidden input */}
+              {/* RHF 등록 유지용 hidden input */}
               <input type="hidden" {...register("emailDomain")} />
               <input type="hidden" {...register("emailDomainType")} />
 

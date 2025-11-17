@@ -24,9 +24,6 @@ export default function OrderLayout() {
   const myDeposit = userInfo?.deposit ?? 0;
   const [addrDetail, setAddrDetail] = useState("");
 
-  // ✅ 수정: Header에서처럼 Zustand의 리액티브 훅 패턴을 사용하여 상태 변화에 반응하도록 변경합니다.
-  // OrderLayout은 훅이 아니므로 authStore((s) => s.isAuthenticated) 사용은 불가능합니다.
-  // 따라서, useBasket에서 사용했던 "토큰 유무" 체크를 추가하여 enabled 조건을 강화합니다.
   const { userRole, token } = authStore.getState();
   const isUser = userRole?.includes("USER");
   const isUserAuthenticated = isUser && !!token; // 토큰이 있을 때만 쿼리 실행
@@ -35,7 +32,7 @@ export default function OrderLayout() {
   const { data: basket } = useQuery({
     queryKey: ["basket"],
     queryFn: basketAPI.getMyBasket,
-    // ✅ enabled 조건 강화: isUserAuthenticated (인증 로딩 완료 시점까지 대기)
+    // enabled 조건 강화: isUserAuthenticated (인증 로딩 완료 시점까지 대기)
     enabled: isUserAuthenticated,
     onError: (err) => handleError(err, "OrderLayout.getBasket"),
   });

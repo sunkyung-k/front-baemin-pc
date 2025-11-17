@@ -2,12 +2,6 @@
 @use "sass:math";
 @use "@/assets/scss/utils/variables" as *;
 
-// // rem
-// @function fn-rem($px, $base: 16) {
-//   @return (math.div($px, $base)) * 1rem;
-// }
-
-// variables
 @function fn-color($name) {
   @if map.has-key($colors, $name) {
     @return map.get($colors, $name);

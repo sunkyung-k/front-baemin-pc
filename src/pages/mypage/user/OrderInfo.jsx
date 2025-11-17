@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useHandleError } from "@/hooks/common/useHandleError";
 import { useOrderStatus } from "@/hooks/useOrderStatus";
-import { useReviewCreate } from "@/hooks/review/useReviewCreate"; // ✅ 등록 전용 훅
+import { useReviewCreate } from "@/hooks/review/useReviewCreate"; // 등록 전용 훅
 import { FaUtensils } from "react-icons/fa";
 import Card from "@/components/mypage/Card";
 import OrderList from "@/components/mypage/OrderList";

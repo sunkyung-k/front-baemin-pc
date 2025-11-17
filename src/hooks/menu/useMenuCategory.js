@@ -35,7 +35,7 @@ export const useMenuCategory = (storeId) => {
     mutationFn: menuCategoryAPI.create,
     onSuccess: () => {
       afterMutation(queryKey);
-      invalidateStoreDetail(); //  추가
+      invalidateStoreDetail();
     },
     onError: (err) => handleError(err, "useMenuCategory.create"),
   });
@@ -45,7 +45,7 @@ export const useMenuCategory = (storeId) => {
     mutationFn: menuCategoryAPI.update,
     onSuccess: () => {
       afterMutation(queryKey);
-      invalidateStoreDetail(); // 추가
+      invalidateStoreDetail();
     },
     onError: (err) => handleError(err, "useMenuCategory.update"),
   });

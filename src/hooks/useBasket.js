@@ -12,7 +12,7 @@ import { authStore } from "@/store/authStore";
 export const useBasket = () => {
   const { setBasket, clearBasket, releaseLock } = useBasketStore();
 
-  // 수정: Zustand의 reactive selector를 사용하여 상태 변화에 반응합니다.
+  // Zustand의 reactive selector를 사용하여 상태 변화에 반응합니다.
   const isAuthenticated = authStore((s) => s.isAuthenticated);
   const getUserRole = authStore((s) => s.getUserRole);
 

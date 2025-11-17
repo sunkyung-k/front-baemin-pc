@@ -30,7 +30,7 @@ export const useReviewCreate = (page = 0, role = "user") => {
       const orderId = Number(formData.get("orderId"));
       console.info("리뷰 등록 성공:", orderId);
 
-      // ✅ React Query 캐시 즉시 반영
+      // React Query 캐시 즉시 반영
       queryClient.setQueryData([QUERY_KEYS.MY_ORDER_LIST, page], (prev) => {
         if (!prev) return prev;
         const response =
@@ -47,7 +47,7 @@ export const useReviewCreate = (page = 0, role = "user") => {
         return { ...prev, response: { ...response, content: newContent } };
       });
 
-      // ✅ 서버 invalidate
+      // 서버 invalidate
       await Promise.all([
         queryClient.invalidateQueries([QUERY_KEYS.MY_ORDER_LIST]),
         queryClient.invalidateQueries([QUERY_KEYS.MY_REVIEW_LIST]),

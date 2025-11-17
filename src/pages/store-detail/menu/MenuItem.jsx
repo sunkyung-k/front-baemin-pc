@@ -55,7 +55,7 @@ export default function MenuItem({ menuId }) {
   /** 옵션 그룹 */
   const optionGroups = menu.menuOptionGroupList || [];
 
-  /** ✅ 옵션 아이템 0개면 옵션 그룹 미노출 */
+  /** 옵션 아이템 0개면 옵션 그룹 미노출 */
   const visibleOptionGroups = optionGroups.filter((group) => {
     const validOptions =
       group.menuOptionList?.filter(
