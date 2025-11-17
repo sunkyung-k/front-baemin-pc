@@ -5,14 +5,12 @@
   top: $header-height;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: space("md");
   padding: space("md") 0;
   background: fn-color("white");
   border-bottom: 1px solid fn-color("gray-200");
   z-index: 2;
 
-  /* 모바일도 상단 높이는 동일하게 유지 */
   @media (max-width: bp("md")) {
     top: $header-height;
   }
@@ -21,7 +19,7 @@
   &-inner {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     gap: space("lg");
   }
 
@@ -31,6 +29,7 @@
     align-items: center;
     width: 100%;
     max-width: fn-rem(650);
+    margin: 0 auto;
     padding: 0 space("sm");
     height: fn-rem(50);
     background: fn-color("white");
@@ -39,6 +38,11 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 3px 8px rgba(0, 0, 0, 0.05);
     transition: all 0.25s ease;
 
+    @media (max-width: bp("md")) {
+      width: calc(100% - space("xl"));
+    }
+
+    &:hover,
     &:focus-within {
       border-color: fn-color("primary");
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);

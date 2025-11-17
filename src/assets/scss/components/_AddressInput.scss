@@ -5,21 +5,18 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  height: fn-rem(64);
   max-width: fn-rem(648);
   margin: 0 auto;
-  padding: space("sm");
+  padding: space("md");
   background: fn-color("white");
   border: fn-rem(2) solid fn-color("primary");
-  border-radius: radius("xl");
+  border-radius: radius("full");
   transition: all 0.2s ease;
 
-  // &:hover {
-  //   border-color: fn-color("gray-300");
-  // }
-
+  &:hover,
   &:focus-within {
-    border-color: fn-color("primary");
-    box-shadow: 0 0 0 3px rgba(fn-color("primary"), 0.15);
+    box-shadow: 0 0 0 fn-rem(4) rgba(fn-color("primary"), 0.15);
   }
 
   /* 주소 입력 필드 */

@@ -19,6 +19,10 @@
     align-items: center;
     height: $header-height;
     gap: space("xl");
+
+    @media (max-width: bp("lg")) {
+      gap: space("md");
+    }
   }
 
   .mobile-menu-btn {
