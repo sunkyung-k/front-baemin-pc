@@ -41,10 +41,7 @@ export default function MenuItem({ menuId }) {
   const { data: menu } = useQuery({
     queryKey: QUERY_KEYS.MENU_DETAIL(menuId),
     queryFn: () => menuAPI.getMenuDetail(menuId),
-
-    /** 메뉴가 storeDetail 안에 존재할 때만 조회 */
     enabled: !!menuId && menuExistsInStore,
-
     retry: false,
     staleTime: 0,
   });
@@ -54,8 +51,20 @@ export default function MenuItem({ menuId }) {
   if (menu.menuId === 0 || menu.delYn === "Y") return null;
 
   const imageUrl = getAbsoluteImageUrl(menu);
+
+  /** 옵션 그룹 */
   const optionGroups = menu.menuOptionGroupList || [];
 
+  /** ✅ 옵션 아이템 0개면 옵션 그룹 미노출 */
+  const visibleOptionGroups = optionGroups.filter((group) => {
+    const validOptions =
+      group.menuOptionList?.filter(
+        (opt) => opt.availableYn === "Y" && opt.delYn === "N"
+      ) ?? [];
+    return validOptions.length > 0; // 옵션 1개 이상 있을 때만 노출
+  });
+
+  /** 옵션 변경 */
   const handleChange = (groupId, value, type, maxSelect = 0) => {
     setSelectedValues((prev) => {
       if (type === "radio") return { ...prev, [groupId]: value };
@@ -71,10 +80,11 @@ export default function MenuItem({ menuId }) {
     });
   };
 
+  /** 담기 */
   const handleAdd = (e) => {
     e.stopPropagation();
 
-    const requiredGroups = optionGroups.filter(
+    const requiredGroups = visibleOptionGroups.filter(
       (g) => g.requiredYn === "Y" && g.menuOptionList?.length > 0
     );
 
@@ -124,7 +134,6 @@ export default function MenuItem({ menuId }) {
           {imageUrl ? (
             <>
               <img src={imageUrl} alt={menu.menuName} />
-
               {menu.soldoutYn === "Y" && (
                 <span className={styles.soldoutBadge}>품절</span>
               )}
@@ -158,7 +167,7 @@ export default function MenuItem({ menuId }) {
 
       {isOpen && (
         <div className={styles.optionBox} onClick={(e) => e.stopPropagation()}>
-          {optionGroups.map((group) => {
+          {visibleOptionGroups.map((group) => {
             const {
               menuOptGrpId,
               menuOptGrpName,
@@ -168,6 +177,11 @@ export default function MenuItem({ menuId }) {
             } = group;
 
             const isRequired = requiredYn === "Y";
+
+            const filteredOptions =
+              menuOptionList?.filter(
+                (opt) => opt.availableYn === "Y" && opt.delYn === "N"
+              ) ?? [];
 
             const labelText = (
               <>
@@ -180,19 +194,17 @@ export default function MenuItem({ menuId }) {
               </>
             );
 
-            const options = (menuOptionList || [])
-              .filter((opt) => opt.availableYn === "Y" && opt.delYn === "N")
-              .map((opt) => ({
-                value: opt.menuOptId.toString(),
-                label: (
-                  <>
-                    <span>{opt.menuOptName}</span>
-                    {opt.price > 0 && (
-                      <span>+{opt.price.toLocaleString()}원</span>
-                    )}
-                  </>
-                ),
-              }));
+            const options = filteredOptions.map((opt) => ({
+              value: opt.menuOptId.toString(),
+              label: (
+                <>
+                  <span>{opt.menuOptName}</span>
+                  {opt.price > 0 && (
+                    <span>+{opt.price.toLocaleString()}원</span>
+                  )}
+                </>
+              ),
+            }));
 
             return isRequired ? (
               <RadioGroup
