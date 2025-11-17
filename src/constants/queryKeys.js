@@ -66,4 +66,8 @@ export const QUERY_KEYS = {
   /** 유틸성 (캐시 전체 초기화 등) */
   ALL_MENUS: ["allMenus"],
   ALL_OPTIONS: ["allOptions"],
+
+  /** 관리자(Admin) */
+  ADMIN_USER_LIST: (filters) => ["adminUserList", filters],
+  ADMIN_USER_DETAIL: (userId) => ["adminUserDetail", userId],
 };

@@ -1,64 +1,57 @@
-// src/hooks/admin/useAdminUser.js
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import adminUserAPI from "@/service/admin/adminUserAPI";
+import { QUERY_KEYS } from "@/constants/queryKeys";
+import { useAfterMutation, AFTER_TYPES } from "@/hooks/common/useAfterMutation";
 import { handleApiError } from "@/utills/handleApiError";
+import { authStore } from "@/store/authStore";
 
-const LIST_KEY = ["adminUserList"];
-const DETAIL_KEY = (userId) => ["adminUserDetail", userId];
-
-/** 🔍 유저 리스트 조회 훅 */
+/** 어드민: 회원 리스트 조회 */
 export function useAdminUserList(params) {
   return useQuery({
-    queryKey: ["adminUserList", params],
+    queryKey: QUERY_KEYS.ADMIN_USER_LIST(params),
     queryFn: () => adminUserAPI.getList(params),
     onError: (err) => handleApiError(err, "useAdminUserList"),
   });
 }
 
-/** 🔍 유저 상세 조회 훅 */
+/** 어드민: 회원 상세 조회 */
 export function useAdminUserDetail(userId, enabled = false) {
   return useQuery({
-    queryKey: DETAIL_KEY(userId),
+    queryKey: QUERY_KEYS.ADMIN_USER_DETAIL(userId),
     queryFn: () => adminUserAPI.getDetail(userId),
     enabled: !!userId && enabled,
     onError: (err) => handleApiError(err, "useAdminUserDetail"),
   });
 }
 
-/** ➕✏❌ 등록/수정/삭제 훅 */
+/** 어드민: 회원 등록 / 수정 / 삭제 */
 export function useAdminUserMutation() {
   const queryClient = useQueryClient();
+  const afterList = useAfterMutation(AFTER_TYPES.LIST);
 
+  /** 회원 등록 */
   const create = useMutation({
     mutationFn: adminUserAPI.create,
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: LIST_KEY });
+    onSuccess: () => {
+      afterList(["adminUserList"]); // 리스트 갱신
     },
     onError: (err) => handleApiError(err, "adminUser.create"),
   });
 
+  /** 회원 수정 */
   const update = useMutation({
     mutationFn: adminUserAPI.update,
-    onSettled: (data, error, variables) => {
-      queryClient.invalidateQueries({ queryKey: LIST_KEY });
-
-      const userId = variables?.userId;
-      if (userId) {
-        queryClient.invalidateQueries({ queryKey: DETAIL_KEY(userId) });
-      }
+    onSuccess: () => {
+      afterList(["adminUserList"]);
     },
     onError: (err) => handleApiError(err, "adminUser.update"),
   });
 
+  /** 회원 삭제 */
   const remove = useMutation({
     mutationFn: adminUserAPI.remove,
-    onSettled: (data, error, variables) => {
-      queryClient.invalidateQueries({ queryKey: LIST_KEY });
-
-      const userId = variables; // remove(userId)
-      if (userId) {
-        queryClient.removeQueries({ queryKey: DETAIL_KEY(userId) });
-      }
+    onSuccess: (_, __, userId) => {
+      afterList(["adminUserList"]); // 리스트 갱신
     },
     onError: (err) => handleApiError(err, "adminUser.remove"),
   });

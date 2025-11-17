@@ -1,0 +1,30 @@
+/* 2컬럼 (수정 모드) */
+.gridTwo {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: space("lg");
+  padding-top: space("sm");
+
+  @media (max-width: bp("md")) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 1컬럼 (등록 모드) */
+.gridOne {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: space("lg");
+  padding-top: space("sm");
+}
+
+/* editable form 구역 */
+.formArea {
+  display: flex;
+  flex-direction: column;
+  gap: space("md");
+}
+
+:global(.form-modal__footer .btnWrap) {
+  margin-top: 0;
+}

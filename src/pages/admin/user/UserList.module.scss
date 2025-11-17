@@ -1,103 +1,155 @@
-.pageTitle {
-  margin-bottom: space("lg");
-  font-size: font("xxl");
-  color: fn-color("gray-900");
-}
-
-/* ===============================
-    SEARCH AREA
-=============================== */
-
-.searchArea {
-  margin: space("lg") 0 space("md"); // ⭐ 탭과 리스트 사이 breathing space 확보
+.adminWrap {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: space("lg");
+}
+
+/* 검색 + 버튼 */
+.topArea {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: space("sm");
+}
 
-  input {
-    flex: 1;
-    max-width: 600px;
-    padding: space("sm") space("md");
-    border: 1px solid fn-color("gray-300");
+.searchBox {
+  position: relative;
+  flex: 1;
+  max-width: fn-rem(400);
+
+  :global(.input-field) {
+    margin: 0;
+  }
+
+  :global(.input-field .input-txt) {
+    height: fn-rem(40);
+    width: 100%;
+    padding-left: fn-rem(32);
+  }
+
+  .searchIcon {
+    position: absolute;
+    left: fn-rem(10);
+    top: 50%;
+    transform: translateY(-50%);
+    color: fn-color("gray-500");
+    font-size: fn-rem(15);
+    pointer-events: none;
+  }
+}
+
+/* 테이블 */
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: space("sm");
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+
+  table {
+    min-width: fn-rem(900);
+    width: 100%;
+    overflow: hidden;
     border-radius: radius("md");
+    font-size: font("md");
+    border-collapse: collapse;
     background-color: fn-color("white");
-    font-size: font("md");
-
-    &:focus {
-      border-color: fn-color("primary");
-      outline: none;
-    }
+    text-align: left;
   }
-
-  .addBtn {
-    padding: space("sm") space("md");
-    background-color: fn-color("primary");
-    color: fn-color("white");
-    font-size: font("md");
-    font-weight: 600;
-    border-radius: radius("md");
-  }
-}
-
-/* ===============================
-    RESULT COUNT
-=============================== */
-
-.resultCount {
-  margin: space("md") 0 space("sm");
-  font-size: font("md");
-  color: fn-color("gray-600");
-}
-
-/* ===============================
-    TABLE
-=============================== */
-
-.adminTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: space("sm");
-  background-color: fn-color("white");
-  border-radius: radius("md");
-  overflow: hidden;
-  border: 1px solid fn-color("gray-200");
 
   thead {
     background-color: fn-color("gray-100");
 
     th {
-      padding: space("md");
-      font-size: font("md"); // ⭐ lg → md (데이터와 균형)
-      font-weight: 600;
-      color: fn-color("gray-700");
-      text-align: left;
+      padding: fn-rem(12);
       border-bottom: 1px solid fn-color("gray-200");
     }
   }
 
-  tbody tr {
-    border-bottom: 1px solid fn-color("gray-200");
-    transition: background-color 0.15s;
+  tbody {
+    tr {
+      border-bottom: 1px solid fn-color("gray-200");
+      transition: background-color 0.15s;
 
-    &:hover {
-      background-color: fn-color("gray-50");
+      &:hover {
+        background-color: fn-color("gray-50");
+      }
+    }
+
+    td {
+      padding: fn-rem(12);
+      color: fn-color("gray-800");
     }
   }
+}
 
-  td {
-    padding: space("md");
-    font-size: font("md");
-    color: fn-color("gray-700");
+.roleBox {
+  display: flex;
+  align-items: center;
+  gap: fn-rem(8);
+}
+
+.roleText {
+  color: fn-color("gray-800");
+  font-weight: 600;
+}
+
+.storeBadge {
+  display: inline-block;
+  padding: fn-rem(4) fn-rem(8);
+  background-color: fn-color("gray-100");
+  border-radius: fn-rem(6);
+  font-size: font("sm");
+  font-weight: 600;
+  color: fn-color("gray-700");
+  max-width: fn-rem(100);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    background-color: fn-color("primary-bg");
+    color: fn-color("primary");
+  }
+}
+
+/* 비활성 (가게 없음) */
+.storeBadgeDisabled {
+  display: inline-block;
+  padding: fn-rem(4) fn-rem(8);
+  font-size: font("sm");
+  font-weight: 600;
+  color: fn-color("gray-400");
+  max-width: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+
+.storeLink {
+  color: fn-color("primary");
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: fn-color("primary");
   }
 }
 
 .editableName {
-  cursor: pointer;
-  color: fn-color("primary");
   font-weight: 600;
+  text-decoration: underline;
+
+  &:hover {
+    color: fn-color("primary");
+  }
 }
 
 .disabledName {
   color: fn-color("gray-500");
+  text-decoration: line-through;
+  cursor: default;
 }

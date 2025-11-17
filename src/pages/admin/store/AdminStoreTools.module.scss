@@ -1,0 +1,70 @@
+.toolsWrap {
+  display: flex;
+  align-items: center;
+  gap: fn-rem(12);
+}
+
+/* 토글 영역 */
+.toggleArea {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: fn-rem(12);
+  height: fn-rem(44);
+  background: fn-color("gray-50");
+  padding: space("md");
+  border-radius: radius("md");
+  border: 1px solid fn-color("gray-200");
+}
+
+.label {
+  font-size: font("sm");
+  color: fn-color("gray-700");
+  font-weight: 500;
+}
+
+/* 토글 스위치 */
+.switch {
+  position: relative;
+  width: fn-rem(44);
+  height: fn-rem(24);
+
+  input {
+    display: none;
+  }
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: fn-color("gray-300");
+  border-radius: radius("full");
+  transition: 0.2s;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: fn-rem(20);
+    height: fn-rem(20);
+    left: fn-rem(2);
+    top: fn-rem(2);
+    background: fn-color("white");
+    border-radius: radius("full");
+    transition: all 0.2s ease;
+  }
+}
+
+input:checked + .slider {
+  background: fn-color("primary");
+
+  &::before {
+    transform: translateX(fn-rem(20));
+  }
+}
+
+/** 현재 영업 상태 텍스트 */
+.stateText {
+  font-size: font("md");
+  font-weight: 600;
+  color: fn-color("gray-800");
+}

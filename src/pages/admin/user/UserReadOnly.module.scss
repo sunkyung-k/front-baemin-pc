@@ -1,0 +1,46 @@
+.readOnlyBox {
+  position: sticky;
+  top: fn-rem(10);
+  align-self: start;
+  background: fn-color("gray-50");
+  border: 1px solid fn-color("gray-200");
+  border-radius: radius("md");
+  padding: fn-rem(18) fn-rem(20);
+  height: fit-content;
+
+  @media (max-width: bp("md")) {
+    position: static;
+    height: auto;
+  }
+
+  p {
+    font-size: font("lg");
+    font-weight: 800;
+    border-bottom: 1px solid fn-color("gray-200");
+    padding-bottom: fn-rem(10);
+    margin-bottom: fn-rem(10);
+  }
+}
+
+.roGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: fn-rem(14) fn-rem(20);
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: fn-rem(4);
+
+    span {
+      font-size: font("sm");
+      color: fn-color("gray-600");
+    }
+
+    strong {
+      font-size: font("md");
+      color: fn-color("dark");
+      font-weight: 600;
+    }
+  }
+}

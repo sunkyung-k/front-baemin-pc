@@ -9,7 +9,7 @@ import { formatPrice } from "@/utills/valueFormatter";
 
 export default function MypageProfile() {
   const navigate = useNavigate();
-  const { userName, userId, userRole } = authStore();
+  const { userId, userRole } = authStore();
   const { myStore } = useStore();
   const { userInfo, isUserInfoLoading } = useAccount();
   const [isChargeOpen, setChargeOpen] = useState(false);
@@ -78,7 +78,7 @@ export default function MypageProfile() {
 
   return (
     <div className={styles.profile}>
-      <strong className={styles.pName}>{userName}님</strong>
+      <strong className={styles.pName}>{userInfo?.userName}님</strong>
       {info.label && (
         <p className={styles.pId}>
           <span>{info.labelTxt}</span>

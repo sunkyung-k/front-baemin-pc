@@ -2,7 +2,7 @@ import api from "@/api/axiosApi";
 import { authStore } from "@/store/authStore";
 
 const storeAPI = {
-  /** 가게 등록 */
+  /** 가게 등록 (점주) */
   async create(formData) {
     const res = await api.post("/api/v1/store", formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -15,7 +15,7 @@ const storeAPI = {
     return res.data;
   },
 
-  /** 내 가게 조회 */
+  /** 점주 전용 - 내 가게 조회 */
   async getMyStore() {
     const { userRole } = authStore.getState();
 
@@ -49,10 +49,10 @@ const storeAPI = {
   /** 가게 삭제 */
   async remove(storeId) {
     const res = await api.delete(`/api/v1/store/${storeId}`);
-    return res.data; // 상태 조작은 useStore가 담당
+    return res.data;
   },
 
-  /** 유저용 가게 상세 조회 (로그인 불필요, ownerInfo 병합 포함) */
+  /** 가게 상세 조회 (vo + ownerInfo + closeYn 병합) */
   async getStoreDetail(storeId) {
     if (import.meta.env.MODE === "development") {
       console.log(`[storeAPI] getStoreDetail 호출 (storeId=${storeId})`);
@@ -60,12 +60,15 @@ const storeAPI = {
 
     const res = await api.get(`/api/v1/store/${storeId}`);
 
-    // ✅ 백엔드 구조: response.vo + response.ownerInfo
+    // 백엔드 응답
     const vo = res.data?.response?.vo ?? null;
     const ownerInfo = res.data?.response?.ownerInfo ?? null;
 
-    // ✅ 병합해서 반환 (storeDetail.ownerInfo 접근 가능)
-    const merged = { ...vo, ownerInfo };
+    // 휴무 여부 (백엔드 값 우선)
+    const closeYn = vo?.closeYn ?? "N";
+
+    // 상세 데이터 구성
+    const merged = { ...vo, ownerInfo, closeYn };
 
     if (import.meta.env.MODE === "development") {
       console.log("[storeAPI] getStoreDetail merged:", merged);
