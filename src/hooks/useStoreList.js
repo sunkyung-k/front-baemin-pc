@@ -31,8 +31,8 @@ export function useStoreList(filters = {}) {
     try {
       const data = await storeListAPI.getStores(params);
       if (import.meta.env.DEV)
-        console.log("[useStoreList] fetched stores:", data);
-      return data;
+        // console.log("[useStoreList] fetched stores:", data);
+        return data;
     } catch (err) {
       handleApiError(err, "useStoreList.getStores");
       return [];

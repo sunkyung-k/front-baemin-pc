@@ -8,10 +8,6 @@ const storeAPI = {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    if (import.meta.env.MODE === "development") {
-      console.log("[storeAPI] 가게 등록 완료:", res.data);
-    }
-
     return res.data;
   },
 
@@ -39,10 +35,6 @@ const storeAPI = {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    if (import.meta.env.MODE === "development") {
-      console.log("[storeAPI] 가게 수정 성공:", res.data);
-    }
-
     return res.data;
   },
 
@@ -54,10 +46,6 @@ const storeAPI = {
 
   /** 가게 상세 조회 (vo + ownerInfo + closeYn 병합) */
   async getStoreDetail(storeId) {
-    if (import.meta.env.MODE === "development") {
-      console.log(`[storeAPI] getStoreDetail 호출 (storeId=${storeId})`);
-    }
-
     const res = await api.get(`/api/v1/store/${storeId}`);
 
     // 백엔드 응답
@@ -69,10 +57,6 @@ const storeAPI = {
 
     // 상세 데이터 구성
     const merged = { ...vo, ownerInfo, closeYn };
-
-    if (import.meta.env.MODE === "development") {
-      console.log("[storeAPI] getStoreDetail merged:", merged);
-    }
 
     return merged;
   },

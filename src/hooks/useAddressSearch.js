@@ -14,7 +14,7 @@ export function useAddressSearch(onSelect) {
         onSelect(addr);
       }
 
-      console.log("주소 선택:", addr);
+      // console.log("주소 선택:", addr);
     });
   };
 

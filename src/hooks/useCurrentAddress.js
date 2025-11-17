@@ -40,10 +40,10 @@ export function useCurrentAddress() {
 
       // 전역 상태에 반영
       setGlobalAddress(addr);
-      console.log("📍 현재 위치 주소:", addr);
+      // console.log("현재 위치 주소:", addr);
       return addr;
     } catch (err) {
-      console.error("📍 위치 불러오기 실패:", err);
+      // console.error("위치 불러오기 실패:", err);
       alert("위치 정보를 가져올 수 없습니다.");
       return null;
     }

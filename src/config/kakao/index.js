@@ -16,7 +16,7 @@ export async function loadKakaoSDK() {
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${KAKAO_JS_KEY}&autoload=false&libraries=services`;
     script.onload = () => {
       window.kakao.maps.load(() => {
-        console.log("Kakao SDK 완전 초기화 완료");
+        // console.log("Kakao SDK 완전 초기화 완료");
         resolve();
       });
     };

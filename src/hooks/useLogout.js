@@ -21,7 +21,7 @@ export const useLogout = () => {
       }
     },
     onSuccess: (data) => {
-      console.log("Logout 성공:", data);
+      // console.log("Logout 성공:", data);
 
       // 캐시 초기화
       queryClient.clear();

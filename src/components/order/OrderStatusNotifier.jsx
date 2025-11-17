@@ -28,7 +28,7 @@ export default function OrderStatusNotifier() {
       const message = event.data?.trim();
       if (!message) return;
 
-      console.log("SSE 수신:", message);
+      // console.log("SSE 수신:", message);
 
       if (message.includes("수락")) {
         toast.success(message, {
@@ -60,7 +60,7 @@ export default function OrderStatusNotifier() {
 
     // 컴포넌트 언마운트 시 닫기
     return () => {
-      console.log("SSE 연결 해제됨");
+      // console.log("SSE 연결 해제됨");
       eventSource.close();
       eventSourceRef.current = null;
     };
