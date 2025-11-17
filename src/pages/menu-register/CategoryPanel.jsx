@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useMenuCategory } from "@/hooks/menu/useMenuCategory";
-import { dummyRegister } from "@/utills/formUtils";
 import EmptyState from "@/components/menu/EmptyState";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useHandleError } from "@/hooks/common/useHandleError";
@@ -92,6 +91,7 @@ export default function CategoryPanel({ storeId }) {
       );
 
       setEditableErrors((prev) => ({ ...prev, [id]: {} }));
+
       updateCategory.mutate(
         {
           menuCaId: id,
@@ -135,11 +135,7 @@ export default function CategoryPanel({ storeId }) {
     setActiveId((prev) => (prev === id ? null : id));
   };
 
-  /**
-   * ⭐ 최초 진입 + 카테고리 선택 시
-   * menuDetail로 menuList를 최신화해서 activeCategory에 넣기
-   * 옵션 그룹까지 전부 포함된 상세 데이터가 들어감
-   */
+  /** 메뉴 상세 최신화 */
   useEffect(() => {
     if (!categories?.length) return;
 
@@ -154,7 +150,6 @@ export default function CategoryPanel({ storeId }) {
       return;
     }
 
-    // 메뉴 상세 최신화
     const loadMenuDetails = async () => {
       try {
         const updatedMenuList = await Promise.all(
@@ -195,7 +190,7 @@ export default function CategoryPanel({ storeId }) {
         className="btn btn-default btn-primary-line btn-sm"
         onClick={() => setModalOpen(true)}
       >
-        <TiPlus size={18} /> 새 카테고리
+        <TiPlus size={18} /> 새 카테테고리
       </button>
 
       {visibleCategories.length > 0 ? (
@@ -227,6 +222,7 @@ export default function CategoryPanel({ storeId }) {
                     className={styles.categoryEdit}
                     onClick={(e) => e.stopPropagation()}
                   >
+                    {/* 카테고리명 */}
                     <div className={styles.formGroup}>
                       <InputField
                         label="카테고리명"
@@ -243,10 +239,10 @@ export default function CategoryPanel({ storeId }) {
                           }))
                         }
                         errorMessage={curErrors.name}
-                        register={dummyRegister}
                       />
                     </div>
 
+                    {/* 정렬 순서 */}
                     <div className={styles.formGroup}>
                       <InputField
                         label="정렬 순서"
@@ -263,7 +259,6 @@ export default function CategoryPanel({ storeId }) {
                           }))
                         }
                         errorMessage={curErrors.order}
-                        register={dummyRegister}
                       />
                     </div>
 
