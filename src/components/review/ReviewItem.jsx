@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaStar } from "react-icons/fa";
+import { createRoot } from "react-dom/client";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 import ReviewReplyBox from "./ReviewReplyBox";
 import ReviewSwiper from "./ReviewSwiper";
@@ -7,6 +8,33 @@ import ReviewModal from "./ReviewModal";
 import { useReviewUpdate } from "@/hooks/review/useReviewUpdate";
 import { useAdminReview } from "@/hooks/admin/useAdminReview";
 import { authStore } from "@/store/authStore";
+
+/* ============================================================
+   전역 모달(root)로 ReviewSwiper 띄우는 함수
+============================================================ */
+function openReviewSwiperGlobal(images) {
+  const root = document.getElementById("global-modal-root");
+  if (!root) return;
+
+  // 기존 모달 비우기
+  root.innerHTML = "";
+
+  // 컨테이너 생성
+  const container = document.createElement("div");
+  root.appendChild(container);
+
+  const modalRoot = createRoot(container);
+
+  modalRoot.render(
+    <ReviewSwiper
+      images={images}
+      onClose={() => {
+        modalRoot.unmount();
+        root.innerHTML = "";
+      }}
+    />
+  );
+}
 
 /**
  * ReviewItem (리뷰 카드 공용)
@@ -16,13 +44,11 @@ import { authStore } from "@/store/authStore";
  * - onDelete: 상위 리스트 동기화를 위한 삭제 핸들러 (선택)
  */
 export default function ReviewItem({ review, role = "user", onDelete }) {
-  const [isSwiperOpen, setSwiperOpen] = useState(false);
   const [isEditOpen, setEditOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
   const { updateReview, removeReview } = useReviewUpdate();
   const { reviewDelete, replyDelete } = useAdminReview();
-
   const loginRole = authStore.getState().userRole;
 
   if (!review) return null;
@@ -38,11 +64,11 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
     delYn,
   } = review;
 
-  // ⭐ 삭제된 리뷰 체크
   const isDeletedByAdmin =
     delYn === "A" || content === "해당 리뷰는 관리자에 의해 삭제된 리뷰입니다.";
 
   const toggleExpand = () => setExpanded((prev) => !prev);
+
   const images = fileList.map((f) => getAbsoluteImageUrl(f)).filter(Boolean);
 
   /** 리뷰 수정 */
@@ -54,33 +80,16 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
 
   /** 유저 리뷰 삭제 */
   const handleUserDelete = () => {
-    removeReview.mutate(reviewId, {
-      onSuccess: () => onDelete?.(reviewId),
-    });
+    removeReview.mutate(reviewId);
   };
 
   /** 관리자 리뷰 삭제 */
   const handleAdminReviewDelete = () => {
     if (!window.confirm("정말 이 리뷰를 삭제하시겠습니까?")) return;
 
-    reviewDelete.mutate(reviewId, {
-      onSuccess: () => onDelete?.(reviewId),
-    });
+    reviewDelete.mutate(reviewId);
   };
 
-  /** 관리자 답변 삭제 */
-  const handleAdminReplyDelete = () => {
-    if (!reply) return;
-    if (!window.confirm("정말 이 답변을 삭제하시겠습니까?")) return;
-
-    replyDelete.mutate(reply.reviewReplyId, {
-      onSuccess: () => {
-        review.reply = null;
-      },
-    });
-  };
-
-  /** 표시명 */
   const displayName =
     role === "user"
       ? order?.storeName || "가게명 없음"
@@ -102,7 +111,7 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
           ))}
         </div>
 
-        {/* 유저 수정/삭제 (삭제된 리뷰면 숨김) */}
+        {/* 유저 수정/삭제 */}
         {role === "user" && !isDeletedByAdmin && (
           <div className="review-actions">
             <button
@@ -120,7 +129,7 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
           </div>
         )}
 
-        {/* 관리자 삭제 버튼 (삭제 리뷰는 숨김) */}
+        {/* 관리자 삭제 버튼 */}
         {isAdmin && !isDeletedByAdmin && (
           <div className="review-actions">
             <button
@@ -129,25 +138,19 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
             >
               리뷰 삭제
             </button>
-
-            {reply && (
-              <button
-                className="btn btn-secondary-line btn-sm"
-                onClick={handleAdminReplyDelete}
-              >
-                답변 삭제
-              </button>
-            )}
           </div>
         )}
       </div>
 
       {/* 상단 정보 */}
+
       <div className="review-info">
-        <div className="review-info-top">
-          <strong className="store-name">{displayName}</strong>
-          <span className="order-date"> / {order?.orderDate ?? ""}</span>
-        </div>
+        {!isDeletedByAdmin && (
+          <div className="review-info-top">
+            <strong className="store-name">{displayName}</strong>
+            <span className="order-date"> / {order?.orderDate ?? ""}</span>
+          </div>
+        )}
 
         {/* 주문 요약 */}
         {order?.itemList && (
@@ -171,14 +174,14 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
         )}
       </div>
 
-      {/* 리뷰 내용  */}
+      {/* 리뷰 내용 */}
       <p
         className={`review-content ${isDeletedByAdmin ? "deleted-review" : ""}`}
       >
         {content}
       </p>
 
-      {/* 이미지 */}
+      {/* 이미지 썸네일 */}
       {images.length > 0 && (
         <div className="review-thumbnails">
           {images.map((src, idx) => (
@@ -186,26 +189,21 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
               key={idx}
               src={src}
               alt={`리뷰이미지${idx + 1}`}
-              onClick={() => setSwiperOpen(true)}
+              onClick={() => openReviewSwiperGlobal(images)}
               className="thumbnail"
             />
           ))}
         </div>
       )}
 
-      {/* 답글 — 삭제되면 readOnly */}
+      {/* 답글 */}
       <ReviewReplyBox
         reply={review.reply ?? null}
         reviewId={reviewId}
         isReadOnly={role !== "owner" || isDeletedByAdmin}
       />
 
-      {/* 전체보기 */}
-      {isSwiperOpen && (
-        <ReviewSwiper images={images} onClose={() => setSwiperOpen(false)} />
-      )}
-
-      {/* 수정모달 */}
+      {/* 리뷰 수정 모달 */}
       {isEditOpen && (
         <ReviewModal
           isOpen={isEditOpen}

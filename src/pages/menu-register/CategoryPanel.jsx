@@ -12,6 +12,7 @@ import { dummyRegister } from "@/utills/formUtils";
 import EmptyState from "@/components/menu/EmptyState";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useHandleError } from "@/hooks/common/useHandleError";
+import menuAPI from "@/service/menu/menuAPI"; // ⭐ 추가 (필수)
 
 /** 유효성 검증 스키마 */
 const schema = yup.object({
@@ -134,7 +135,11 @@ export default function CategoryPanel({ storeId }) {
     setActiveId((prev) => (prev === id ? null : id));
   };
 
-  /** 선택된 카테고리 전역 상태 동기화 */
+  /**
+   * ⭐ 최초 진입 + 카테고리 선택 시
+   * menuDetail로 menuList를 최신화해서 activeCategory에 넣기
+   * 옵션 그룹까지 전부 포함된 상세 데이터가 들어감
+   */
   useEffect(() => {
     if (!categories?.length) return;
 
@@ -144,8 +149,37 @@ export default function CategoryPanel({ storeId }) {
     }
 
     const selected = categories.find((c) => c.menuCaId === activeId);
-    if (selected) setActiveCategory({ ...selected, storeId });
-  }, [activeId, categories, storeId, setActiveCategory, clearActiveCategory]);
+    if (!selected) {
+      clearActiveCategory();
+      return;
+    }
+
+    // 메뉴 상세 최신화
+    const loadMenuDetails = async () => {
+      try {
+        const updatedMenuList = await Promise.all(
+          (selected.menuList || []).map(async (m) => {
+            try {
+              const detail = await menuAPI.getMenuDetail(m.menuId);
+              return detail || m;
+            } catch {
+              return m;
+            }
+          })
+        );
+
+        setActiveCategory({
+          ...selected,
+          storeId,
+          menuList: updatedMenuList,
+        });
+      } catch (err) {
+        handleError(err, "CategoryPanel.loadMenuDetails");
+      }
+    };
+
+    loadMenuDetails();
+  }, [activeId, categories, storeId]);
 
   if (isLoading) return null;
 
@@ -277,6 +311,7 @@ export default function CategoryPanel({ storeId }) {
             register={register}
             errorMessage={errors.categoryName?.message}
           />
+
           <InputField
             label="정렬 순서"
             name="categoryOrder"
@@ -285,6 +320,7 @@ export default function CategoryPanel({ storeId }) {
             register={register}
             errorMessage={errors.categoryOrder?.message}
           />
+
           <button type="submit" className="btn btn-primary btn-full">
             등록
           </button>

@@ -1,3 +1,4 @@
+// src/pages/mypage/MypageReview.jsx
 import React, { useState } from "react";
 import { authStore } from "@/store/authStore";
 import { useStore } from "@/hooks/useStore";
@@ -15,25 +16,37 @@ import { useHandleError } from "@/hooks/common/useHandleError";
  * - 점주: 내 가게 리뷰 (storeId 필요)
  */
 export default function MypageReview() {
-  const { userRole } = authStore();
+  const { userRole, token } = authStore(); // ★ token 함께 확인
+  const isLoggedIn = !!token; // ★ 로그인 여부
+
   const isOwner = userRole?.includes("OWNER");
   const role = isOwner ? "owner" : "user";
 
   const [page, setPage] = useState(0);
+
+  // 공통 에러 핸들링
   const handleError = useHandleError();
 
   /** 점주일 때 storeId 필요 */
-  const { myStore, isStoreLoading } = useStore();
+  const { myStore } = useStore();
   const storeId = myStore?.storeId;
 
-  /** 기본적으로 user는 바로 호출 / owner는 storeId 필요 */
-  const enableFetch = role === "user" || !!storeId;
+  /**
+   * 절대 API 호출되면 안 되는 조건
+   * - 로그인 안됨
+   * - user인데 token 없음
+   * - owner인데 storeId 없음
+   */
+  const enableFetch =
+    isLoggedIn && (role === "user" || (role === "owner" && !!storeId));
 
   /** 리뷰 조회 */
   const { data, isFetching } = useReviewList(page, role, storeId, enableFetch);
 
+  /** 리뷰 삭제 */
   const { removeReview } = useReviewUpdate();
 
+  /** 안전한 데이터 파싱 */
   const reviews =
     data?.response?.content ??
     data?.data?.response?.content ??
@@ -49,19 +62,8 @@ export default function MypageReview() {
   const handlePageChange = (newPage) => setPage(newPage);
 
   const handleDelete = (reviewId) => {
-    removeReview.mutate(reviewId, {
-      onError: (err) => handleError(err, "MypageReview.handleDelete"),
-    });
+    removeReview.mutate(reviewId);
   };
-
-  /** 점주인데 storeId 아직 로드 안 됨 */
-  if (isOwner && !storeId) {
-    return (
-      <Card title="내 가게 리뷰 관리">
-        <p style={{ padding: "20px" }}>가게 정보를 불러오는 중...</p>
-      </Card>
-    );
-  }
 
   return (
     <Card title={isOwner ? "내 가게 리뷰 관리" : "내 리뷰 내역"}>

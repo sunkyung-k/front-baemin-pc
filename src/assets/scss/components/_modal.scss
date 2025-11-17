@@ -57,7 +57,8 @@
     transition: color 0.2s;
 
     &:hover {
-      color: #222;
+      color: fn-color("primary");
+      transform: scale(1.1);
     }
   }
 

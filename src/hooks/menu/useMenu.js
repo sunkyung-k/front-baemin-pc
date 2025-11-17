@@ -6,10 +6,6 @@ import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useHandleError } from "@/hooks/common/useHandleError";
 import { useConfirmDelete } from "@/hooks/common/useConfirmDelete";
 
-/**
- *  메뉴 CRUD 훅 (React Query + Zustand 완전 동기화)
- * - 등록/수정/삭제 후: React Query 캐시와 Zustand activeCategory 동시에 갱신
- */
 export const useMenu = (storeId) => {
   const queryClient = useQueryClient();
   const { activeCategory, setActiveCategory } = useMenuCategoryStore();
@@ -31,6 +27,9 @@ export const useMenu = (storeId) => {
           setActiveCategory({ ...structuredClone(updated), storeId });
         }
       }
+
+      // StoreDetailLayout 갱신
+      queryClient.invalidateQueries(QUERY_KEYS.STORE_DETAIL(storeId));
     } catch (err) {
       handleError(err, "useMenu.refreshAll");
     }

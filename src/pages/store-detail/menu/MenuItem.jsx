@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useOutletContext } from "react-router-dom";
 import { QUERY_KEYS } from "@/constants/queryKeys";
@@ -10,50 +10,61 @@ import useBasket from "@/hooks/useBasket";
 import { authStore } from "@/store/authStore";
 import { useHandleError } from "@/hooks/common/useHandleError";
 import styles from "./MenuItem.module.scss";
+import useMenuAdmin from "../../../hooks/admin/useAdminMenu";
 
-/**
- * MenuItem
- * ------------------------------------------------------
- * - 단일 메뉴 카드 + 옵션 선택 + 장바구니 담기
- * - 필수 옵션 검증 및 alert 처리
- * - 프론트는 선택된 메뉴/옵션만 서버에 전송
- * - 수량/총합 계산은 백엔드가 처리
- */
 export default function MenuItem({ menuId }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValues, setSelectedValues] = useState({});
   const { addMenu } = useBasket();
+
   const { userId, userRole } = authStore.getState();
   const isUser = userRole?.includes("USER");
-  const handleError = useHandleError();
+  const isAdmin = userRole?.includes("ADMIN");
 
+  const handleError = useHandleError();
   const { storeDetail } = useOutletContext();
   const currentStoreId = storeDetail?.storeId;
 
-  /** 메뉴 상세 조회 */
-  const { data: menu, isError } = useQuery({
+  /** Admin 삭제 훅 */
+  const { removeMenu, removeOption } = useMenuAdmin(currentStoreId);
+
+  /** 현재 storeDetail에서 존재하는 menuId 리스트 */
+  const categoryMenuIds = useMemo(() => {
+    if (!storeDetail?.menuCategoryList) return [];
+    return storeDetail.menuCategoryList.flatMap((cat) =>
+      cat.menuList?.map((m) => m.menuId)
+    );
+  }, [storeDetail]);
+
+  /** 메뉴 존재 여부 (삭제 즉시 false) */
+  const menuExistsInStore = categoryMenuIds.includes(menuId);
+
+  /**
+   * useQuery — 훅 규칙 100% 지키고 enabled로 호출 완전 차단
+   * retry: false → 실패 시 재요청 0회 (500 두 번 방지)
+   */
+  const { data: menu } = useQuery({
     queryKey: QUERY_KEYS.MENU_DETAIL(menuId),
     queryFn: () => menuAPI.getMenuDetail(menuId),
-    enabled: !!menuId,
+    enabled: !!menuId && menuExistsInStore,
+    retry: false, // 🔥 핵심: 실패 재시도 완전 OFF
+    staleTime: 0,
   });
 
-  if (isError || !menu) return null;
+  /** 메뉴가 삭제되었으면 UI 렌더링도 안함 */
+  if (!menuExistsInStore) return null;
+  if (!menu) return null;
 
   const imageUrl = getAbsoluteImageUrl(menu);
   const optionGroups = menu.menuOptionGroupList || [];
 
-  /** 옵션 변경 */
   const handleChange = (groupId, value, type, maxSelect = 0) => {
     setSelectedValues((prev) => {
-      if (type === "radio") {
-        return { ...prev, [groupId]: value };
-      }
+      if (type === "radio") return { ...prev, [groupId]: value };
+
       if (Array.isArray(value)) {
         if (maxSelect > 0 && value.length > maxSelect) {
-          handleError(
-            new Error(`최대 ${maxSelect}개까지만 선택할 수 있습니다.`),
-            "MenuItem.maxSelect"
-          );
+          handleError(new Error(`최대 ${maxSelect}개까지만 선택 가능`));
           return prev;
         }
         return { ...prev, [groupId]: value };
@@ -62,60 +73,64 @@ export default function MenuItem({ menuId }) {
     });
   };
 
-  /** 담기 */
   const handleAdd = (e) => {
     e.stopPropagation();
 
-    // 필수 옵션 체크
     const requiredGroups = optionGroups.filter(
       (g) => g.requiredYn === "Y" && g.menuOptionList?.length > 0
     );
+
     const missing = requiredGroups.find((g) => {
-      const val = selectedValues[g.menuOptGrpId];
-      return Array.isArray(val) ? val.length === 0 : !val;
+      const v = selectedValues[g.menuOptGrpId];
+      return Array.isArray(v) ? v.length === 0 : !v;
     });
+
     if (missing) {
-      handleError(
-        new Error(`${missing.menuOptGrpName} 옵션을 선택해주세요.`),
-        "MenuItem.optionSelect"
-      );
+      handleError(new Error(`${missing.menuOptGrpName} 옵션을 선택해주세요.`));
       return;
     }
 
-    // 선택된 옵션 구성 (옵션 quantity는 메뉴 quantity와 동일하게 설정)
-    const menuQuantity = 1; // 최초 담기 시 기본 수량은 1
+    const quantity = 1;
+
     const optionList = Object.values(selectedValues)
       .flat()
-      .map((optId) => ({
-        menuOptId: Number(optId),
-        quantity: menuQuantity,
+      .map((id) => ({
+        menuOptId: Number(id),
+        quantity,
       }));
 
-    const payload = {
-      userId,
-      menu: {
-        menuId: menu.menuId,
-        storeId: currentStoreId,
-        quantity: menuQuantity,
-        optionList,
+    addMenu.mutate(
+      {
+        userId,
+        menu: {
+          menuId: menu.menuId,
+          storeId: currentStoreId,
+          quantity,
+          optionList,
+        },
       },
-    };
-
-    addMenu.mutate(payload, {
-      onSuccess: () => setIsOpen(false),
-      onError: (err) => handleError(err, "MenuItem.addMenu"),
-    });
+      {
+        onSuccess: () => setIsOpen(false),
+        onError: handleError,
+      }
+    );
   };
 
   return (
     <div
       className={`${styles.box} ${isOpen ? styles.open : ""}`}
-      onClick={() => setIsOpen((prev) => !prev)}
+      onClick={() => setIsOpen((p) => !p)}
     >
       <div className={styles.menuCard}>
         <div className={styles.thumb}>
           {imageUrl ? (
-            <img src={imageUrl} alt={menu.menuName} />
+            <>
+              <img src={imageUrl} alt={menu.menuName} />
+
+              {menu.soldoutYn === "Y" && (
+                <span className={styles.soldoutBadge}>품절</span>
+              )}
+            </>
           ) : (
             <div className={styles.noImg}></div>
           )}
@@ -126,8 +141,21 @@ export default function MenuItem({ menuId }) {
             <h4 className={styles.name}>{menu.menuName}</h4>
             <p className={styles.desc}>{menu.description}</p>
           </div>
+
           <p className={styles.price}>{menu.price?.toLocaleString()}원</p>
         </div>
+
+        {isAdmin && (
+          <button
+            className="btn btn-sm btn-danger"
+            onClick={(e) => {
+              e.stopPropagation();
+              removeMenu.mutate(menuId);
+            }}
+          >
+            삭제
+          </button>
+        )}
       </div>
 
       {isOpen && (
@@ -142,11 +170,10 @@ export default function MenuItem({ menuId }) {
             } = group;
 
             const isRequired = requiredYn === "Y";
-            const type = isRequired ? "radio" : "checkbox";
 
             const labelText = (
               <>
-                {menuOptGrpName}{" "}
+                {menuOptGrpName}
                 <span className={styles.radioTag}>
                   {isRequired
                     ? "필수"
@@ -180,6 +207,8 @@ export default function MenuItem({ menuId }) {
                   handleChange(menuOptGrpId, e.target.value, "radio")
                 }
                 options={options}
+                isAdmin={isAdmin}
+                removeOption={removeOption}
               />
             ) : (
               <CheckboxGroup
@@ -192,6 +221,8 @@ export default function MenuItem({ menuId }) {
                   handleChange(menuOptGrpId, vals, "checkbox", maxSelect)
                 }
                 options={options}
+                isAdmin={isAdmin}
+                removeOption={removeOption}
               />
             );
           })}
@@ -200,14 +231,15 @@ export default function MenuItem({ menuId }) {
             <button
               className="btn btn-default btn-primary"
               onClick={handleAdd}
-              disabled={!storeDetail?.open || !!storeDetail?.hourComment}
-              title={
-                storeDetail?.hourComment
-                  ? storeDetail.hourComment
-                  : "지금 주문 가능합니다."
+              disabled={
+                menu.soldoutYn === "Y" ||
+                !storeDetail?.open ||
+                !!storeDetail?.hourComment
               }
             >
-              {storeDetail?.open && !storeDetail?.hourComment
+              {menu.soldoutYn === "Y"
+                ? "품절"
+                : storeDetail?.open && !storeDetail?.hourComment
                 ? "담기"
                 : storeDetail?.hourComment || "주문 불가"}
             </button>

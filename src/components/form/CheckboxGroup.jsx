@@ -1,11 +1,5 @@
 import React from "react";
 
-/**
- * CheckboxGroup (공용 체크박스 그룹)
- * - RHF(register) 또는 수동 onChange 둘 다 호환
- * - label: string 또는 ReactNode 모두 지원
- * - values 배열 기반으로 다중 선택 관리
- */
 export default function CheckboxGroup({
   label,
   name,
@@ -14,12 +8,13 @@ export default function CheckboxGroup({
   values = [],
   onChange,
   errorMessage,
-  direction = "column", // "row" | "column"
+  direction = "column",
+  isAdmin = false,
+  removeOption, // removeOption.mutate(optId)
 }) {
   const isRHF = typeof register === "function";
   const registerProps = isRHF ? register(name) : {};
 
-  /** 특정 옵션 클릭 시 상태 업데이트 */
   const handleToggle = (value) => {
     let updated = [...values];
     if (updated.includes(value)) {
@@ -47,11 +42,25 @@ export default function CheckboxGroup({
               value={opt.value}
               {...registerProps}
               checked={isRHF ? undefined : values.includes(opt.value)}
-              onChange={isRHF ? undefined : () => handleToggle(opt.value)} // 각 체크박스 고유 핸들러
+              onChange={isRHF ? undefined : () => handleToggle(opt.value)}
             />
+
             <span className="chk-label">
               {typeof opt.label === "string" ? opt.label : opt.label}
             </span>
+
+            {/* 옵션 삭제 버튼 (어드민 전용) */}
+            {isAdmin && removeOption && (
+              <button
+                className="btn btn-sm btn-danger admin-delete"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeOption.mutate(Number(opt.value));
+                }}
+              >
+                삭제
+              </button>
+            )}
           </label>
         ))}
       </div>

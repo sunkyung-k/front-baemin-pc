@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import styles from "./OptionGroupPanel.module.scss";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import EmptyState from "@/components/menu/EmptyState";
@@ -8,45 +8,23 @@ import OptionGroupModal from "./OptionGroupModal";
 import OptionPanel from "./OptionPanel";
 import OptionModal from "./OptionModal";
 import { useMenuOptionGroup } from "@/hooks/menu/useMenuOptionGroup";
-import menuAPI from "@/service/menu/menuAPI";
-import { useHandleError } from "@/hooks/common/useHandleError";
-import { useConfirmDelete } from "@/hooks/common/useConfirmDelete";
 
 export default function OptionGroupPanel({ menuId }) {
-  const { activeCategory, setActiveCategory } = useMenuCategoryStore();
+  const { activeCategory } = useMenuCategoryStore();
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [mode, setMode] = useState("create");
+
   const [optionModalOpen, setOptionModalOpen] = useState(false);
   const [optionGroupTarget, setOptionGroupTarget] = useState(null);
   const [openGroupId, setOpenGroupId] = useState(null);
 
   const { remove, refreshMenu } = useMenuOptionGroup(menuId);
-  const handleError = useHandleError();
-  const { handleDelete } = useConfirmDelete();
 
-  /** 메뉴 상세 최신화 */
-  useEffect(() => {
-    const fetchMenuDetail = async () => {
-      if (!activeCategory || !menuId) return;
-      try {
-        const updatedMenu = await menuAPI.getMenuDetail(menuId);
-        if (!updatedMenu) return;
-        const updatedList = activeCategory.menuList.map((m) =>
-          m.menuId === menuId ? updatedMenu : m
-        );
-        setActiveCategory({ ...activeCategory, menuList: updatedList });
-      } catch (err) {
-        handleError(err, "OptionGroupPanel.fetchMenuDetail");
-      }
-    };
-    fetchMenuDetail();
-  }, [menuId]);
-
-  /** targetMenu 구하기 */
+  /** 현재 메뉴 찾기 */
   const targetMenu = useMemo(() => {
-    if (!activeCategory?.menuList) return null;
-    return activeCategory.menuList.find((m) => m.menuId === menuId);
+    return activeCategory?.menuList?.find((m) => m.menuId === menuId) || null;
   }, [activeCategory, menuId]);
 
   const groupList = targetMenu?.menuOptionGroupList ?? [];
@@ -59,7 +37,7 @@ export default function OptionGroupPanel({ menuId }) {
 
   /** 그룹 모달 열기 */
   const handleOpenGroupModal = useCallback((group = null, e) => {
-    if (e) e.stopPropagation();
+    e?.stopPropagation?.();
     setEditTarget(group);
     setMode(group ? "edit" : "create");
     setModalOpen(true);
@@ -70,19 +48,24 @@ export default function OptionGroupPanel({ menuId }) {
     setModalOpen(false);
     setEditTarget(null);
     setMode("create");
+
+    /** ⭐ 핵심: menuDetail을 새로 불러와 activeCategory를 갱신 */
     await refreshMenu();
   }, [refreshMenu]);
 
-  /** 옵션 모달 열기/닫기 */
+  /** 옵션 모달 */
   const handleOpenOptionModal = useCallback((group, e) => {
-    if (e) e.stopPropagation();
+    e?.stopPropagation?.();
     setOptionGroupTarget(group);
     setOptionModalOpen(true);
   }, []);
+
   const handleCloseOptionModal = useCallback(async () => {
     const targetId = optionGroupTarget?.menuOptGrpId;
     setOptionModalOpen(false);
-    await refreshMenu();
+
+    await refreshMenu(); // 옵션 CRUD 후 즉시 반영
+
     if (targetId) setOpenGroupId(targetId);
     setOptionGroupTarget(null);
   }, [refreshMenu, optionGroupTarget]);
@@ -91,13 +74,8 @@ export default function OptionGroupPanel({ menuId }) {
   const handleRemoveGroup = useCallback(
     async (groupId, e) => {
       e?.stopPropagation?.();
-      try {
-        //  handleDelete 제거 — remove 내부에서 이미 confirm/alert 수행
-        await remove.mutateAsync(groupId);
-        await refreshMenu();
-      } catch (err) {
-        handleError(err, "OptionGroupPanel.handleRemoveGroup");
-      }
+      await remove.mutateAsync(groupId);
+      await refreshMenu();
     },
     [remove, refreshMenu]
   );
@@ -146,6 +124,7 @@ export default function OptionGroupPanel({ menuId }) {
                       )
                     </span>
                   </div>
+
                   <div
                     className={styles.groupActions}
                     onClick={(e) => e.stopPropagation()}
@@ -182,7 +161,7 @@ export default function OptionGroupPanel({ menuId }) {
       )}
 
       <OptionGroupModal
-        key={`${menuId}-${mode}-${modalOpen ? "open" : "close"}`}
+        key={`${menuId}-${mode}-${modalOpen}`}
         menuId={menuId}
         isOpen={modalOpen}
         onClose={handleCloseGroupModal}

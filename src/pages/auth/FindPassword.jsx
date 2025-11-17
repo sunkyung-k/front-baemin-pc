@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -21,28 +21,48 @@ const schema = yup.object().shape({
 export default function FindPassword() {
   const navigate = useNavigate();
   const handleError = useHandleError();
-  const [emailDomainType, setEmailDomainType] = useState("");
+
+  const [selectedDomain, setSelectedDomain] = useState("");
   const [loading, setLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
+    shouldUnregister: false,
   });
 
-  /** 이메일 도메인 선택 */
+  /* RHF hidden 초기값 */
+  useEffect(() => {
+    setValue("emailDomain", "", { shouldDirty: false });
+  }, [setValue]);
+
+  /*  이메일 도메인 선택 */
   const handleEmailDomainChange = (e) => {
     const value = e.target.value;
-    setEmailDomainType(value);
-    if (value === "custom") setValue("emailDomain", "");
-    else setValue("emailDomain", value);
+    setSelectedDomain(value);
+
+    if (value === "custom") {
+      // 직접 입력 → hidden 초기화
+      setValue("emailDomain", "", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    } else {
+      // 선택한 도메인 → hidden 입력
+      setValue("emailDomain", value, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
   };
 
-  /** 비밀번호 재설정 링크 요청 */
+  /* 비밀번호 재설정 요청 */
   const onSubmit = async (data) => {
     const fullEmail = `${data.emailId}@${data.emailDomain}`;
     const payload = {
@@ -73,7 +93,7 @@ export default function FindPassword() {
       description={`비밀번호를 재설정할 계정의 아이디와 이메일을 입력해주세요.\n입력하신 이메일로 재설정 링크가 발송됩니다.`}
       footer={
         <>
-          아이디가 기억나지 않는다면?{" "}
+          아이디가 기억나지 않는다면{" "}
           <Link to="/find-id" className="btn-hv">
             아이디찾기
           </Link>
@@ -100,11 +120,16 @@ export default function FindPassword() {
               register={register}
               errorMessage={errors.emailId?.message}
             />
+
             <span>@</span>
+
             <div className="emailBox">
+              {/* 도메인 선택 */}
               <SelectBox
-                name="emailDomain"
-                register={register}
+                name="emailDomainSelect"
+                value={selectedDomain}
+                onChange={handleEmailDomainChange}
+                isControlled
                 options={[
                   { label: "naver.com", value: "naver.com" },
                   { label: "gmail.com", value: "gmail.com" },
@@ -112,10 +137,14 @@ export default function FindPassword() {
                   { label: "nate.com", value: "nate.com" },
                   { label: "직접입력", value: "custom" },
                 ]}
-                onChange={handleEmailDomainChange}
                 errorMessage={errors.emailDomain?.message}
               />
-              {emailDomainType === "custom" && (
+
+              {/* RHF에 실제로 저장되는 hidden */}
+              <input type="hidden" {...register("emailDomain")} />
+
+              {/* 직접입력 선택 시 도메인 입력창 표시 */}
+              {selectedDomain === "custom" && (
                 <InputField
                   name="emailDomain"
                   placeholder="직접 입력"

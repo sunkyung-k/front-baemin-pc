@@ -20,6 +20,10 @@
     border-color: fn-color("primary");
     box-shadow: 0 0 0 2px color.scale(fn-color("primary"), $lightness: 30%);
   }
+
+  :global(.btn-danger) {
+    min-width: fn-rem(50);
+  }
 }
 
 .menuCard {
@@ -29,6 +33,7 @@
 }
 
 .thumb {
+  position: relative;
   width: fn-rem(80);
   height: fn-rem(80);
   background: fn-color("gray-100");
@@ -82,10 +87,14 @@
   display: flex;
   flex-direction: column;
   gap: space("md");
-  :global(.btn) {
+  :global(.btn:not(.admin-delete)) {
     width: 100%;
     height: fn-rem(38);
     margin-top: space("sm");
+  }
+
+  :global(.admin-delete) {
+    margin-left: space("sm");
   }
 }
 
@@ -96,6 +105,24 @@
   font-weight: 400;
   border-radius: fn-rem(4);
   margin-left: space("xs");
+}
+
+.soldoutBadge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  color: fn-color("white");
+  font-size: font("sm");
+  font-weight: 600;
+  padding: fn-rem(3) fn-rem(6);
+  border-radius: fn-rem(4);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes fadeIn {

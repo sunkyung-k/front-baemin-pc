@@ -30,7 +30,7 @@ export default function Login() {
     try {
       await loginMutate(data);
     } catch {
-      setLoginError("아이디 또는 비밀번호가 일치하지 않습니다.");
+      setLoginError("아이디 또는 비밀번호가 올바르지 않습니다.");
     }
   };
 

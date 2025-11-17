@@ -12,11 +12,18 @@ import styles from "./StoreDetailLayout.module.scss";
 export default function StoreDetailLayout() {
   const { storeId } = useParams();
   const handleError = useHandleError();
-
   const { data } = useQuery({
     queryKey: [QUERY_KEYS.STORE_DETAIL, storeId],
     queryFn: () => storeAPI.getStoreDetail(storeId),
     enabled: !!storeId,
+
+    /** 🔥 자동 refetch 완전 차단 */
+    staleTime: Infinity,
+    gcTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+
     onError: (err) => handleError(err, "StoreDetailLayout.getStoreDetail"),
   });
 

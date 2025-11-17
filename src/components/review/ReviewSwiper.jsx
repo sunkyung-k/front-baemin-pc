@@ -6,12 +6,6 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 
-/**
- * ReviewSwiper (리뷰 이미지 전체보기)
- * --------------------------------------------------
- * @param {string[]} images - 이미지 URL 배열
- * @param {function} onClose - 닫기 핸들러
- */
 export default function ReviewSwiper({ images = [], onClose }) {
   /** ESC 키 방지 */
   useEffect(() => {
@@ -31,7 +25,7 @@ export default function ReviewSwiper({ images = [], onClose }) {
 
   return (
     <div
-      className="review-swiper-overlay"
+      className="review-swiper-overlay active"
       onClick={handleOverlayClick}
       role="dialog"
     >

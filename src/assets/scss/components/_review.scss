@@ -1,4 +1,8 @@
 @use "@/assets/scss/utils" as *;
+
+/* ============================================================
+  Review Stars
+============================================================ */
 .review-stars {
   display: flex;
   gap: fn-rem(3);
@@ -11,6 +15,10 @@
     }
   }
 }
+
+/* ============================================================
+  Review Card
+============================================================ */
 .review-card {
   position: relative;
   background-color: fn-color("white");
@@ -121,9 +129,7 @@
   }
 
   .review-actions {
-    position: static;
     display: flex;
-    align-items: center;
     justify-content: flex-end;
     gap: space("sm");
     margin-top: fn-rem(4);
@@ -131,53 +137,6 @@
     .btn {
       font-weight: 500;
       font-size: font("sm");
-    }
-  }
-
-  // 사장님 답글
-  .review-reply-display {
-    margin-top: fn-rem(10);
-    padding: fn-rem(16);
-    border-radius: radius("md");
-    border: 1px solid fn-color("gray-200");
-    background-color: fn-color("white");
-
-    .reply-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: fn-rem(8);
-
-      .reply-label {
-        font-size: font("md");
-        font-weight: 700;
-        color: fn-color("dark");
-      }
-
-      .reply-actions {
-        display: flex;
-        gap: fn-rem(10);
-
-        .btn-text-sm {
-          background: none;
-          border: none;
-          padding: 0;
-          font-size: font("sm");
-          color: fn-color("gray-500");
-          cursor: pointer;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-      }
-    }
-
-    .reply-content {
-      font-size: font("md");
-      color: fn-color("gray-800");
-      line-height: 1.6;
-      white-space: pre-wrap;
     }
   }
 
@@ -193,6 +152,7 @@
     background-color: fn-color("gray-50");
     border-radius: radius("sm");
   }
+
   .reply-header {
     display: flex;
     align-items: flex-start;
@@ -208,8 +168,11 @@
       align-items: center;
       gap: space("sm");
     }
+
     .btn {
-      padding: 0;
+      &:not(.admin-delete) {
+        padding: 0;
+      }
       font-weight: 500;
     }
   }
@@ -222,10 +185,9 @@
   }
 }
 
-// ------------------------------------------------------------
-// -------------------- Modal & Swiper & Others --------------------
-// ------------------------------------------------------------
-
+/* ============================================================
+  Review Modal
+============================================================ */
 .review-modal {
   display: flex;
   flex-direction: column;
@@ -321,71 +283,105 @@
 }
 
 /* ============================================================
-  Review Swiper (전체 이미지 보기)
+  Review Swiper (전체 이미지 모달)
 ============================================================ */
 .review-swiper-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 9999;
   display: flex;
   justify-content: center;
   align-items: center;
+}
 
-  .review-swiper-container {
-    position: relative;
-    width: 90%;
-    max-width: fn-rem(600);
-    background: fn-color("white");
-    border-radius: radius("md");
-    overflow: hidden;
-    box-shadow: 0 0 fn-rem(20) rgba(0, 0, 0, 0.3);
+.review-swiper-container {
+  position: relative;
+  width: 92%;
+  max-width: fn-rem(620);
+  background: fn-color("white");
+  border-radius: radius("xl");
+  overflow: hidden;
+  box-shadow: 0 10px fn-rem(40) rgba(0, 0, 0, 0.35);
+  animation: fadeUp 0.28s ease-out;
 
-    .swiper-close-btn {
-      position: absolute;
-      top: fn-rem(8);
-      right: fn-rem(8);
-      background: none;
-      border: none;
-      color: fn-color("dark");
-      font-size: fn-rem(28);
-      cursor: pointer;
-      z-index: 10;
+  .swiper-close-btn {
+    position: absolute;
+    top: fn-rem(12);
+    right: fn-rem(12);
+    background: none;
+    border: none;
+    color: fn-color("gray-800");
+    font-size: fn-rem(26);
+    cursor: pointer;
+    z-index: 20;
+
+    &:hover {
+      color: fn-color("primary");
+      transform: scale(1.1);
+    }
+  }
+
+  /* 메인 스와이퍼 */
+  .review-swiper {
+    width: 100%;
+    height: fn-rem(420);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      background-color: fn-color("gray-bg");
+      transition: transform 0.25s ease;
+    }
+
+    /* 페이지네이션 */
+    .swiper-pagination-bullet {
+      background: fn-color("gray-400");
+      opacity: 0.8;
+      width: fn-rem(10);
+      height: fn-rem(10);
+    }
+
+    .swiper-pagination-bullet-active {
+      background: fn-color("primary");
+      width: fn-rem(20);
+      border-radius: fn-rem(10);
+      transition: all 0.25s ease;
+    }
+
+    /* Navigation */
+    .swiper-button-prev,
+    .swiper-button-next {
+      color: fn-color("gray-200");
+      transition: all 0.25s ease;
+      background-color: fn-color("gray-500");
+      width: fn-rem(30);
+      padding: space("xs") space("sm");
+      opacity: 0.5;
 
       &:hover {
         color: fn-color("primary");
       }
     }
-
-    .review-swiper {
-      width: 100%;
-      height: fn-rem(400);
-
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        background-color: fn-color("gray-bg");
-      }
-
-      .swiper-pagination-bullet {
-        background: fn-color("gray-400");
-        opacity: 0.7;
-      }
-
-      .swiper-pagination-bullet-active {
-        background: fn-color("primary");
-      }
-
-      .swiper-button-prev,
-      .swiper-button-next {
-        color: fn-color("gray-700");
-
-        &:hover {
-          color: fn-color("primary");
-        }
-      }
+    .swiper-button-prev {
+      left: 0;
     }
+    .swiper-button-next {
+      right: 0;
+    }
+  }
+}
+
+/* 등장 애니메이션 */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(fn-rem(20));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -393,23 +389,6 @@
   display: flex;
   flex-direction: column;
   gap: fn-rem(16);
-}
-
-.review-empty {
-  text-align: center;
-  padding: fn-rem(40);
-  color: fn-color("gray-500");
-  font-size: font("md");
-}
-
-.reply-textarea {
-  width: 100%;
-  min-height: fn-rem(80);
-  border: 1px solid fn-color("gray-300");
-  border-radius: radius("sm");
-  padding: fn-rem(8);
-  resize: none;
-  font-size: font("md");
 }
 
 .reply-btns {

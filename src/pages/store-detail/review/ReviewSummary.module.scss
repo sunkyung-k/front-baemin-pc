@@ -12,6 +12,14 @@
   strong {
     font-size: font("md");
   }
+
+  /* 반응형 */
+  @media (max-width: bp("md")) {
+    flex-direction: column;
+    align-items: center;
+    gap: space("xl");
+    padding: space("xl") 0;
+  }
 }
 
 .ratingBox {
@@ -22,15 +30,29 @@
   gap: space("md");
   padding-right: fn-rem(80);
   border-right: 1px solid fn-color("gray-200");
+
+  /* 반응형 */
+  @media (max-width: bp("md")) {
+    padding-right: 0;
+    border-right: none;
+    padding-bottom: space("lg");
+    border-bottom: 1px solid fn-color("gray-200");
+    width: 100%;
+  }
 }
 
 .ratingText {
   font-size: fn-rem(50);
   font-weight: 600;
   color: fn-color("primary");
+
   span {
     color: fn-color("gray-100");
     font-weight: 400;
+  }
+
+  @media (max-width: bp("md")) {
+    font-size: fn-rem(40);
   }
 }
 
@@ -38,6 +60,10 @@
   color: fn-color("primary");
   font-size: fn-rem(50);
   font-weight: 600;
+
+  @media (max-width: bp("md")) {
+    font-size: fn-rem(40);
+  }
 }
 
 .reviewBox {
@@ -46,8 +72,17 @@
   justify-content: center;
   align-items: center;
   gap: space("md");
+
+  @media (max-width: bp("md")) {
+    padding-top: space("lg");
+    gap: space("sm");
+  }
 }
 
 .reviewIcon {
   color: fn-color("gray-300");
+
+  @media (max-width: bp("md")) {
+    font-size: fn-rem(20);
+  }
 }

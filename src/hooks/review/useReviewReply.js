@@ -14,17 +14,15 @@ export const useReviewReply = () => {
   const createReply = useMutation({
     mutationFn: reviewReplyAPI.create,
     onSuccess: async (_, payload) => {
-      // ✅ 로컬 즉시 반영
       updateReviewLocal({
         reviewId: payload.reviewId,
         reply: payload,
       });
 
-      // ✅ 캐시 invalidate 대상 확대
       await Promise.all([
-        queryClient.invalidateQueries([QUERY_KEYS.MY_STORE_REVIEW_LIST]), // 점주용
-        queryClient.invalidateQueries([QUERY_KEYS.MY_REVIEW_LIST]), // 유저용
-        queryClient.invalidateQueries([QUERY_KEYS.STORE_REVIEW_LIST]), // 가게상세용
+        queryClient.invalidateQueries([QUERY_KEYS.MY_STORE_REVIEW_LIST]),
+        queryClient.invalidateQueries([QUERY_KEYS.MY_REVIEW_LIST]),
+        queryClient.invalidateQueries([QUERY_KEYS.STORE_REVIEW_LIST]),
       ]);
     },
     onError: (err) => handleError(err, "useReviewReply.create"),
@@ -50,9 +48,18 @@ export const useReviewReply = () => {
 
   /** 삭제 */
   const removeReply = useMutation({
-    mutationFn: reviewReplyAPI.remove,
-    onSuccess: async (_, replyId) => {
-      updateReviewLocal({ reply: null });
+    mutationFn: ({ reviewReplyId }) => reviewReplyAPI.remove(reviewReplyId),
+
+    onSuccess: async (_, { reviewReplyId, reviewId }) => {
+      // 즉시 화면 반영될 수 있게 reply 객체를 완전히 새로 생성
+      updateReviewLocal({
+        reviewId,
+        reply: {
+          reviewReplyId,
+          content: "",
+          delYn: "Y",
+        },
+      });
 
       await Promise.all([
         queryClient.invalidateQueries([QUERY_KEYS.MY_STORE_REVIEW_LIST]),
@@ -60,6 +67,7 @@ export const useReviewReply = () => {
         queryClient.invalidateQueries([QUERY_KEYS.STORE_REVIEW_LIST]),
       ]);
     },
+
     onError: (err) => handleError(err, "useReviewReply.remove"),
   });
 

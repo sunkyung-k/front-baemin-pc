@@ -10,6 +10,32 @@ import ImageUpload from "@/components/form/ImageUpload";
 import OrderList from "@/components/mypage/OrderList";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 
+import { createRoot } from "react-dom/client";
+import ReviewSwiper from "./ReviewSwiper";
+
+/* 전역 스와이퍼 실행 */
+function openReviewSwiperGlobal(images) {
+  const root = document.getElementById("global-modal-root");
+  if (!root) return;
+
+  root.innerHTML = "";
+
+  const container = document.createElement("div");
+  root.appendChild(container);
+
+  const modalRoot = createRoot(container);
+
+  modalRoot.render(
+    <ReviewSwiper
+      images={images}
+      onClose={() => {
+        modalRoot.unmount();
+        root.innerHTML = "";
+      }}
+    />
+  );
+}
+
 /* yup 스키마 */
 const schema = yup.object().shape({
   rating: yup.number().min(1, "별점을 선택해주세요.").required(),
@@ -43,7 +69,7 @@ export default function ReviewModal({
 
   const rating = watch("rating");
 
-  /** 이미지 상태 (기존 + 빈칸) */
+  /** 이미지 상태 */
   const [images, setImages] = useState(() => {
     const existing =
       defaultValues?.fileList?.map((f) => ({
@@ -52,9 +78,11 @@ export default function ReviewModal({
         preview: getAbsoluteImageUrl(f),
         isExisting: true,
       })) || [];
+
     if (existing.length === 0) return [null];
     if (existing.length < 3 && !existing.includes(null))
       return [...existing, null];
+
     return existing;
   });
 
@@ -78,17 +106,19 @@ export default function ReviewModal({
   const handleRemove = (idx) => {
     const updated = images.filter((_, i) => i !== idx);
     const filled = updated.filter(Boolean).length;
+
     if (filled < 3 && !updated.includes(null)) updated.push(null);
+
     setImages(updated);
     setValue("imageList", updated.map((img) => img?.file).filter(Boolean));
   };
 
-  /** formData 구성 (rfId 기반, 전부 삭제 시 key 생략) */
+  /** 제출 */
   const handleReviewSubmit = async (data) => {
     const formData = new FormData();
-    const activeImages = images.filter(Boolean);
+    const active = images.filter(Boolean);
 
-    // 필수 필드
+    // 필드
     if (mode === "edit" && defaultValues?.reviewId) {
       formData.append("reviewId", defaultValues.reviewId);
     }
@@ -97,35 +127,26 @@ export default function ReviewModal({
     formData.append("rating", data.rating);
     formData.append("content", data.content);
 
-    // 기존 이미지 유지 목록 (rfId)
-    const keepImageList = activeImages
+    // 기존 이미지 유지 목록
+    const keepImageList = active
       .filter((img) => img.isExisting && img.rfId)
       .map((img) => img.rfId);
 
-    // 기존 이미지가 하나라도 있으면 배열 형태로 append
-    if (keepImageList.length > 0) {
-      keepImageList.forEach((rfId, index) => {
-        formData.append(`keepImageList[${index}]`, rfId);
-      });
-    }
+    keepImageList.forEach((rfId, idx) =>
+      formData.append(`keepImageList[${idx}]`, rfId)
+    );
 
-    // 새로 추가된 이미지 파일만 append
-    const newFiles = activeImages
-      .filter((img) => img && img.file instanceof File)
+    // 새 이미지
+    const newFiles = active
+      .filter((img) => img.file instanceof File)
       .slice(0, 3);
-    newFiles.forEach((img, index) => {
-      formData.append(`imageList[${index}].image`, img.file);
-      formData.append(`imageList[${index}].displayOrder`, index + 1);
+
+    newFiles.forEach((img, idx) => {
+      formData.append(`imageList[${idx}].image`, img.file);
+      formData.append(`imageList[${idx}].displayOrder`, idx + 1);
     });
 
-    // 최종 제출
     onSubmit(formData, mode);
-
-    // 확인용 콘솔
-    console.log("===== FormData 확인 =====");
-    for (let [k, v] of formData.entries()) {
-      console.log(k, v);
-    }
   };
 
   if (!isOpen) return null;
@@ -170,14 +191,16 @@ export default function ReviewModal({
           errorMessage={errors.content?.message}
         />
 
-        {/* 이미지 업로드 */}
+        {/* 이미지 */}
         <div className="review-images">
           <label className="upload-label">이미지 업로드</label>
+
           <div className="image-list">
             {images.map((img, idx) => (
               <div
                 key={idx}
                 className={`image-box ${img ? "filled" : "empty"}`}
+                style={{ position: "relative" }}
               >
                 <ImageUpload
                   name={`imageList.${idx}`}
@@ -188,6 +211,8 @@ export default function ReviewModal({
                   showHint={false}
                   showError={false}
                 />
+
+                {/* 삭제 버튼 */}
                 {img && (
                   <button
                     type="button"
@@ -200,6 +225,7 @@ export default function ReviewModal({
               </div>
             ))}
           </div>
+
           <p className="hint">
             JPG, PNG 형식 / 최대 3장, 50MB 이하 파일만 업로드 가능합니다.
           </p>

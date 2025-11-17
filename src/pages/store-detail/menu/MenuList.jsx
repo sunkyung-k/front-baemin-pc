@@ -11,21 +11,26 @@ import { FaUtensils } from "react-icons/fa6";
  * MenuList
  * ------------------------------------------------------
  * - OutletContext로 전달받은 storeDetail에서 메뉴카테고리 추출
- * - 중복 API 호출 제거
+ * - 삭제된 메뉴(delYn="Y")를 categories 단계에서 제거
+ * - 메뉴 삭제 후 500 에러 호출 완전 방지
  */
 export default function MenuList() {
   const { storeDetail: store } = useOutletContext();
   const [active, setActive] = useState("전체");
 
-  /** 메뉴가 포함된 카테고리만 필터링 */
+  /** 메뉴 포함 카테고리 필터링 (🔥 delYn="Y" 메뉴 완전 제거) */
   const categories = useMemo(() => {
     if (!store?.menuCategoryList) return [];
-    return store.menuCategoryList.filter(
-      (cat) => Array.isArray(cat.menuList) && cat.menuList.length > 0
-    );
+
+    return store.menuCategoryList
+      .map((cat) => ({
+        ...cat,
+        menuList: (cat.menuList || []).filter((m) => m.delYn !== "Y"), // 🔥 여기 추가
+      }))
+      .filter((cat) => Array.isArray(cat.menuList) && cat.menuList.length > 0);
   }, [store]);
 
-  /** 모든 카테고리의 메뉴를 평탄화 */
+  /** 모든 카테고리 메뉴 평탄화 */
   const allMenus = useMemo(
     () =>
       categories.flatMap((cat) =>
@@ -46,9 +51,9 @@ export default function MenuList() {
   /** 현재 탭 기준 메뉴 필터링 */
   const filteredMenus = useMemo(
     () =>
-      active === "전체"
-        ? allMenus
-        : allMenus.filter((m) => m.categoryName === active),
+      allMenus.filter((m) =>
+        active === "전체" ? true : m.categoryName === active
+      ),
     [active, allMenus]
   );
 

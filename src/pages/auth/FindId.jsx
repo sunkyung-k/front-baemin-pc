@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -20,7 +20,9 @@ const schema = yup.object().shape({
 export default function FindId() {
   const navigate = useNavigate();
   const handleError = useHandleError();
-  const [emailDomainType, setEmailDomainType] = useState("");
+
+  // SelectBox에서 선택한 값 저장
+  const [selectedDomain, setSelectedDomain] = useState("");
   const [loading, setLoading] = useState(false);
 
   const {
@@ -31,14 +33,32 @@ export default function FindId() {
   } = useForm({
     resolver: yupResolver(schema),
     mode: "onChange",
+    shouldUnregister: false,
   });
+
+  /** Hidden 초기값 */
+  useEffect(() => {
+    setValue("emailDomain", "", { shouldDirty: false });
+  }, [setValue]);
 
   /** 이메일 도메인 선택 */
   const handleEmailDomainChange = (e) => {
     const value = e.target.value;
-    setEmailDomainType(value);
-    if (value === "custom") setValue("emailDomain", "");
-    else setValue("emailDomain", value);
+    setSelectedDomain(value);
+
+    if (value === "custom") {
+      // 직접 입력 → hidden 초기화
+      setValue("emailDomain", "", {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    } else {
+      // 선택한 값 hidden 입력
+      setValue("emailDomain", value, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
   };
 
   /** 아이디 찾기 요청 */
@@ -83,9 +103,12 @@ export default function FindId() {
             <span>@</span>
 
             <div className="emailBox">
+              {/* 이메일 도메인 선택 */}
               <SelectBox
-                name="emailDomain"
-                register={register}
+                name="emailDomainSelect"
+                value={selectedDomain}
+                onChange={handleEmailDomainChange}
+                isControlled
                 options={[
                   { label: "naver.com", value: "naver.com" },
                   { label: "gmail.com", value: "gmail.com" },
@@ -93,11 +116,14 @@ export default function FindId() {
                   { label: "nate.com", value: "nate.com" },
                   { label: "직접입력", value: "custom" },
                 ]}
-                onChange={handleEmailDomainChange}
                 errorMessage={errors.emailDomain?.message}
               />
 
-              {emailDomainType === "custom" && (
+              {/* RHF hidden 실제 도메인 값 */}
+              <input type="hidden" {...register("emailDomain")} />
+
+              {/* 직접입력 UI */}
+              {selectedDomain === "custom" && (
                 <InputField
                   name="emailDomain"
                   placeholder="직접 입력"
