@@ -186,7 +186,18 @@
         padding: fn-rem(6) 0;
 
         &::after {
+          height: fn-rem(4);
           background-color: fn-color("dark");
+        }
+
+        @media (max-width: bp("lg")) {
+          &.active {
+            color: fn-color("primary");
+
+            &::after {
+              background-color: fn-color("primary");
+            }
+          }
         }
       }
     }

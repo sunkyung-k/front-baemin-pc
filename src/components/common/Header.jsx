@@ -7,56 +7,59 @@ import { useAddressSearch } from "@/hooks/useAddressSearch";
 import AddressInput from "@/components/form/AddressInput";
 import { FaBars } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
+import useAccount from "@/hooks/useAccount";
 
-/**
- * 메뉴 권한 규칙
- * ---------------------------------------------------------
- * visible: ["ROLE", "ROLE"...] 에 현재 role이 포함되면 메뉴 표시
- * GUEST는 userRole이 없는 상태 → role = "GUEST" 로 치환
- */
-const MENU_ITEMS = [
-  // ADMIN 전용
-  { to: "/admin/user", label: "회원 관리", visible: ["ROLE_ADMIN"] },
+/** ROLE 별 메뉴 정의 */
+const MENU_BY_ROLE = {
+  ROLE_ADMIN: [
+    { label: "회원 관리", to: "/admin/user", activeMatch: ["/admin/user"] },
+    {
+      label: "가게 관리",
+      to: "/admin/store",
+      activeMatch: ["/admin/store", "/store/"],
+    },
+  ],
+  ROLE_USER: [
+    { label: "가게", to: "/store", activeMatch: ["/store"] },
+    { label: "찜", to: "/favorite", activeMatch: ["/favorite"] },
+    { label: "주문 현황", to: "/order/status", activeMatch: ["/order/status"] },
+    { label: "마이페이지", to: "/mypage", activeMatch: ["/mypage"] },
+  ],
+  ROLE_OWNER: [
+    { label: "가게", to: "/store", activeMatch: ["/store"] },
+    { label: "찜", to: "/favorite", activeMatch: ["/favorite"] },
+    { label: "마이페이지", to: "/mypage", activeMatch: ["/mypage"] },
+  ],
+  GUEST: [
+    { label: "가게", to: "/store", activeMatch: ["/store"] },
+    { label: "찜", to: "/favorite", activeMatch: ["/favorite"] },
+    { label: "주문 현황", to: "/order/status", activeMatch: ["/order/status"] },
+    { label: "마이페이지", to: "/mypage", activeMatch: ["/mypage"] },
+  ],
+};
 
-  {
-    to: "/store",
-    label: "가게",
-    visible: ["GUEST", "ROLE_USER", "ROLE_OWNER", "ROLE_ADMIN"],
-  },
-  {
-    to: "/favorite",
-    label: "찜",
-    visible: ["GUEST", "ROLE_USER", "ROLE_OWNER"],
-  },
-  { to: "/order/status", label: "주문 현황", visible: ["GUEST", "ROLE_USER"] },
-
-  // USER 전용 마이페이지
-  {
-    to: "/mypage/order/info",
-    label: "마이페이지",
-    visible: ["GUEST", "ROLE_USER"],
-  },
-
-  // OWNER 전용 마이페이지
-  { to: "/mypage/order/manage", label: "마이페이지", visible: ["ROLE_OWNER"] },
-];
+function getMenus(role) {
+  return MENU_BY_ROLE[role] || MENU_BY_ROLE.GUEST;
+}
 
 export default function Header() {
-  const { isAuthenticated, clearAuth, getUserRole } = authStore();
-  const userName = authStore((s) => s.userName);
   const navigate = useNavigate();
   const location = useLocation();
 
-  /** 현재 role (게스트는 userRole이 없음 → "GUEST") */
-  const rawRole = getUserRole();
-  const role = rawRole || "GUEST";
+  /** Zustand 값 */
+  const isAuthenticated = authStore((s) => s.isAuthenticated);
+  const clearAuth = authStore((s) => s.clearAuth);
+  const getUserRole = authStore((s) => s.getUserRole);
 
-  /** 현재 role이 볼 수 있는 메뉴만 필터링 */
-  const visibleMenus = MENU_ITEMS.filter((item) => item.visible.includes(role));
+  /** React Query 기반 최신 유저 정보 */
+  const { userInfo } = useAccount();
 
+  const role = getUserRole() || "GUEST";
+  const visibleMenus = getMenus(role);
+
+  /** 주소 상태 */
   const address = useAddressStore((s) => s.address);
   const setAddress = useAddressStore((s) => s.setAddress);
-
   const { fetchAddress, loading } = useCurrentAddress();
   const { openAddressSearch } = useAddressSearch();
 
@@ -64,7 +67,9 @@ export default function Header() {
 
   const isStoreListPage = location.pathname === "/store";
   const isFavoritePage = location.pathname === "/favorite";
-  const showAddressInput = isStoreListPage || isFavoritePage;
+
+  const showAddressInput =
+    role !== "ROLE_ADMIN" && (isStoreListPage || isFavoritePage);
 
   const handleLogout = () => {
     clearAuth();
@@ -72,18 +77,17 @@ export default function Header() {
     setMenuOpen(false);
   };
 
-  /**
-   * 메뉴 클릭 핸들러 (게스트는 로그인 필요 알럿)
-   */
-  const handleMenuClick = (e, to) => {
-    setMenuOpen(false);
+  const handleNeedLogin = () => {
+    if (confirm("로그인이 필요한 기능입니다. 로그인 하시겠습니까?")) {
+      navigate("/login");
+    }
+  };
 
-    // 게스트 → confirm 후 로그인 이동
+  const handleMenuClick = (e) => {
+    setMenuOpen(false);
     if (role === "GUEST") {
       e.preventDefault();
-      if (confirm("로그인이 필요한 기능입니다. 로그인 하시겠습니까?")) {
-        navigate("/login");
-      }
+      handleNeedLogin();
     }
   };
 
@@ -115,7 +119,6 @@ export default function Header() {
           <FaBars size={20} />
         </button>
 
-        {/* 사이드 메뉴 */}
         <aside className={`aside ${menuOpen ? "open" : ""}`}>
           <button
             className="aside-close-btn"
@@ -125,27 +128,35 @@ export default function Header() {
           </button>
 
           <div className="aside-inner">
-            {/* GNB */}
             <nav className="nav">
-              {visibleMenus.map(({ to, label }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  className={({ isActive }) =>
-                    `nav-link ${isActive ? "active" : ""}`
-                  }
-                  onClick={(e) => handleMenuClick(e, to)}
-                >
-                  {label}
-                </NavLink>
-              ))}
+              {visibleMenus.map((item, idx) => {
+                const isCustomActive =
+                  item.activeMatch &&
+                  item.activeMatch.some((pattern) =>
+                    location.pathname.startsWith(pattern)
+                  );
+
+                return (
+                  <NavLink
+                    key={`${item.to}-${idx}`}
+                    to={item.to}
+                    className={({ isActive }) =>
+                      `nav-link ${isActive || isCustomActive ? "active" : ""}`
+                    }
+                    onClick={handleMenuClick}
+                  >
+                    {item.label}
+                  </NavLink>
+                );
+              })}
             </nav>
 
-            {/* 로그인 / 로그아웃 */}
             <div className="user-menu">
-              {isAuthenticated() ? (
+              {isAuthenticated && userInfo?.userName ? (
                 <>
-                  <span className="user-name">{userName}님 안녕하세요.</span>
+                  <span className="user-name">
+                    {userInfo.userName}님 안녕하세요.
+                  </span>
                   <button
                     className="btn btn-sm btn-round"
                     onClick={handleLogout}

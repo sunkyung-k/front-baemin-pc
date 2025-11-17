@@ -2,10 +2,19 @@ import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { authStore } from "@/store/authStore";
 
-export default function ProtectedRoute({ allowedRoles, children }) {
+export default function ProtectedRoute({
+  allowedRoles,
+  disallowRoles,
+  children,
+}) {
   const isAuthenticated = authStore((s) => s.isAuthenticated)();
   const role = authStore((s) => s.getUserRole)();
   const location = useLocation();
+
+  // 특정 role만 접근 금지
+  if (disallowRoles?.includes(role)) {
+    return <Navigate to="/" replace />;
+  }
 
   // ADMIN이 "/" 접근하면 admin 전용 페이지로 이동
   if (role === "ROLE_ADMIN" && location.pathname === "/") {

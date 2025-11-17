@@ -8,12 +8,12 @@ import Home from "../pages/home/Home";
 import Login from "../pages/login/Login";
 import Join from "../pages/join/Join";
 
-import StoreListLayout from "../pages/store-list/StoreListLayout";
-import StoreList from "../pages/store-list/StoreList";
+import StoreListPage from "../pages/store-list/StoreListPage";
 
 import StoreDetailLayout from "../pages/store-detail/StoreDetailLayout";
 import MenuTabContent from "../pages/store-detail/menu/MenuTabContent";
 import InfoTabContent from "../pages/store-detail/info/InfoTabContent";
+import ReviewTabContent from "../pages/store-detail/review/ReviewTabContent";
 
 import Favorite from "../pages/favorite/Favorite";
 
@@ -37,8 +37,10 @@ import FindPasswordComplete from "../pages/auth/FindPasswordComplete";
 import FindIdComplete from "../pages/auth/FindIdComplete";
 import FindId from "../pages/auth/FindId";
 import FindPassword from "../pages/auth/FindPassword";
+
+// admin
 import UserList from "../pages/admin/user/UserList";
-import ReviewTabContent from "../pages/store-detail/review/ReviewTabContent";
+import AdminStoreListPage from "../pages/admin/store/AdminStoreListPage";
 
 export const router = createBrowserRouter([
   {
@@ -58,12 +60,12 @@ export const router = createBrowserRouter([
 
       {
         path: "store",
-        element: <StoreListLayout />,
+        element: (
+          <ProtectedRoute disallowRoles={["ROLE_ADMIN"]}>
+            <StoreListPage />
+          </ProtectedRoute>
+        ),
         handle: { layoutClass: "wide" },
-        children: [
-          { index: true, element: <StoreList /> },
-          { path: "list", loader: () => redirect("/store") },
-        ],
       },
 
       {
@@ -180,6 +182,15 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: "admin/store",
+        element: (
+          <ProtectedRoute allowedRoles={["ROLE_ADMIN"]}>
+            <AdminStoreListPage />
+          </ProtectedRoute>
+        ),
+        handle: { layoutClass: "wide" },
+      },
     ],
   },
 
@@ -189,7 +200,7 @@ export const router = createBrowserRouter([
 
   { path: "/menuRegister/:storeId", element: <MenuLayout /> },
 
-  // 아이디 비번 찾기
+  // ---------------------- 아이디 비번 찾기 ----------------------
   { path: "/find-id", element: <FindId /> },
   { path: "/find-id/complete", element: <FindIdComplete /> },
   { path: "/find-password", element: <FindPassword /> },
