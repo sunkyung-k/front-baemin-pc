@@ -1,6 +1,6 @@
 @use "@/assets/scss/utils" as *;
 
-/* 기본 탭 스타일 (가게 상세) */
+/* 기본 탭 */
 .tabs {
   display: flex;
   justify-content: space-between;
@@ -8,7 +8,6 @@
   background-color: fn-color("gray-50");
   border-bottom: 1px solid fn-color("gray-200");
 
-  /* 기본 버튼 */
   .tab-btn {
     flex: 1;
     padding: space("md") 0;
@@ -16,7 +15,6 @@
     font-weight: 600;
     color: fn-color("gray-600");
     position: relative;
-    transition: color 0.2s ease;
 
     &::after {
       content: "";
@@ -26,57 +24,60 @@
       width: 100%;
       height: fn-rem(3);
       background-color: transparent;
-      transition: background-color 0.2s ease;
+      transition: width 0.25s ease;
     }
 
-    &.active {
-      color: fn-color("primary");
+    &:hover {
+      background-color: fn-color("gray-100");
+    }
 
-      &::after {
-        background-color: fn-color("primary");
-      }
+    &.active::after {
+      background-color: fn-color("primary");
     }
   }
-}
 
-/* 관리자 탭 */
-.tabs--admin {
-  background: transparent;
-  border-bottom: 1px solid fn-color("gray-100");
-  justify-content: flex-start;
-  gap: space("xl");
-  padding-bottom: space("xs");
+  /* 관리자 탭 */
+  &--admin {
+    justify-content: flex-start;
+    gap: space("xl");
+    padding-bottom: space("xs");
+    border-bottom: 1px solid fn-color("gray-100");
+    background: transparent;
 
-  .tab-btn {
-    flex: none;
-    padding: 0;
-    font-size: font("md");
-    font-weight: 600;
-    color: fn-color("gray-600");
-
-    &::after {
-      content: "";
-      position: absolute;
-      bottom: fn-rem(-2);
-      left: 0;
-      width: 0;
-      height: fn-rem(2);
-      background-color: rgba(#fff, 0.85);
-    }
-
-    &::after {
-      height: 2px;
-      bottom: -6px;
-      border-radius: radius("full");
-      transition: width 0.2s;
-    }
-
-    &:hover,
-    &.active {
-      color: fn-color("primary");
+    .tab-btn {
+      flex: none;
+      padding: 0;
+      font-size: font("md");
+      font-weight: 600;
+      color: fn-color("gray-600");
+      position: relative;
 
       &::after {
-        width: 100%;
+        content: "";
+        position: absolute;
+        bottom: fn-rem(-6);
+        left: 0;
+        width: 0;
+        height: fn-rem(2);
+        background-color: fn-color("primary");
+        transition: width 0.25s ease;
+        will-change: width;
+      }
+
+      &:hover {
+        background-color: transparent;
+
+        &:not(.active)::after {
+          width: 100%;
+        }
+      }
+
+      &.active {
+        color: fn-color("primary");
+
+        &::after {
+          width: 100%;
+        }
       }
     }
   }

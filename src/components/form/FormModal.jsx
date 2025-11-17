@@ -15,6 +15,7 @@ export default function FormModal({
   submitLabel = "등록",
   disabled = false,
   className = "",
+  footer,
 }) {
   return (
     <Modal isOpen={isOpen} title={title} onClose={onClose}>
@@ -26,13 +27,17 @@ export default function FormModal({
         <div className="form-modal__body">{children}</div>
 
         <div className="form-modal__footer">
-          <button
-            type="submit"
-            className="btn btn-primary btn-full"
-            disabled={disabled}
-          >
-            {submitLabel}
-          </button>
+          {footer ? (
+            footer
+          ) : (
+            <button
+              type="submit"
+              className="btn btn-primary btn-full"
+              disabled={disabled}
+            >
+              {submitLabel}
+            </button>
+          )}
         </div>
       </form>
     </Modal>

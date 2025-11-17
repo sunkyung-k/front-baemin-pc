@@ -1,0 +1,32 @@
+@use "@/assets/scss/utils" as *;
+
+.store-list {
+  max-width: fn-rem(1200);
+  margin: space("md") auto 0;
+  width: 100%;
+  padding: 0 space("lg");
+
+  /* 빈 상태 */
+  :global(.empty-state) {
+    margin-top: fn-rem(50);
+  }
+
+  /* 상단 헤더 */
+  &-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &-result-count {
+    font-size: font("md");
+  }
+
+  /* 카드 그리드 */
+  &-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: space("md");
+    margin-top: space("lg");
+  }
+}

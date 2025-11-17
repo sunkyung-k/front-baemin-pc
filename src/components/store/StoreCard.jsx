@@ -75,7 +75,9 @@ export default function StoreCard({
 
         {/* 평점 */}
         <p className="card-rating">
-          <FaStar /> {(ratingAvg ?? 0).toFixed(1)}
+          <FaStar />
+          {(ratingAvg ?? 0).toFixed(1)}
+          {store.reviewCount > 0 && <>({store.reviewCount})</>}
         </p>
 
         {/* 반경 4km 이상 시 */}

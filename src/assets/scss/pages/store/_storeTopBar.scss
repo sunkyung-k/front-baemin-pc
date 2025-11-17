@@ -1,0 +1,131 @@
+@use "@/assets/scss/utils" as *;
+
+.store-topbar {
+  position: sticky;
+  top: $header-height;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: space("md");
+  padding: space("md") 0;
+  background: fn-color("white");
+  border-bottom: 1px solid fn-color("gray-200");
+  z-index: 2;
+
+  /* 모바일도 상단 높이는 동일하게 유지 */
+  @media (max-width: bp("md")) {
+    top: $header-height;
+  }
+
+  /* 내부 래퍼 */
+  &-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: space("lg");
+  }
+
+  /* 검색 영역 */
+  &-search {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: fn-rem(650);
+    padding: 0 space("sm");
+    height: fn-rem(50);
+    background: fn-color("white");
+    border-radius: fn-rem(30);
+    border: 1px solid fn-color("gray-300");
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 3px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.25s ease;
+
+    &:focus-within {
+      border-color: fn-color("primary");
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+  }
+
+  &-search-icon {
+    flex-shrink: 0;
+    width: fn-rem(40);
+    color: fn-color("gray-500");
+    font-size: font("lg");
+  }
+
+  &-search-btn {
+    width: calc(100% - fn-rem(80));
+    height: 100%;
+
+    &-empty {
+      color: fn-color("gray-400");
+    }
+  }
+
+  &-placeholder {
+    font-size: inherit;
+  }
+
+  &-clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fn-rem(40);
+    font-size: font("lg");
+    color: fn-color("gray-500");
+  }
+
+  /* 카테고리 탭 */
+  &-categories {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  &-tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: space("md");
+    padding: 0 space("md");
+    overflow-x: hidden;
+
+    @media (max-width: bp("md")) {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: auto;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+  }
+
+  /* 카테고리 버튼 */
+  &-tab {
+    flex-shrink: 0;
+    border-radius: radius("lg");
+    padding: space("xs") space("md");
+    font-size: font("md");
+    color: fn-color("gray-700");
+    background: fn-color("gray-50");
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    &:hover:not(.store-topbar-tab-active) {
+      color: fn-color("primary");
+      background: fn-color("primary-bg");
+      border-color: fn-color("primary");
+    }
+  }
+
+  /* 활성 상태 */
+  &-tab-active {
+    background: fn-color("primary");
+    border-color: fn-color("primary");
+    color: fn-color("white");
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(fn-color("primary"), 0.3);
+  }
+}

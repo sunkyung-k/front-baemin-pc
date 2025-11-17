@@ -1,24 +1,31 @@
-@forward "button";
+/* Form 관련 */
 @forward "input";
-@forward "checkbox";
-@forward "imageUpload";
 @forward "textarea";
-@forward "modal";
-@forward "emptyState";
-@forward "formModal";
-@forward "radioGroup";
-@forward "hours";
+@forward "checkbox";
 @forward "checkboxGroup";
-@forward "quantityControl";
-@forward "loading";
+@forward "radioGroup";
 @forward "emailGroup";
-@forward "card";
-@forward "orderList";
+@forward "quantityControl";
 @forward "AddressInput";
-@forward "storeLikeButton";
-@forward "storeCard";
-@forward "pagination";
-@forward "review";
+@forward "hours";
+
+/* UI 요소 */
+@forward "button";
+@forward "imageUpload";
+@forward "modal";
+@forward "formModal";
+@forward "loading";
+@forward "emptyState";
 @forward "complete";
+
+/* 카드 / 리스트 */
+@forward "card";
+@forward "storeCard";
+@forward "storeLikeButton";
+@forward "orderList";
+@forward "review";
+
+/* 네비게이션 / 레이아웃 */
 @forward "authLayout";
 @forward "tabs";
+@forward "pagination";

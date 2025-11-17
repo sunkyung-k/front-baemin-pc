@@ -3,16 +3,17 @@ import { FaMagnifyingGlass } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import { useCategory } from "@/hooks/useCategory";
 import Modal from "@/components/common/Modal";
-import SearchModalContent from "./SearchModalContent";
-import styles from "./StoreTopBar.module.scss";
+import SearchModal from "@/components/store/SearchModal";
 
-export default function StoreTopBar({ filters, setCategory, setSearchText }) {
+export default function StoreTopBar({
+  filters,
+  setCategory,
+  setSearchText,
+  isAdmin = false,
+}) {
   const { categories } = useCategory();
 
-  // 검색 값 (버튼에 표시될 값)
   const [searchValue, setSearchValue] = useState(filters.searchText || "");
-
-  // 모달 열림/닫힘
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const clearSearch = () => {
@@ -24,25 +25,24 @@ export default function StoreTopBar({ filters, setCategory, setSearchText }) {
   const isActive = (id) => Number(filters.caId ?? 0) === Number(id ?? 0);
 
   return (
-    <section className={styles.topBar}>
-      <div className={styles.innerBox}>
-        {/* 검색 버튼 */}
-        <div className={styles.searchWrap}>
-          <FaMagnifyingGlass className={styles.searchIcon} />
+    <section className="store-topbar">
+      <div className="store-topbar-inner">
+        {/* 검색 영역 */}
+        <div className="store-topbar-search">
+          <FaMagnifyingGlass className="store-topbar-search-icon" />
 
           <button
-            className={`${styles.searchBtn} ${
-              !searchValue ? styles.valueNone : ""
+            className={`store-topbar-search-btn ${
+              !searchValue ? "store-topbar-search-btn-empty" : ""
             }`}
             onClick={() => setIsModalOpen(true)}
           >
-            <span className={styles.placeholder}>
+            <span className="store-topbar-placeholder">
               {searchValue || "메뉴명 또는 가게명을 입력하세요"}
             </span>
           </button>
 
-          {/* 검색어가 존재할 때만 표시 */}
-          <button className={styles.clearBtn} onClick={clearSearch}>
+          <button className="store-topbar-clear-btn" onClick={clearSearch}>
             {searchValue && <IoClose />}
           </button>
         </div>
@@ -53,7 +53,7 @@ export default function StoreTopBar({ filters, setCategory, setSearchText }) {
           onClose={() => setIsModalOpen(false)}
           title="검색하기"
         >
-          <SearchModalContent
+          <SearchModal
             closePopup={() => setIsModalOpen(false)}
             onSearch={(word) => {
               setSearchValue(word);
@@ -63,14 +63,14 @@ export default function StoreTopBar({ filters, setCategory, setSearchText }) {
         </Modal>
 
         {/* 카테고리 */}
-        <div className={styles.categoryTabsWrap}>
-          <div className={styles.categoryTabs}>
+        <div className="store-topbar-categories">
+          <div className="store-topbar-tabs">
             {allCategories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setCategory(cat.id)}
-                className={`${styles.tab} ${
-                  isActive(cat.id) ? styles.active : ""
+                className={`store-topbar-tab ${
+                  isActive(cat.id) ? "store-topbar-tab-active" : ""
                 }`}
               >
                 {cat.name}

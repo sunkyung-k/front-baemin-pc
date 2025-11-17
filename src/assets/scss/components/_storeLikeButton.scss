@@ -15,6 +15,7 @@
   cursor: pointer;
   transition: all 0.25s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 
   svg {
     font-size: font("lg");
@@ -40,14 +41,12 @@
     }
   }
 
-  /* animated prop이 true일 때만 하트 팝 애니메이션 실행 */
   &.active.animated {
     svg {
       animation: heartPop 0.45s cubic-bezier(0.25, 1.25, 0.5, 1) forwards;
     }
   }
 
-  /* round=false 일 경우엔 원형 배경 제거 */
   &:not(.round) {
     position: static;
     background: none;

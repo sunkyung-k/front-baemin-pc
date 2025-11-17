@@ -1,0 +1,46 @@
+@use "@/assets/scss/utils" as *;
+
+/* 검색 섹션 */
+.search {
+  &-modal {
+    width: 100%;
+  }
+
+  &-row {
+    display: flex;
+    align-items: center;
+    gap: space("sm");
+    margin-bottom: space("md");
+  }
+
+  &-input-wrap {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: fn-color("gray-100");
+    border: 1px solid fn-color("gray-200");
+    border-radius: radius("sm");
+    padding: 0 space("md");
+
+    .input-field {
+      width: 100%;
+
+      .input-txt {
+        border: none;
+        background: none;
+        padding-right: 0;
+      }
+    }
+  }
+
+  &-icon {
+    flex-shrink: 0;
+    color: fn-color("dark");
+    font-size: font("xl");
+  }
+
+  &-input {
+    width: 100%;
+  }
+}
