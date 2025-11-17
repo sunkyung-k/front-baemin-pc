@@ -27,6 +27,10 @@
     padding-left: fn-rem(32);
   }
 
+  input[type="search"]::-webkit-search-cancel-button {
+    cursor: pointer;
+  }
+
   .searchIcon {
     position: absolute;
     left: fn-rem(10);
