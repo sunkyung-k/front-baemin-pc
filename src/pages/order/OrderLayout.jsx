@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { FaBoxOpen } from "react-icons/fa6";
@@ -6,11 +6,12 @@ import basketAPI from "@/service/basketAPI";
 import { useAddressStore } from "@/store/useAddressStore";
 import useAccount from "@/hooks/useAccount";
 import { useHandleError } from "@/hooks/common/useHandleError";
-import { useBasketStore } from "@/store/useBasketStore"; // 추가
+import { useBasketStore } from "@/store/useBasketStore";
 import OrderCartBox from "./OrderCartBox";
 import OrderSummaryBox from "./OrderSummaryBox";
 import EmptyState from "@/components/menu/EmptyState";
 import styles from "./OrderLayout.module.scss";
+import { authStore } from "@/store/authStore";
 
 export default function OrderLayout() {
   const navigate = useNavigate();
@@ -23,10 +24,19 @@ export default function OrderLayout() {
   const myDeposit = userInfo?.deposit ?? 0;
   const [addrDetail, setAddrDetail] = useState("");
 
-  /** 장바구니 데이터 조회 */
+  // ✅ 수정: Header에서처럼 Zustand의 리액티브 훅 패턴을 사용하여 상태 변화에 반응하도록 변경합니다.
+  // OrderLayout은 훅이 아니므로 authStore((s) => s.isAuthenticated) 사용은 불가능합니다.
+  // 따라서, useBasket에서 사용했던 "토큰 유무" 체크를 추가하여 enabled 조건을 강화합니다.
+  const { userRole, token } = authStore.getState();
+  const isUser = userRole?.includes("USER");
+  const isUserAuthenticated = isUser && !!token; // 토큰이 있을 때만 쿼리 실행
+
+  /** 장바구니 데이터 조회 — USER만 호출 */
   const { data: basket } = useQuery({
     queryKey: ["basket"],
     queryFn: basketAPI.getMyBasket,
+    // ✅ enabled 조건 강화: isUserAuthenticated (인증 로딩 완료 시점까지 대기)
+    enabled: isUserAuthenticated,
     onError: (err) => handleError(err, "OrderLayout.getBasket"),
   });
 
@@ -34,9 +44,8 @@ export default function OrderLayout() {
   const orderMutation = useMutation({
     mutationFn: basketAPI.orderAll,
     onSuccess: async () => {
-      // 장바구니 비우기 (Zustand + React Query 캐시 동기화)
-      clearBasket(); // Zustand 상태 비움
-      await queryClient.invalidateQueries(["basket"]); // 서버 캐시 무효화
+      clearBasket();
+      await queryClient.invalidateQueries(["basket"]);
 
       alert("결제가 완료되었습니다.");
       navigate("/order/complete", {
@@ -46,7 +55,7 @@ export default function OrderLayout() {
     onError: (err) => handleError(err, "OrderLayout.orderAll"),
   });
 
-  // 데이터 없을 때 렌더 차단
+  // 데이터 없을 때 렌더 차단 (isUserAuthenticated가 false일 때도 null 반환)
   if (!basket) return null;
   const isEmpty = !basket.itemList || basket.itemList.length === 0;
   if (isEmpty)
