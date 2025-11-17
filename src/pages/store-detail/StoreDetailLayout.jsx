@@ -12,17 +12,16 @@ import styles from "./StoreDetailLayout.module.scss";
 export default function StoreDetailLayout() {
   const { storeId } = useParams();
   const handleError = useHandleError();
+
   const { data } = useQuery({
     queryKey: [QUERY_KEYS.STORE_DETAIL, storeId],
     queryFn: () => storeAPI.getStoreDetail(storeId),
     enabled: !!storeId,
 
-    /** 🔥 자동 refetch 완전 차단 */
-    staleTime: Infinity,
-    gcTime: Infinity,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnReconnect: true,
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
 
     onError: (err) => handleError(err, "StoreDetailLayout.getStoreDetail"),
   });
@@ -33,13 +32,9 @@ export default function StoreDetailLayout() {
 
   return (
     <>
-      {/* 상단 히어로 */}
       <StoreHero storeDetail={storeDetail} />
-
-      {/* 탭 네비게이션 */}
       <StoreTabs />
 
-      {/* 탭 콘텐츠 (Outlet) */}
       <div className={styles.tabContent}>
         <Outlet context={{ storeDetail, storeId: Number(storeId) }} />
       </div>
