@@ -33,7 +33,18 @@ export function useStore() {
   // 가게 등록
   const create = useMutation({
     mutationFn: storeAPI.create,
-    onSettled: () => afterMutationDetail(queryKey),
+    onSuccess: async () => {
+      // 1) 등록 성공 후 내 가게 다시 조회
+      const my = await storeAPI.getMyStore();
+
+      // 2) storeId 갱신
+      if (my?.storeId && my.storeId > 0) {
+        authStore.getState().setStoreId(my.storeId);
+      }
+
+      // 3) 화면 갱신
+      afterMutationDetail(queryKey);
+    },
     onError: (err) => handleApiError(err, "useStore.create"),
   });
 
