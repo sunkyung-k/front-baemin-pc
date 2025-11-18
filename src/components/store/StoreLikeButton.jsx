@@ -9,6 +9,7 @@ import { authStore } from "@/store/authStore";
  * - 클릭 시 링크 이동 방지 및 이벤트 전파 차단
  * - 비회원(GUEST)일 경우: 로그인 유도 + toggle 호출하지 않음
  * - 관리자일 경우: 찜버튼 숨김
+ * - GA4: favorite_toggle 이벤트 전송 (add/remove)
  */
 
 export default function LikeButton({
@@ -16,6 +17,7 @@ export default function LikeButton({
   onToggle,
   round = true,
   animated = true,
+  storeId,
 }) {
   const isAuthenticated = authStore((s) => s.isAuthenticated)();
   const userRole = authStore((s) => s.userRole);
@@ -28,12 +30,24 @@ export default function LikeButton({
     e.preventDefault();
     e.stopPropagation();
 
+    // 비로그인 상태 → toggle 및 GA 이벤트 전송 X
     if (!isAuthenticated) {
       alert("로그인이 필요한 기능입니다. 로그인 후 이용해주세요.");
       return;
     }
 
+    // 1) 먼저 사용자 토글 실행 (부모가 상태 바꿈)
     onToggle?.(!isActive);
+
+    // GA전송
+    if (window.gtag) {
+      window.gtag("event", "favorite_toggle", {
+        storeId,
+        status: !isActive ? "add" : "remove",
+        page_path: `/store/${storeId}`,
+        timestamp: Date.now(),
+      });
+    }
   };
 
   return (

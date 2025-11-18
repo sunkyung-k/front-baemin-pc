@@ -40,14 +40,29 @@ export default function OrderLayout() {
   /** 주문 처리 */
   const orderMutation = useMutation({
     mutationFn: basketAPI.orderAll,
-    onSuccess: async () => {
-      clearBasket();
-      await queryClient.invalidateQueries(["basket"]);
+    onSuccess: async (response, payload) => {
+      // GA전송
+      if (window.gtag) {
+        window.gtag("event", "order_complete", {
+          orderId: response?.orderId ?? null,
+          storeId: basket?.storeId ?? null,
+          price: basket?.totalPrice ?? 0,
+          itemCount: basket?.itemList?.length ?? 0,
+          timestamp: Date.now(),
+        });
+      }
 
-      alert("결제가 완료되었습니다.");
-      navigate("/order/complete", {
-        state: { fromOrder: true, orderDate: new Date().toISOString() },
-      });
+      // GA 전송 안정화를 위해 120~200ms 정도 대기 권장
+      setTimeout(async () => {
+        clearBasket(); // 로컬 장바구니 비움
+        await queryClient.invalidateQueries(["basket"]); // 서버 캐시 최신화
+
+        alert("결제가 완료되었습니다.");
+
+        navigate("/order/complete", {
+          state: { fromOrder: true, orderDate: new Date().toISOString() },
+        });
+      }, 150);
     },
     onError: (err) => handleError(err, "OrderLayout.orderAll"),
   });
