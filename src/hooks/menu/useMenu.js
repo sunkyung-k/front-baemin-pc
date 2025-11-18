@@ -60,7 +60,14 @@ export const useMenu = (storeId) => {
     },
   });
 
-  return { create, update, remove };
+  /** 메뉴 복사 */
+  const copy = useMutation({
+    mutationFn: (menuId) => menuAPI.copy(menuId),
+    onSuccess: refreshAll,
+    onError: (err) => handleError(err, "useMenu.copy"),
+  });
+
+  return { create, update, remove, copy };
 };
 
 export default useMenu;

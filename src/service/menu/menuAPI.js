@@ -31,6 +31,12 @@ const menuAPI = {
     const res = await api.get(`/api/v1/menu/${menuId}`);
     return res?.data?.response?.vo ?? null;
   },
+
+  /** 메뉴 복사 */
+  async copy(menuId) {
+    const res = await api.post(`/api/v1/menu/copy/${menuId}`);
+    return res.data?.response;
+  },
 };
 
 export default menuAPI;

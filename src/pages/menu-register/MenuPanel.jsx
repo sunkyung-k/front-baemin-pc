@@ -3,6 +3,7 @@ import styles from "./MenuPanel.module.scss";
 import EmptyState from "@/components/menu/EmptyState";
 import { TiPlus } from "react-icons/ti";
 import { FaUtensils, FaPen, FaTrashAlt } from "react-icons/fa";
+import { MdContentCopy } from "react-icons/md";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useMenu } from "@/hooks/menu/useMenu";
 import MenuModal from "./MenuModal";
@@ -10,12 +11,6 @@ import OptionGroupPanel from "./OptionGroupPanel";
 import { getAbsoluteImageUrl } from "@/utills/imageUtills";
 import { formatPrice } from "@/utills/valueFormatter";
 
-/**
- * 메뉴 패널 (카테고리별 메뉴 목록 + CRUD)
- * --------------------------------------------------
- * - React Query + Zustand 완전 동기화 구조
- * - formatPrice 적용 (가격 + "원" 단위 통일)
- */
 export default function MenuPanel() {
   const { activeCategory } = useMenuCategoryStore();
   const [modalOpen, setModalOpen] = useState(false);
@@ -32,7 +27,7 @@ export default function MenuPanel() {
     activeCategory?.store_id ||
     activeCategory?.storeID;
 
-  const { create, update, remove } = useMenu(storeId);
+  const { create, update, remove, copy } = useMenu(storeId);
 
   /** 메뉴 등록 모달 열기 */
   const handleCreate = () => {
@@ -75,12 +70,23 @@ export default function MenuPanel() {
     }
   };
 
+  /** 메뉴 복사 */
+  const handleCopy = async (menuId) => {
+    if (!window.confirm("이 메뉴를 복사하시겠습니까?")) return;
+    try {
+      await copy.mutateAsync(menuId);
+      alert("메뉴가 복사되었습니다.");
+    } catch (err) {
+      console.error("메뉴 복사 실패:", err);
+      alert("복사 중 오류가 발생했습니다.");
+    }
+  };
+
   /** 옵션 그룹 토글 */
   const handleToggle = (menuId) => {
     setActiveMenuId((prev) => (prev === menuId ? null : menuId));
   };
 
-  /** 카테고리 선택 안 된 경우 */
   if (!hasActiveCategory) {
     return (
       <section className={styles.detailPanel}>
@@ -99,6 +105,7 @@ export default function MenuPanel() {
         <h2 className={styles.categoryTitle}>
           <span>{activeCategory.menuCaName}</span>
         </h2>
+
         <button
           className="btn btn-primary-line btn-default btn-sm"
           onClick={handleCreate}
@@ -133,6 +140,7 @@ export default function MenuPanel() {
                       ) : (
                         <span className={styles.noImage}>사진 없음</span>
                       )}
+
                       {menu.soldoutYn === "Y" && (
                         <span className={styles.soldoutBadge}>품절</span>
                       )}
@@ -148,7 +156,9 @@ export default function MenuPanel() {
                     <div className={styles.menuPrice}>
                       {`${formatPrice(menu.price ?? 0)}원`}
                     </div>
+
                     <div className={styles.menuButtons}>
+                      {/* 수정 */}
                       <button
                         className="btn btn-sm btn-secondary-line"
                         onClick={(e) => {
@@ -159,6 +169,20 @@ export default function MenuPanel() {
                         <FaPen />
                         수정
                       </button>
+
+                      {/* 복사 */}
+                      <button
+                        className="btn btn-sm btn-primary-line"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCopy(menu.menuId);
+                        }}
+                      >
+                        <MdContentCopy />
+                        복사
+                      </button>
+
+                      {/* 삭제 */}
                       <button
                         className="btn btn-sm btn-danger"
                         onClick={(e) => {
@@ -173,6 +197,7 @@ export default function MenuPanel() {
                   </div>
                 </div>
 
+                {/* 옵션 패널 */}
                 {isActive && (
                   <div className={styles.optionPanelWrapper}>
                     <OptionGroupPanel menuId={menu.menuId} />
@@ -190,7 +215,7 @@ export default function MenuPanel() {
         />
       )}
 
-      {/* 메뉴 등록/수정 모달 */}
+      {/* 모달 */}
       <MenuModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
