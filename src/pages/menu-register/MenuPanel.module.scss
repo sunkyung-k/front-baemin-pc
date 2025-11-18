@@ -87,6 +87,7 @@
 }
 
 .menuThumb {
+  overflow: hidden;
   position: relative;
   width: fn-rem(80);
   height: fn-rem(80);
@@ -98,6 +99,12 @@
   justify-content: center;
   color: fn-color("gray-400");
   font-size: font("sm");
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .soldoutBadge {

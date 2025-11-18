@@ -2,13 +2,13 @@
 .menuListWrap {
   display: flex;
   flex-direction: column;
-  gap: space("lg");
+  gap: space("md");
 }
 
 .categoryTabs {
   display: flex;
   gap: space("sm");
-  margin-bottom: space("lg");
+  margin-bottom: space("md");
   flex-wrap: wrap;
 }
 
@@ -39,11 +39,11 @@
   font-size: font("xl");
   font-weight: 600;
   color: fn-color("gray-800");
-  margin-bottom: space("md");
+  margin-bottom: space("sm");
 }
 
 .menuItems {
   display: flex;
   flex-direction: column;
-  gap: space("lg");
+  gap: space("md");
 }
