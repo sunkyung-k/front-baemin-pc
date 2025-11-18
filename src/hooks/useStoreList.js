@@ -30,9 +30,9 @@ export function useStoreList(filters = {}) {
     if (!address) return [];
     try {
       const data = await storeListAPI.getStores(params);
-      if (import.meta.env.DEV)
-        // console.log("[useStoreList] fetched stores:", data);
-        return data;
+      // if (import.meta.env.DEV)
+      // console.log("[useStoreList] fetched stores:", data);
+      return data;
     } catch (err) {
       handleApiError(err, "useStoreList.getStores");
       return [];
