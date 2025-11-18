@@ -25,8 +25,17 @@ import {
 import styles from "./UserModal.module.scss";
 
 /** Yup 스키마 */
+const ID_REGEX = /^(?=.*[a-z])(?=.*\d)[a-z\d]{4,20}$/;
+const PW_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/;
+
 const schema = yup.object().shape({
-  userId: yup.string().required("아이디를 입력해주세요."),
+  userId: yup
+    .string()
+    .required("아이디를 입력해주세요.")
+    .matches(
+      ID_REGEX,
+      "아이디는 영문 소문자와 숫자를 모두 포함해 4~20자 이내로 입력해주세요."
+    ),
   userName: yup.string().required("이름을 입력해주세요."),
   birth: yup
     .string()
@@ -46,21 +55,46 @@ const schema = yup.object().shape({
     otherwise: (schema) => schema.notRequired(),
   }),
 
-  /* 비밀번호 — 등록은 필수 / 수정은 선택 */
-  passwd: yup.string().when("_isEdit", {
+  /** -------------------------------------------------------
+   *  password / confirmPassword
+   *  - 등록: password 필수 + PW_REGEX + confirmPassword 필수
+   *  - 수정: password 입력 안 하면 둘 다 스킵
+   *          password 입력하면 confirmPassword + PW_REGEX 모두 수행
+   ------------------------------------------------------- */
+  password: yup.string().when("_isEdit", {
     is: false,
     then: (schema) =>
-      schema.required("비밀번호를 입력해주세요.").min(4, "최소 4자 이상"),
-    otherwise: (schema) => schema.notRequired(),
+      schema
+        .required("비밀번호를 입력해주세요.")
+        .matches(
+          PW_REGEX,
+          "비밀번호는 영문과 숫자를 모두 포함해 최소 8자 이상 20자 이내로 입력해주세요."
+        ),
+    otherwise: (schema) =>
+      schema
+        .transform((v) => (v === "" ? undefined : v))
+        .matches(
+          PW_REGEX,
+          "비밀번호는 영문과 숫자를 모두 포함해 최소 8자 이상 20자 이내로 입력해주세요."
+        )
+        .nullable(),
   }),
 
-  passwdConfirm: yup.string().when("passwd", {
-    is: (v) => v?.length > 0,
+  confirmPassword: yup.string().when("_isEdit", {
+    is: false,
     then: (schema) =>
       schema
-        .oneOf([yup.ref("passwd")], "비밀번호가 일치하지 않습니다.")
-        .required("비밀번호 확인을 입력해주세요."),
-    otherwise: (schema) => schema.notRequired(),
+        .required("비밀번호를 다시 입력해주세요.")
+        .oneOf([yup.ref("password")], "비밀번호가 일치하지 않습니다."),
+    otherwise: (schema) =>
+      schema.when("password", {
+        is: (pwd) => !!pwd,
+        then: (schema) =>
+          schema
+            .required("비밀번호 확인을 입력해주세요.")
+            .oneOf([yup.ref("password")], "비밀번호가 일치하지 않습니다."),
+        otherwise: (schema) => schema.notRequired(),
+      }),
   }),
 });
 
@@ -164,7 +198,7 @@ export default function UserModal({ userId, isOpen, onClose }) {
       businessNo:
         data.userRole === "OWNER" ? cleanNumber(data.businessNo || "") : null,
 
-      ...(data.passwd && { passwd: data.passwd }),
+      ...(data.password && { passwd: data.password }),
     };
 
     const action = isEdit ? update : create;
@@ -242,20 +276,20 @@ export default function UserModal({ userId, isOpen, onClose }) {
             <>
               <InputField
                 label="비밀번호"
-                name="passwd"
                 type="password"
+                name="password"
                 register={register}
                 placeholder="비밀번호"
-                errorMessage={errors.passwd?.message}
+                errorMessage={errors.password?.message}
               />
 
               <InputField
                 label="비밀번호 확인"
-                name="passwdConfirm"
                 type="password"
+                name="confirmPassword"
                 register={register}
                 placeholder="비밀번호 확인"
-                errorMessage={errors.passwdConfirm?.message}
+                errorMessage={errors.confirmPassword?.message}
               />
             </>
           )}
@@ -265,21 +299,22 @@ export default function UserModal({ userId, isOpen, onClose }) {
             <>
               <InputField
                 label="새 비밀번호 (선택사항)"
-                name="passwd"
                 type="password"
+                name="password"
                 register={register}
                 placeholder="변경할 때만 입력"
-                errorMessage={errors.passwd?.message}
+                errorMessage={errors.password?.message}
               />
-
-              <InputField
-                label="비밀번호 확인"
-                name="passwdConfirm"
-                type="password"
-                register={register}
-                placeholder="비밀번호 확인"
-                errorMessage={errors.passwdConfirm?.message}
-              />
+              {watch("password") && (
+                <InputField
+                  label="비밀번호 확인"
+                  type="password"
+                  name="confirmPassword"
+                  register={register}
+                  placeholder="비밀번호 확인"
+                  errorMessage={errors.confirmPassword?.message}
+                />
+              )}
             </>
           )}
 
@@ -342,13 +377,25 @@ export default function UserModal({ userId, isOpen, onClose }) {
 
               <div className="emailBox">
                 <SelectBox
-                  name="emailDomain"
-                  register={register}
+                  name="emailDomainSelect"
+                  isControlled
                   value={isCustomDomain ? "custom" : watch("emailDomain")}
                   onChange={(e) => {
                     const val = e.target.value;
-                    setIsCustomDomain(val === "custom");
-                    setValue("emailDomain", val === "custom" ? "" : val);
+
+                    if (val === "custom") {
+                      setIsCustomDomain(true);
+                      setValue("emailDomain", "", {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                    } else {
+                      setIsCustomDomain(false);
+                      setValue("emailDomain", val, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                    }
                   }}
                   options={[
                     { label: "naver.com", value: "naver.com" },
@@ -359,7 +406,7 @@ export default function UserModal({ userId, isOpen, onClose }) {
                   ]}
                   errorMessage={errors.emailDomain?.message}
                 />
-
+                <input type="hidden" {...register("emailDomain")} />
                 {isCustomDomain && (
                   <InputField
                     name="emailDomain"
