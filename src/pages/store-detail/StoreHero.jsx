@@ -56,6 +56,7 @@ export default function StoreHero({ storeDetail }) {
             isActive={isLiked}
             onToggle={toggleLike}
             size={24}
+            storeId={storeId}
             round
             animated
           />

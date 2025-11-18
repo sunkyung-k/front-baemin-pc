@@ -22,16 +22,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       {/* SSE 구독 + Toast 알림 */}
       <OrderStatusNotifier />
-
       {/* error loading */}
       <GlobalLoading />
-
       {/* Toast 알림 컨테이너 */}
       <ToastContainer position="bottom-right" autoClose={5000} />
-
       {/* 모달 컨테이너 */}
       <ModalContainer />
-
       <RouterProvider router={router} />
     </QueryClientProvider>
   );

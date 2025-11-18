@@ -46,6 +46,7 @@ export default function StoreCard({
       <LikeButton
         isActive={isLiked}
         onToggle={toggleLike}
+        storeId={storeId}
         size={20}
         round
         animated

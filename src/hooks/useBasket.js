@@ -47,6 +47,7 @@ export const useBasket = () => {
   });
 
   /** 메뉴 추가 */
+  /** 메뉴 추가 */
   const addMenu = useMutation({
     mutationFn: async (payload) => {
       if (!isUserAllowed) throw new Error("Unauthorized access.");
@@ -66,6 +67,22 @@ export const useBasket = () => {
       }
       return basketAPI.addMenu(payload);
     },
+
+    // GA전송
+    onSuccess: (res, payload) => {
+      if (window.gtag) {
+        const menu = payload.menu;
+        window.gtag("event", "add_to_cart", {
+          menuId: menu.menuId,
+          storeId: menu.storeId,
+          quantity: menu.quantity,
+          optionCount: menu.optionList?.length || 0,
+          page_path: `/store/${menu.storeId}`,
+          timestamp: Date.now(),
+        });
+      }
+    },
+
     onSettled: () => isUserAllowed && afterMutation(QUERY_KEYS.BASKET),
   });
 

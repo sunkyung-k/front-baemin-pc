@@ -12,11 +12,25 @@ export default function SearchModal({ closePopup, onSearch }) {
   useEffect(() => {
     storeListAPI.getPopularKeywords().then(setKeywords);
   }, []);
+  // GA전송
+  const sendGAEvent = (value) => {
+    if (window.gtag) {
+      window.gtag("event", "search_keyword", {
+        keyword: value,
+        length: value.length,
+        page_path: window.location.pathname,
+        timestamp: Date.now(),
+      });
+    }
+  };
 
   const submitSearch = () => {
     const value = keyword.trim();
 
-    // 빈값일 때 전체 검색
+    // GA전송
+    sendGAEvent(value);
+
+    // 빈값일 때 전체 검색 동일하게 처리
     onSearch(value);
     closePopup();
   };
@@ -53,6 +67,9 @@ export default function SearchModal({ closePopup, onSearch }) {
         <PopularList
           keywords={keywords}
           onSelect={(word) => {
+            // GA전송
+            sendGAEvent(word);
+
             onSearch(word);
             closePopup();
           }}

@@ -3,6 +3,8 @@ import { Outlet, useMatches } from "react-router";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 import ScrollToTop from "../components/common/ScrollToTop";
+import useGA from "../hooks/common/useGA";
+import useFirstVisit from "../hooks/common/useFirstVisit";
 
 function Layout() {
   const matches = useMatches();
@@ -13,6 +15,8 @@ function Layout() {
     .filter(Boolean)
     .at(-1);
 
+  useGA();
+  useFirstVisit();
   return (
     <div className="wrap">
       {/* 페이지 이동 시 스크롤 맨 위로 */}
