@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import styles from "./MenuLayout.module.scss";
 import CategoryPanel from "./CategoryPanel";
 import MenuPanel from "./MenuPanel";
-import { IoClose } from "react-icons/io5";
 import { useMenuCategoryStore } from "@/store/useMenuCategoryStore";
 import { useMenuCategory } from "@/hooks/menu/useMenuCategory";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -34,7 +33,7 @@ export default function MenuLayout() {
 
   // 카테고리 삭제된 경우 활성 카테고리 초기화
   useEffect(() => {
-    if (isLoading) return; // 🔹 내부에서 처리만, return 문으로 Hook 자체를 끊지 않음
+    if (isLoading) return; // 내부에서 처리만, return 문으로 Hook 자체를 끊지 않음
     if (!activeCategory) return;
 
     const stillExists = categories?.some(

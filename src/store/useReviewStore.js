@@ -9,37 +9,16 @@ import { devtools } from "zustand/middleware";
  */
 export const useReviewStore = create(
   devtools((set, get) => ({
-    /** 주문 관련 상태 */
-    orders: [],
-
-    /** 서버에서 내려온 주문 리스트 저장 */
-    setOrders: (orderList = []) =>
-      set(() => ({
-        orders: Array.isArray(orderList) ? [...orderList] : [],
-      })),
-
-    /** 특정 주문의 reviewed 상태 true로 변경 */
-    markReviewed: (orderId) =>
-      set((state) => {
-        const updatedOrders = state.orders.map((o) =>
-          o.orderId === orderId ? { ...o, reviewed: true } : o
-        );
-        return { orders: [...updatedOrders] };
-      }),
-
-    /** 주문 초기화 */
-    clearOrders: () => set({ orders: [] }),
-
-    /** 리뷰 관련 상태 */
+    /** 리뷰 목록 */
     reviews: [],
 
-    /** 리뷰 목록 교체 */
+    /** 리뷰 목록 저장 */
     setReviews: (reviewList = []) =>
       set(() => ({
         reviews: Array.isArray(reviewList) ? [...reviewList] : [],
       })),
 
-    /** 단일 리뷰 수정/삭제 (UI 즉시 반영) */
+    /** 리뷰 수정/삭제 → UI 즉시 반영 */
     updateReviewLocal: (updated) =>
       set((state) => {
         const newList = state.reviews.map((r) =>
@@ -47,7 +26,6 @@ export const useReviewStore = create(
             ? {
                 ...r,
                 ...updated,
-
                 reply: updated.reply ? { ...updated.reply } : null,
               }
             : r
@@ -55,14 +33,13 @@ export const useReviewStore = create(
         return { reviews: [...newList] };
       }),
 
-    /** 단일 리뷰 삭제 */
+    /** 리뷰 삭제 */
     removeReviewLocal: (reviewId) =>
-      set((state) => {
-        const newList = state.reviews.filter((r) => r.reviewId !== reviewId);
-        return { reviews: [...newList] };
-      }),
+      set((state) => ({
+        reviews: state.reviews.filter((r) => r.reviewId !== reviewId),
+      })),
 
-    /** 리뷰 초기화 */
+    /** 전체 초기화 */
     clearReviews: () => set({ reviews: [] }),
   }))
 );

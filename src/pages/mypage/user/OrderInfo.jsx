@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useHandleError } from "@/hooks/common/useHandleError";
 import { useOrderStatus } from "@/hooks/useOrderStatus";
-import { useReviewCreate } from "@/hooks/review/useReviewCreate"; // 등록 전용 훅
+import { useReviewCreate } from "@/hooks/review/useReviewCreate";
 import { FaUtensils } from "react-icons/fa";
 import Card from "@/components/mypage/Card";
 import OrderList from "@/components/mypage/OrderList";
 import Pagination from "@/components/common/Pagination";
 import ReviewModal from "@/components/review/ReviewModal";
 import EmptyState from "@/components/menu/EmptyState";
-import { useReviewStore } from "@/store/useReviewStore";
+import { useOrderStore } from "@/store/useOrderStore";
+import { authStore } from "@/store/authStore";
 
 /**
  * OrderInfo (마이페이지 주문 내역)
  * -------------------------------------------------------
  * - 리뷰 등록 전용 (create only)
  * - React Query + Zustand 하이브리드 구조
- * - 등록 성공 시: UI 즉시 반영 + 서버 invalidate
+ * - 유저 변경 시 주문 초기화 (정석)
  */
 export default function OrderInfo() {
   const [page, setPage] = useState(0);
@@ -25,7 +26,17 @@ export default function OrderInfo() {
   const handleError = useHandleError();
   const { updateStatus } = useOrderStatus(page);
   const { orderQuery, createReview } = useReviewCreate(page, "user");
-  const { orders: storeOrders, setOrders, markReviewed } = useReviewStore();
+
+  // 🚀 정석: 주문 전용 스토어
+  const {
+    orders: storeOrders,
+    setOrders,
+    markReviewed,
+    clearOrders,
+  } = useOrderStore();
+
+  // 로그인된 유저 ID
+  const { userId } = authStore.getState();
 
   const orderData = orderQuery.data;
 
@@ -44,6 +55,17 @@ export default function OrderInfo() {
     data?.data?.pageInfo ??
     data?.pageInfo ??
     null;
+
+  /**
+   * 유저 변경 시 → 주문 초기화 (정석)
+   * ----------------------------------------------------
+   * - 로그인 전 유저 주문데이터를 제거
+   * - 실제 new userId 기준으로 새 orderQuery 결과가 들어옴
+   */
+  useEffect(() => {
+    clearOrders();
+    setPage(0);
+  }, [userId, clearOrders]);
 
   /** 서버 → store 동기화 */
   useEffect(() => {
@@ -66,9 +88,12 @@ export default function OrderInfo() {
   const handleReviewSubmit = async (formData) => {
     try {
       await createReview.mutateAsync(formData);
+
       const orderId = Number(formData.get("orderId"));
       markReviewed(orderId);
+
       alert("리뷰가 성공적으로 등록되었습니다.");
+
       setReviewOpen(false);
       setSelectedOrder(null);
     } catch (err) {
