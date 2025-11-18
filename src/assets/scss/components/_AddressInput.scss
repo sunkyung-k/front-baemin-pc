@@ -124,6 +124,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 
     .address-display {
+      padding: 0 space("sm");
       font-size: font("sm");
       font-weight: 400;
       color: fn-color("gray-700");
