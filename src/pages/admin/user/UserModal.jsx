@@ -310,6 +310,7 @@ export default function UserModal({ userId, isOpen, onClose }) {
               { label: "남성", value: "M" },
               { label: "여성", value: "F" },
             ]}
+            disabled={isEdit}
             register={register}
             errorMessage={errors.gender?.message}
           />
