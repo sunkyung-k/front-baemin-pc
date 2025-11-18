@@ -80,6 +80,7 @@ export default function ReviewItem({ review, role = "user", onDelete }) {
 
   /** 유저 리뷰 삭제 */
   const handleUserDelete = () => {
+    if (!window.confirm("정말 이 리뷰를 삭제하시겠습니까?")) return;
     removeReview.mutate(reviewId);
   };
 

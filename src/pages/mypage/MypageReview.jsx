@@ -16,8 +16,8 @@ import { useHandleError } from "@/hooks/common/useHandleError";
  * - 점주: 내 가게 리뷰 (storeId 필요)
  */
 export default function MypageReview() {
-  const { userRole, token } = authStore(); // ★ token 함께 확인
-  const isLoggedIn = !!token; // ★ 로그인 여부
+  const { userRole, token } = authStore();
+  const isLoggedIn = !!token;
 
   const isOwner = userRole?.includes("OWNER");
   const role = isOwner ? "owner" : "user";
@@ -31,12 +31,6 @@ export default function MypageReview() {
   const { myStore } = useStore();
   const storeId = myStore?.storeId;
 
-  /**
-   * 절대 API 호출되면 안 되는 조건
-   * - 로그인 안됨
-   * - user인데 token 없음
-   * - owner인데 storeId 없음
-   */
   const enableFetch =
     isLoggedIn && (role === "user" || (role === "owner" && !!storeId));
 
