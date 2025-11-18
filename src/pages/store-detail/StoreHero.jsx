@@ -15,6 +15,7 @@ export default function StoreHero({ storeDetail }) {
   const {
     storeId,
     storeName,
+    branchName,
     ratingAvg = 0,
     minPrice,
     hourComment,
@@ -65,7 +66,9 @@ export default function StoreHero({ storeDetail }) {
 
       <div className={styles.storeInfoWrap}>
         <div className={styles.storeInfo}>
-          <h2 className={styles.storeName}>{storeName}</h2>
+          <h2 className={styles.storeName}>
+            {storeName} - {branchName && ` ${branchName}`}
+          </h2>
 
           <InfoRow icon={<FaStar className={styles.starIcon} />}>
             {ratingText} | 최소 주문 금액 : {minPrice?.toLocaleString()}원
