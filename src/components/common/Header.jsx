@@ -96,7 +96,9 @@ export default function Header() {
       <div className="header-inner">
         <div className="left-wrap">
           <div className="logo">
-            <NavLink to="/">배민PC</NavLink>
+            <NavLink to="/">
+              <img src="/bmpc.png" alt="배민PC 로고" />
+            </NavLink>
           </div>
 
           {showAddressInput && (
