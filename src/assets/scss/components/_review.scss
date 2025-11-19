@@ -330,7 +330,7 @@
     img {
       width: 100%;
       height: 100%;
-      object-fit: fill;
+      object-fit: contain;
       background-color: fn-color("gray-bg");
       transition: transform 0.25s ease;
     }
