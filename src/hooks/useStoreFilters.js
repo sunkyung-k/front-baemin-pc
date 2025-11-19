@@ -23,6 +23,7 @@ export function useStoreFilters() {
       caId: Number(params.get("caId")) || 0,
       searchText: params.get("searchText") || "",
       sort: params.get("sort") || "ratingAvg,desc",
+      page: Number(params.get("page")) || 0,
     };
   });
 
@@ -31,6 +32,8 @@ export function useStoreFilters() {
     const newParams = new URLSearchParams();
 
     newParams.set("caId", filters.caId ?? 0);
+    newParams.set("page", filters.page ?? 0);
+
     if (filters.searchText) newParams.set("searchText", filters.searchText);
     if (filters.sort) newParams.set("sort", filters.sort);
 
@@ -61,5 +64,10 @@ export function useStoreFilters() {
     []
   );
 
-  return { filters, setCategory, setSearchText, setSort };
+  const setPage = useCallback(
+    (page) => setFilters((prev) => ({ ...prev, page })),
+    []
+  );
+
+  return { filters, setCategory, setSearchText, setSort, setPage };
 }
