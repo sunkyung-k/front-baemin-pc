@@ -18,7 +18,7 @@
 
   &.open {
     border-color: fn-color("primary");
-    box-shadow: 0 0 0 2px color.scale(fn-color("primary"), $lightness: 30%);
+    box-shadow: 0 0 0 2px color.scale(fn-color("primary"));
   }
 
   :global(.btn-danger) {
