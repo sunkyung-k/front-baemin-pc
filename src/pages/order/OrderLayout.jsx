@@ -43,11 +43,16 @@ export default function OrderLayout() {
     onSuccess: async (response, payload) => {
       // GA전송
       if (window.gtag) {
+        const itemCount = basket?.itemList?.reduce(
+          (acc, cur) => acc + (cur.quantity ?? 1),
+          0
+        );
+
         window.gtag("event", "order_complete", {
           orderId: response?.orderId ?? null,
           storeId: basket?.storeId ?? null,
           price: basket?.totalPrice ?? 0,
-          itemCount: basket?.itemList?.length ?? 0,
+          itemCount,
           timestamp: Date.now(),
         });
       }
