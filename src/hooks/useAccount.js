@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { handleApiError } from "@/utills/handleApiError";
 import { authStore } from "@/store/authStore";
 import { useAfterMutation, AFTER_TYPES } from "@/hooks/common/useAfterMutation";
@@ -12,6 +12,7 @@ import accountAPI from "@/service/accountAPI";
  * - 공통 에러 핸들링, React Query 캐시 통일
  */
 export function useAccount() {
+  const queryClient = useQueryClient();
   const { userId } = authStore.getState();
   const afterMutation = useAfterMutation(AFTER_TYPES.DETAIL);
 
@@ -30,7 +31,14 @@ export function useAccount() {
   /** 내 정보 수정 */
   const update = useMutation({
     mutationFn: accountAPI.updateUser,
-    onSettled: () => afterMutation(QUERY_KEYS.USER_INFO(userId)),
+    onSettled: () => {
+      // 내 정보 갱신
+      afterMutation(QUERY_KEYS.USER_INFO(userId));
+
+      // 관리자 갱신
+      queryClient.invalidateQueries(QUERY_KEYS.ADMIN_USER_LIST());
+      queryClient.invalidateQueries(QUERY_KEYS.ADMIN_USER_DETAIL(userId));
+    },
     onError: (err) => handleApiError(err, "useAccount.update"),
   });
 

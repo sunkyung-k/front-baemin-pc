@@ -25,6 +25,14 @@
         box-shadow: none;
       }
     }
+
+    .order-actions {
+      display: none;
+    }
+
+    .order-items {
+      display: block !important;
+    }
   }
 }
 

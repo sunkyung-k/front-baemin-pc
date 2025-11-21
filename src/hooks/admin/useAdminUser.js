@@ -33,7 +33,7 @@ export function useAdminUserMutation() {
   const create = useMutation({
     mutationFn: adminUserAPI.create,
     onSuccess: () => {
-      afterList(["adminUserList"]); // 리스트 갱신
+      afterList(["adminUserList"]);
     },
     onError: (err) => handleApiError(err, "adminUser.create"),
   });
@@ -41,8 +41,12 @@ export function useAdminUserMutation() {
   /** 회원 수정 */
   const update = useMutation({
     mutationFn: adminUserAPI.update,
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       afterList(["adminUserList"]);
+      queryClient.invalidateQueries(
+        QUERY_KEYS.ADMIN_USER_DETAIL(variables.userId)
+      );
+      queryClient.invalidateQueries(QUERY_KEYS.MY_INFO);
     },
     onError: (err) => handleApiError(err, "adminUser.update"),
   });
@@ -51,7 +55,7 @@ export function useAdminUserMutation() {
   const remove = useMutation({
     mutationFn: adminUserAPI.remove,
     onSuccess: (_, __, userId) => {
-      afterList(["adminUserList"]); // 리스트 갱신
+      afterList(["adminUserList"]);
     },
     onError: (err) => handleApiError(err, "adminUser.remove"),
   });

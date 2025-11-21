@@ -203,13 +203,16 @@ export default function UserModal({ userId, isOpen, onClose }) {
 
     const action = isEdit ? update : create;
 
-    action.mutate(payload, {
-      onSuccess: () => {
-        alert(isEdit ? "수정되었습니다." : "등록되었습니다.");
-        onClose();
-      },
-      onError: (err) => handleError(err, "adminUser.save"),
-    });
+    action.mutate(
+      { userId, ...payload },
+      {
+        onSuccess: () => {
+          alert(isEdit ? "수정되었습니다." : "등록되었습니다.");
+          onClose();
+        },
+        onError: (err) => handleError(err, "adminUser.save"),
+      }
+    );
   };
 
   /** 삭제 */
