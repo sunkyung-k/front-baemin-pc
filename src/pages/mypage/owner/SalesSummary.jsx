@@ -35,7 +35,7 @@ export default function SalesSummary() {
           <p className={styles.value}>{formatPrice(todaySales)} 원</p>
         </div>
         <div className={styles.salesItem}>
-          <p className={styles.label}>이번 달 수입</p>
+          <p className={styles.label}>최근 30일 수입</p>
           <p className={styles.value}>{formatPrice(monthSales)} 원</p>
         </div>
       </div>
