@@ -8,6 +8,7 @@
   position: relative;
   :global(.btn-sm) {
     z-index: 3;
+    color: fn-color("white");
   }
 }
 
